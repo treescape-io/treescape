@@ -52,9 +52,17 @@ class SpeciesAdminBase(admin.ModelAdmin):
     def get_inlines(self, request, obj=None):
         if obj:
             # Only show inlines once object is created
-            return super().get_inlines(request, obj)
+            return super().get_inlines(request, obj)  # type: ignore
 
         return []
+
+    def add_view(self, request, form_url="", extra_context=None):
+        if not extra_context:
+            extra_context = {}
+
+        extra_context.update({"show_save": False, "show_save_and_add_another": False})
+
+        return super().add_view(request, form_url, extra_context)  # type: ignore
 
 
 @admin.register(Family)
