@@ -3,60 +3,46 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 
-class Family(models.Model):
-    """Represents a biological family, which is a higher classification group that contains one or more genera."""
-
-    latin_name = models.CharField(_("latin name"), max_length=255, db_index=True)
+class SpeciesBase(models.Model):
+    latin_name = models.CharField(_("latin name"), max_length=255, unique=True)
 
     def __str__(self):
         """Returns the Latin name of the family."""
         return self.latin_name
 
     class Meta:
-        verbose_name = _("family")
-        verbose_name_plural = _("families")
+        abstract = True
         ordering = ["latin_name"]
 
 
-class Genus(models.Model):
+class Family(SpeciesBase):
+    """Represents a biological family, which is a higher classification group that contains one or more genera."""
+
+    class Meta:
+        verbose_name = _("family")
+        verbose_name_plural = _("families")
+
+
+class Genus(SpeciesBase):
     """Represents a biological genus, which is a group containing one or more species."""
 
     family = models.ForeignKey(Family, on_delete=models.PROTECT, related_name="genera")
-    latin_name = models.CharField(_("latin name"), max_length=255, db_index=True)
-
-    def __str__(self):
-        """Returns the name of the genus."""
-        return self.latin_name
 
     class Meta:
         verbose_name = _("genus")
         verbose_name_plural = _("genera")
-        ordering = ["latin_name"]
 
 
-class Species(models.Model):
+class Species(SpeciesBase):
     """Represents a biological species with a Latin name."""
-
-    genus = models.ForeignKey(Genus, on_delete=models.PROTECT, related_name="species")
-    latin_name = models.CharField(_("latin name"), max_length=255)
-
-    def __str__(self):
-        """Returns the Latin name of the species."""
-        return self.latin_name
 
     class Meta:
         verbose_name = _("species")
         verbose_name_plural = _("species")
-        ordering = ["latin_name"]
 
 
-class SpeciesCommonName(models.Model):
-    """Represents a common name for a species in a specific language."""
-
-    language = models.CharField(
-        max_length=7, choices=settings.LANGUAGES, verbose_name=_("Language")
-    )
-    species = models.ForeignKey(Species, on_delete=models.CASCADE)
+class CommonNameBase(models.Model):
+    language = models.CharField(_("language"), max_length=7, choices=settings.LANGUAGES)
     name = models.CharField(_("common name"), max_length=255, db_index=True)
 
     def __str__(self):
@@ -67,11 +53,46 @@ class SpeciesCommonName(models.Model):
         verbose_name = _("common name")
         verbose_name_plural = _("common names")
         ordering = ["language", "name"]
+        abstract = True
+
+
+class FamilyCommonName(CommonNameBase):
+    """Represents a common name for a family in a specific language."""
+
+    family = models.ForeignKey(Family, on_delete=models.CASCADE)
+
+    class Meta:
         unique_together = (
+            "family",
             "language",
-            "species",
             "name",
-        )  # Assuming a species cannot have the same common name in the same language
+        )
+
+
+class GenusCommonName(CommonNameBase):
+    """Represents a common name for a genus in a specific language."""
+
+    genus = models.ForeignKey(Genus, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (
+            "genus",
+            "language",
+            "name",
+        )
+
+
+class SpeciesCommonName(CommonNameBase):
+    """Represents a common name for a species in a specific language."""
+
+    species = models.ForeignKey(Species, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (
+            "species",
+            "language",
+            "name",
+        )
 
 
 class Variety(models.Model):
