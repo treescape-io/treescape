@@ -10,12 +10,14 @@ python = "^3.10"
 Django = "^5.0.3"
 django-extensions = "^3.2.3"
 psycopg2-binary = "^2.9.9"
+pygbif = "^0.6.4"
 
 [tool.poetry.group.dev.dependencies]
 pyright = "^1.1.356"
 django-types = "^0.19.1"
 ruff = "^0.3.4"
 ipdb = "^0.13.13"
+prettyprinter = "^0.18.0"
 
 [build-system]
 requires = ["poetry-core"]

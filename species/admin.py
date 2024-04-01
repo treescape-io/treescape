@@ -41,6 +41,8 @@ class VarietyInline(admin.TabularInline):
 class SpeciesAdminBase(admin.ModelAdmin):
     """Base class for species related admins."""
 
+    readonly_fields = ["gbif_id"]
+
     def get_fields(self, request, obj=None):
         if obj:
             # Updating existing object
@@ -63,6 +65,13 @@ class SpeciesAdminBase(admin.ModelAdmin):
         extra_context.update({"show_save": False, "show_save_and_add_another": False})
 
         return super().add_view(request, form_url, extra_context)  # type: ignore
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            # Enrich before saving.
+            obj.enrich_species_data()
+
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(Family)
