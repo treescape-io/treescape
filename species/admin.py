@@ -38,8 +38,27 @@ class VarietyInline(admin.TabularInline):
     extra = 1
 
 
+class SpeciesAdminBase(admin.ModelAdmin):
+    """Base class for species related admins."""
+
+    def get_fields(self, request, obj=None):
+        if obj:
+            # Updating existing object
+            return super().get_fields(request, obj)
+
+        # When creating species, only set latin name field.
+        return ["latin_name"]
+
+    def get_inlines(self, request, obj=None):
+        if obj:
+            # Only show inlines once object is created
+            return super().get_inlines(request, obj)
+
+        return []
+
+
 @admin.register(Family)
-class FamilyAdmin(admin.ModelAdmin):
+class FamilyAdmin(SpeciesAdminBase):
     """Admin interface for the Family model."""
 
     list_display = ("latin_name",)
@@ -47,7 +66,7 @@ class FamilyAdmin(admin.ModelAdmin):
 
 
 @admin.register(Genus)
-class GenusAdmin(admin.ModelAdmin):
+class GenusAdmin(SpeciesAdminBase):
     """Admin interface for the Genus model."""
 
     list_display = ("latin_name", "family")
@@ -57,7 +76,7 @@ class GenusAdmin(admin.ModelAdmin):
 
 
 @admin.register(Species)
-class SpeciesAdmin(admin.ModelAdmin):
+class SpeciesAdmin(SpeciesAdminBase):
     """Admin interface for the Species model."""
 
     list_display = ("latin_name",)
