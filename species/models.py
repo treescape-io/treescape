@@ -1,9 +1,15 @@
+import abc
+
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from prettyprinter import cpprint, set_default_style
 from pygbif import species
 
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+
+from species.exceptions import EnrichmentException, SpeciesAlreadyExists
+from .exceptions import SpeciesNotFound
 
 
 set_default_style("light")
@@ -21,11 +27,14 @@ class SpeciesBase(models.Model):
         """Returns the Latin name of the family."""
         return self.latin_name
 
-    def enrich_species_data(self, rank):
+    @abc.abstractmethod
+    def enrich_data(self):
+        pass
+
+    def _enrich_data(self, rank):
         """Fetch species data from GBIF backbone based on the latin name and updates the instance."""
 
         assert self.latin_name, "Species name required to enrich data."
-        assert self.latin_name, "Species name required to call enrich_species_data()."
         assert rank in ["FAMILY", "GENUS", "SPECIES"]
 
         # Calls https://techdocs.gbif.org/en/openapi/v1/species#/Searching%20names/matchNames
@@ -62,16 +71,59 @@ class SpeciesBase(models.Model):
          'usageKey': 2878688}
          """
 
-        if species_data["matchType"] == "NONE":
-            raise Exception("No match for latin_name in GBIF.")
+        if species_data["matchType"] != "EXACT":
+            raise SpeciesNotFound(f"No unique match species '{self.latin_name}'.")
 
-        self.gbif_id = species_data["usageKey"]
+        # Use the first non-empty key. Note that synonyms have a different usageKey, so we can't use that.
+        self.gbif_id = next(
+            filter(
+                None,
+                (
+                    species_data.get("speciesKey"),
+                    species_data.get("genusKey"),
+                    species_data.get("familyKey"),
+                ),
+            ),
+            None,
+        )
+
+        # Use canonical names
+        self.latin_name = next(
+            filter(
+                None,
+                (
+                    species_data.get("species"),
+                    species_data.get("genus"),
+                    species_data.get("family"),
+                ),
+            ),
+            None,
+        )
+
+        # Validate uniqueness (deal with synonyms)
+        try:
+            existing_species = self.__class__.objects.get(gbif_id=self.gbif_id)
+            raise SpeciesAlreadyExists(
+                f"Species '{self.latin_name}' already  exists under name '{existing_species.latin_name}'."
+            )
+        except ObjectDoesNotExist:
+            # All is fine
+            pass
 
         if rank == "SPECIES":
             self.genus = _get_genus(species_data)
 
         elif rank == "GENUS":
             self.family = _get_family(species_data)
+
+    def clean(self):
+        if not self.pk:
+            try:
+                self.enrich_data()
+            except EnrichmentException as e:
+                raise ValidationError(e)
+
+        super().clean()
 
     class Meta:
         abstract = True
@@ -85,8 +137,8 @@ class Family(SpeciesBase):
         verbose_name = _("family")
         verbose_name_plural = _("families")
 
-    def enrich_species_data(self):
-        super().enrich_species_data(rank="FAMILY")
+    def enrich_data(self):
+        super().enrich_data(rank="FAMILY")
 
 
 class Genus(SpeciesBase):
@@ -98,8 +150,8 @@ class Genus(SpeciesBase):
         verbose_name = _("genus")
         verbose_name_plural = _("genera")
 
-    def enrich_species_data(self):
-        super().enrich_species_data(rank="GENUS")
+    def enrich_data(self):
+        super()._enrich_data(rank="GENUS")
 
 
 class Species(SpeciesBase):
@@ -111,8 +163,8 @@ class Species(SpeciesBase):
         verbose_name = _("species")
         verbose_name_plural = _("species")
 
-    def enrich_species_data(self):
-        super().enrich_species_data(rank="SPECIES")
+    def enrich_data(self):
+        super()._enrich_data(rank="SPECIES")
 
 
 def _get_family(species_data: dict) -> Family:

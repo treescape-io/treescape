@@ -1,8 +1,11 @@
+from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.contrib import admin
 from django.utils.translation import get_language
+
+from species.exceptions import EnrichmentException
 from .models import (
     Family,
     Genus,
@@ -64,11 +67,6 @@ class SpeciesAdminBase(admin.ModelAdmin):
         extra_context = extra_context or {}
         extra_context.update({"show_save": False, "show_save_and_add_another": False})
         return super().add_view(request, form_url, extra_context)  # type: ignore
-
-    def save_model(self, request, obj, form, change):
-        if not change:
-            obj.enrich_species_data()
-        super().save_model(request, obj, form, change)
 
 
 @admin.register(Family)
