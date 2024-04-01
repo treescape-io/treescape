@@ -7,6 +7,7 @@ class SpeciesBase(models.Model):
     """Abstract base class for species models."""
 
     latin_name = models.CharField(_("latin name"), max_length=255, unique=True)
+    gbif_id = models.IntegerField(_("GBIF ID"), null=True, blank=True, unique=True)
 
     def __str__(self):
         """Returns the Latin name of the family."""
