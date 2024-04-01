@@ -21,7 +21,7 @@ class SpeciesBase(models.Model):
         """Returns the Latin name of the family."""
         return self.latin_name
 
-    def _enrich_by_name(self, rank):
+    def enrich_species_data(self, rank):
         """Fetch species data from GBIF backbone based on the latin name and updates the instance."""
 
         assert self.latin_name, "Species name required to enrich data."
@@ -86,7 +86,7 @@ class Family(SpeciesBase):
         verbose_name_plural = _("families")
 
     def enrich_species_data(self):
-        super()._enrich_by_name(rank="FAMILY")
+        super().enrich_species_data(rank="FAMILY")
 
 
 class Genus(SpeciesBase):
@@ -99,7 +99,7 @@ class Genus(SpeciesBase):
         verbose_name_plural = _("genera")
 
     def enrich_species_data(self):
-        super()._enrich_by_name(rank="GENUS")
+        super().enrich_species_data(rank="GENUS")
 
 
 class Species(SpeciesBase):
@@ -112,7 +112,7 @@ class Species(SpeciesBase):
         verbose_name_plural = _("species")
 
     def enrich_species_data(self):
-        super()._enrich_by_name(rank="SPECIES")
+        super().enrich_species_data(rank="SPECIES")
 
 
 def _get_family(species_data: dict) -> Family:
