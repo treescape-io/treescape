@@ -1,60 +1,64 @@
 from django.contrib import admin
-from .models import Family, Genus, Species, SpeciesCommonName, Variety
+from .models import (
+    Family,
+    Genus,
+    Species,
+    FamilyCommonName,
+    GenusCommonName,
+    SpeciesCommonName,
+    Variety,
+)
+
+
+class FamilyCommonNameInline(admin.TabularInline):
+    """Inline admin for family common names."""
+
+    model = FamilyCommonName
+    extra = 1
+
+
+class GenusCommonNameInline(admin.TabularInline):
+    """Inline admin for genus common names."""
+
+    model = GenusCommonName
+    extra = 1
+
+
+class SpeciesCommonNameInline(admin.TabularInline):
+    """Inline admin for species common names."""
+
+    model = SpeciesCommonName
+    extra = 1
+
+
+class VarietyInline(admin.TabularInline):
+    """Inline admin for species varieties."""
+
+    model = Variety
+    extra = 1
 
 
 @admin.register(Family)
 class FamilyAdmin(admin.ModelAdmin):
-    """Admin interface for Family."""
+    """Admin interface for the Family model."""
 
     list_display = ("latin_name",)
-    search_fields = ("latin_name",)
+    inlines = [FamilyCommonNameInline]
 
 
 @admin.register(Genus)
 class GenusAdmin(admin.ModelAdmin):
-    """Admin interface for Genus."""
+    """Admin interface for the Genus model."""
 
     list_display = ("latin_name", "family")
     list_filter = ("family",)
     search_fields = ("latin_name", "family__latin_name")
-    autocomplete_fields = ["family"]
+    inlines = [GenusCommonNameInline]
 
 
 @admin.register(Species)
 class SpeciesAdmin(admin.ModelAdmin):
-    """Admin interface for Species."""
+    """Admin interface for the Species model."""
 
-    list_display = ("latin_name", "genus")
-    list_filter = ("genus", "genus__family")
-    search_fields = ("latin_name", "genus__latin_name", "genus__family__latin_name")
-    autocomplete_fields = ["genus"]
-
-
-@admin.register(SpeciesCommonName)
-class SpeciesCommonNameAdmin(admin.ModelAdmin):
-    """Admin interface for SpeciesCommonName."""
-
-    list_display = ("name", "language", "species")
-    list_filter = ("language", "species", "species__genus__family")
-    search_fields = (
-        "name",
-        "species__latin_name",
-        "species__genus__latin_name",
-        "species__genus__family__latin_name",
-    )
-    autocomplete_fields = ["species"]
-
-
-@admin.register(Variety)
-class VarietyAdmin(admin.ModelAdmin):
-    """Admin interface for Variety."""
-
-    list_display = ("name", "species")
-    list_filter = ("species", "species__genus__family")
-    search_fields = (
-        "name",
-        "species__latin_name",
-        "species__genus__latin_name",
-        "species__genus__family__latin_name",
-    )
-    autocomplete_fields = ["species"]
+    list_display = ("latin_name",)
+    inlines = [SpeciesCommonNameInline, VarietyInline]

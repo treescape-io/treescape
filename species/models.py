@@ -4,6 +4,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class SpeciesBase(models.Model):
+    """Abstract base class for species models."""
+
     latin_name = models.CharField(_("latin name"), max_length=255, unique=True)
 
     def __str__(self):
@@ -42,6 +44,8 @@ class Species(SpeciesBase):
 
 
 class CommonNameBase(models.Model):
+    """Abstract base class for common names."""
+
     language = models.CharField(_("language"), max_length=7, choices=settings.LANGUAGES)
     name = models.CharField(_("common name"), max_length=255, db_index=True)
 
