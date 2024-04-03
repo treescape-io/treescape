@@ -31,22 +31,22 @@ def get_common_name(obj, model_common_name):
 
 class FamilyCommonNameInline(admin.TabularInline):
     model = FamilyCommonName
-    extra = 1
+    extra = 0
 
 
 class GenusCommonNameInline(admin.TabularInline):
     model = GenusCommonName
-    extra = 1
+    extra = 0
 
 
 class SpeciesCommonNameInline(admin.TabularInline):
     model = SpeciesCommonName
-    extra = 1
+    extra = 0
 
 
 class VarietyInline(admin.TabularInline):
     model = Variety
-    extra = 1
+    extra = 0
 
 
 class SpeciesAdminBase(admin.ModelAdmin):
@@ -73,7 +73,7 @@ class SpeciesAdminBase(admin.ModelAdmin):
 class FamilyAdmin(SpeciesAdminBase):
     list_display = ("latin_name", "common_name")
     inlines = [FamilyCommonNameInline]
-    search_fields = ["latin_name", "familycommonname__name"]
+    search_fields = ["latin_name", "common_names__name"]
 
     def common_name(self, obj):
         return get_common_name(obj, FamilyCommonName)
@@ -85,7 +85,7 @@ class FamilyAdmin(SpeciesAdminBase):
 class GenusAdmin(SpeciesAdminBase):
     list_display = ("latin_name", "family", "common_name")
     list_filter = ("family",)
-    search_fields = ["latin_name", "genuscommonname__name", "family__latin_name"]
+    search_fields = ["latin_name", "common_names__name", "family__latin_name"]
     inlines = [GenusCommonNameInline]
 
     def common_name(self, obj):
@@ -96,11 +96,14 @@ class GenusAdmin(SpeciesAdminBase):
 
 @admin.register(Species)
 class SpeciesAdmin(SpeciesAdminBase):
-    list_display = ("latin_name", "genus_family_link", "common_name")
+    # Temporarily disable common name
+    list_display = ("latin_name", "genus_family_link")
     list_filter = ("genus__family", "genus")
     search_fields = [
         "latin_name",
-        "speciescommonname__name",
+        "common_names__name",
+        "genus__common_names__name",
+        "genus__family__common_names__name",
         "genus__latin_name",
         "genus__family__latin_name",
     ]

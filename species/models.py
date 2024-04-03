@@ -1,3 +1,4 @@
+import pycountry
 import abc
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -7,12 +8,24 @@ from pygbif import species
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from species.exceptions import EnrichmentException, SpeciesAlreadyExists
 from .exceptions import SpeciesNotFound
 
 
 set_default_style("light")
+
+
+def _convert_language_code(alpha_3):
+    """Convert ISO 639-2 code to ISO 639-1 using pycountry."""
+
+    assert alpha_3
+    country = pycountry.languages.get(alpha_3=alpha_3)
+    assert country
+
+    return country.alpha_2
 
 
 class SpeciesBase(models.Model):
@@ -31,7 +44,7 @@ class SpeciesBase(models.Model):
     def enrich_data(self):
         pass
 
-    def _enrich_data(self, rank):
+    def _enrich_gbif_name(self, rank):
         """Fetch species data from GBIF backbone based on the latin name and updates the instance."""
 
         assert self.latin_name, "Species name required to enrich data."
@@ -116,6 +129,32 @@ class SpeciesBase(models.Model):
         elif rank == "GENUS":
             self.family = _get_family(species_data)
 
+    def enrich_gbif_common_names(self):
+        """Fetch (missing) common names from GBIF in configured languages."""
+        assert self.pk, "Needs to be saved before adding common names."
+        assert self.gbif_id, "GBIF id required to fetch common names."
+
+        names_data = species.name_usage(self.gbif_id, data="vernacularNames")
+        enabled_languages = [l[0] for l in settings.LANGUAGES]
+
+        for name_data in names_data["results"]:
+            assert "language" in name_data
+            assert "vernacularName" in name_data and name_data["vernacularName"]
+
+            if not name_data["language"]:
+                continue
+
+            alpha2_lang = _convert_language_code(name_data["language"])
+            assert alpha2_lang
+
+            if alpha2_lang in enabled_languages:
+                self.common_names.update_or_create(
+                    language=alpha2_lang,
+                    defaults={
+                        "name": name_data["vernacularName"],
+                    },
+                )
+
     def clean(self):
         if not self.pk:
             try:
@@ -138,7 +177,7 @@ class Family(SpeciesBase):
         verbose_name_plural = _("families")
 
     def enrich_data(self):
-        super().enrich_data(rank="FAMILY")
+        self._enrich_gbif_name(rank="FAMILY")
 
 
 class Genus(SpeciesBase):
@@ -151,7 +190,7 @@ class Genus(SpeciesBase):
         verbose_name_plural = _("genera")
 
     def enrich_data(self):
-        super()._enrich_data(rank="GENUS")
+        self._enrich_gbif_name(rank="GENUS")
 
 
 class Species(SpeciesBase):
@@ -164,7 +203,25 @@ class Species(SpeciesBase):
         verbose_name_plural = _("species")
 
     def enrich_data(self):
-        super()._enrich_data(rank="SPECIES")
+        self._enrich_gbif_name(rank="SPECIES")
+
+
+@receiver(post_save, sender=Family)
+def enrich_family(sender, instance, created, **kwargs):
+    if created:
+        instance.enrich_gbif_common_names()
+
+
+@receiver(post_save, sender=Genus)
+def enrich_genus(sender, instance, created, **kwargs):
+    if created:
+        instance.enrich_gbif_common_names()
+
+
+@receiver(post_save, sender=Species)
+def enrich_species(sender, instance, created, **kwargs):
+    if created:
+        instance.enrich_gbif_common_names()
 
 
 def _get_family(species_data: dict) -> Family:
@@ -210,7 +267,9 @@ class CommonNameBase(models.Model):
 class FamilyCommonName(CommonNameBase):
     """Represents a common name for a family in a specific language."""
 
-    family = models.ForeignKey(Family, on_delete=models.CASCADE)
+    family = models.ForeignKey(
+        Family, on_delete=models.CASCADE, related_name="common_names"
+    )
 
     class Meta:
         unique_together = (
@@ -223,7 +282,9 @@ class FamilyCommonName(CommonNameBase):
 class GenusCommonName(CommonNameBase):
     """Represents a common name for a genus in a specific language."""
 
-    genus = models.ForeignKey(Genus, on_delete=models.CASCADE)
+    genus = models.ForeignKey(
+        Genus, on_delete=models.CASCADE, related_name="common_names"
+    )
 
     class Meta:
         unique_together = (
@@ -236,7 +297,9 @@ class GenusCommonName(CommonNameBase):
 class SpeciesCommonName(CommonNameBase):
     """Represents a common name for a species in a specific language."""
 
-    species = models.ForeignKey(Species, on_delete=models.CASCADE)
+    species = models.ForeignKey(
+        Species, on_delete=models.CASCADE, related_name="common_names"
+    )
 
     class Meta:
         unique_together = (
