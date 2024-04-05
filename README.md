@@ -1,2 +1,2 @@
 # treescape
-Not your momma's agroforestry.
+Accelerate agroforestry for a future worth living.
