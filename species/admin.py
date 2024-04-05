@@ -10,7 +10,7 @@ from .models import (
     FamilyCommonName,
     GenusCommonName,
     SpeciesCommonName,
-    Variety,
+    SpeciesVariety,
 )
 
 
@@ -31,7 +31,7 @@ class SpeciesCommonNameInline(CommonNameInlineBase):
 
 
 class VarietyInline(admin.TabularInline):
-    model = Variety
+    model = SpeciesVariety
 
 
 class SpeciesAdminBase(admin.ModelAdmin):

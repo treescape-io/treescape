@@ -351,7 +351,7 @@ class SpeciesCommonName(CommonNameBase):
         )
 
 
-class Variety(models.Model):
+class SpeciesVariety(models.Model):
     """Represents a variety of a species."""
 
     species = models.ForeignKey(
