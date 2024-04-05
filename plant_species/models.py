@@ -14,8 +14,7 @@ from django.dispatch import receiver
 from django.utils.translation import get_language
 from django.contrib import admin
 
-from species.exceptions import EnrichmentException, SpeciesAlreadyExists
-from .exceptions import SpeciesNotFound
+from .exceptions import EnrichmentException, SpeciesAlreadyExists, SpeciesNotFound
 
 
 def _convert_language_code(alpha_3):
