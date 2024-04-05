@@ -1,11 +1,8 @@
-from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.contrib import admin
-from django.utils.translation import get_language
 
-from species.exceptions import EnrichmentException
 from .models import (
     Family,
     Genus,
@@ -15,18 +12,6 @@ from .models import (
     SpeciesCommonName,
     Variety,
 )
-
-
-# Define a function to retrieve the common name based on the current language.
-def get_common_name(obj, model_common_name):
-    common_names = model_common_name.objects.filter(
-        language=get_language(), **{obj.__class__.__name__.lower(): obj}
-    )
-    if common_names.exists():
-        return common_names.first().name
-
-    # Not available.
-    return ""
 
 
 class FamilyCommonNameInline(admin.TabularInline):
@@ -71,33 +56,22 @@ class SpeciesAdminBase(admin.ModelAdmin):
 
 @admin.register(Family)
 class FamilyAdmin(SpeciesAdminBase):
-    list_display = ("latin_name", "common_name")
+    list_display = ("latin_name", "get_common_name")
     inlines = [FamilyCommonNameInline]
     search_fields = ["latin_name", "common_names__name"]
-
-    def common_name(self, obj):
-        return get_common_name(obj, FamilyCommonName)
-
-    common_name.short_description = _("Common Name")
 
 
 @admin.register(Genus)
 class GenusAdmin(SpeciesAdminBase):
-    list_display = ("latin_name", "family", "common_name")
+    list_display = ("latin_name", "family", "get_common_name")
     list_filter = ("family",)
     search_fields = ["latin_name", "common_names__name", "family__latin_name"]
     inlines = [GenusCommonNameInline]
 
-    def common_name(self, obj):
-        return get_common_name(obj, GenusCommonName)
-
-    common_name.short_description = _("Common Name")
-
 
 @admin.register(Species)
 class SpeciesAdmin(SpeciesAdminBase):
-    # Temporarily disable common name
-    list_display = ("latin_name", "genus_family_link")
+    list_display = ("latin_name", "get_common_name", "genus_family_link")
     list_filter = ("genus__family", "genus")
     search_fields = [
         "latin_name",
@@ -121,8 +95,3 @@ class SpeciesAdmin(SpeciesAdminBase):
         )
 
     genus_family_link.short_description = _("Genus / Family")
-
-    def common_name(self, obj):
-        return get_common_name(obj, SpeciesCommonName)
-
-    common_name.short_description = _("Common Name")

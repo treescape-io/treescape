@@ -1,21 +1,21 @@
+from os import curdir
+from django.db.models.query import Q
 import pycountry
-import abc
+import typing
 
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from prettyprinter import cpprint, set_default_style
 from pygbif import species
 
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.translation import get_language
+from django.contrib import admin
 
 from species.exceptions import EnrichmentException, SpeciesAlreadyExists
 from .exceptions import SpeciesNotFound
-
-
-set_default_style("light")
 
 
 def _convert_language_code(alpha_3):
@@ -28,6 +28,23 @@ def _convert_language_code(alpha_3):
     return country.alpha_2
 
 
+class CommonNameBase(models.Model):
+    """Abstract base class for common names."""
+
+    language = models.CharField(_("language"), max_length=7, choices=settings.LANGUAGES)
+    name = models.CharField(_("common name"), max_length=255, db_index=True)
+
+    def __str__(self):
+        """Returns the common name and its language."""
+        return self.name
+
+    class Meta:
+        verbose_name = _("common name")
+        verbose_name_plural = _("common names")
+        ordering = ["language", "name"]
+        abstract = True
+
+
 class SpeciesBase(models.Model):
     """Abstract base class for species models."""
 
@@ -36,13 +53,39 @@ class SpeciesBase(models.Model):
         _("GBIF usageKey"), null=True, blank=True, unique=True
     )
 
+    if typing.TYPE_CHECKING:
+        from types import MethodType
+        from django.db.models.manager import RelatedManager
+
+        common_names: RelatedManager[CommonNameBase]
+        enrich_data: MethodType
+
     def __str__(self):
         """Returns the Latin name of the family."""
+        common_name = self.get_common_name()
+
+        if common_name:
+            return f"{self.latin_name} ({self.get_common_name()})"
+
         return self.latin_name
 
-    @abc.abstractmethod
-    def enrich_data(self):
-        pass
+    @admin.display(description=_("Common Name"))
+    def get_common_name(self) -> str:
+        """Return common name for currently used language."""
+        current_lang = get_language()
+        assert current_lang
+        print("LAAAAAAA", current_lang)
+
+        try:
+            common_name = self.common_names.get(
+                Q(language=current_lang) | Q(language=current_lang[:2])
+            )
+        except ObjectDoesNotExist:
+            return ""
+
+        assert isinstance(common_name, CommonNameBase)
+
+        return common_name.name
 
     def _enrich_gbif_name(self, rank):
         """Fetch species data from GBIF backbone based on the latin name and updates the instance."""
@@ -135,9 +178,15 @@ class SpeciesBase(models.Model):
         assert self.gbif_id, "GBIF id required to fetch common names."
 
         names_data = species.name_usage(self.gbif_id, data="vernacularNames")
-        enabled_languages = [l[0] for l in settings.LANGUAGES]
 
-        for name_data in names_data["results"]:
+        assert isinstance(names_data, dict)
+        results = names_data["results"]
+
+        enabled_languages = [lang[0] for lang in settings.LANGUAGES]
+
+        assert isinstance(results, list)
+        for name_data in results:
+            assert isinstance(name_data, dict)
             assert "language" in name_data
             assert "vernacularName" in name_data and name_data["vernacularName"]
 
@@ -245,23 +294,6 @@ def _get_genus(species_data: dict) -> Genus:
             gbif_id=species_data["genusKey"],
             latin_name=species_data["genus"],
         )
-
-
-class CommonNameBase(models.Model):
-    """Abstract base class for common names."""
-
-    language = models.CharField(_("language"), max_length=7, choices=settings.LANGUAGES)
-    name = models.CharField(_("common name"), max_length=255, db_index=True)
-
-    def __str__(self):
-        """Returns the common name and its language."""
-        return self.name
-
-    class Meta:
-        verbose_name = _("common name")
-        verbose_name_plural = _("common names")
-        ordering = ["language", "name"]
-        abstract = True
 
 
 class FamilyCommonName(CommonNameBase):
