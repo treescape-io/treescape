@@ -72,7 +72,8 @@ class GenusAdmin(SpeciesAdminBase):
 @admin.register(Species)
 class SpeciesAdmin(SpeciesAdminBase):
     list_display = ("latin_name", "get_common_name", "genus_family_link")
-    list_filter = ("genus__family", "genus")
+    list_select_related = ("genus",)
+    list_filter = ("genus__family",)
     search_fields = [
         "latin_name",
         "common_names__name",
@@ -84,8 +85,10 @@ class SpeciesAdmin(SpeciesAdminBase):
     inlines = [SpeciesCommonNameInline, VarietyInline]
 
     def genus_family_link(self, obj):
-        genus_url = reverse("admin:species_genus_change", args=[obj.genus.pk])
-        family_url = reverse("admin:species_family_change", args=[obj.genus.family.pk])
+        genus_url = reverse("admin:plant_species_genus_change", args=[obj.genus.pk])
+        family_url = reverse(
+            "admin:plant_species_family_change", args=[obj.genus.family.pk]
+        )
         return format_html(
             '<a href="{}">{}</a> / <a href="{}">{}</a>',
             genus_url,

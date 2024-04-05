@@ -155,6 +155,16 @@ class SpeciesBase(models.Model):
             None,
         )
 
+        # Validate uniqueness (deal with synonyms)
+        try:
+            existing_species = self.__class__.objects.get(gbif_id=self.gbif_id)
+            raise SpeciesAlreadyExists(
+                f"Species '{self.latin_name}' already  exists under name '{existing_species.latin_name}'."
+            )
+        except ObjectDoesNotExist:
+            # All is fine
+            pass
+
         # Use canonical names
         self.latin_name = next(
             filter(
@@ -167,16 +177,6 @@ class SpeciesBase(models.Model):
             ),
             None,
         )
-
-        # Validate uniqueness (deal with synonyms)
-        try:
-            existing_species = self.__class__.objects.get(gbif_id=self.gbif_id)
-            raise SpeciesAlreadyExists(
-                f"Species '{self.latin_name}' already  exists under name '{existing_species.latin_name}'."
-            )
-        except ObjectDoesNotExist:
-            # All is fine
-            pass
 
         if rank == "SPECIES":
             self.genus = _get_genus(species_data)
