@@ -1,12 +1,12 @@
-from os import curdir
-from django.db.models.query import Q
 import pycountry
 import typing
+
+from django.db.models.query import Q
 
 from pygbif import species
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.db.models.signals import post_save
@@ -34,6 +34,10 @@ class CommonNameBase(models.Model):
     language = models.CharField(_("language"), max_length=7, choices=settings.LANGUAGES)
     name = models.CharField(_("common name"), max_length=255, db_index=True)
 
+    is_default = models.BooleanField(
+        _("default"), default=False, help_text=_("Use as default name for language.")
+    )
+
     def __str__(self):
         """Returns the common name and its language."""
         return self.name
@@ -41,8 +45,18 @@ class CommonNameBase(models.Model):
     class Meta:
         verbose_name = _("common name")
         verbose_name_plural = _("common names")
-        ordering = ["language", "name"]
+        ordering = ["language", "-is_default", "name"]
         abstract = True
+
+    def save(self, *args, **kwargs):
+        """Ensure there's ever only one default."""
+        with transaction.atomic():
+            if self.is_default:
+                # Set all else to false
+                self.__class__.objects.filter(is_default=True).update(is_default=False)
+
+            # The use of return is explained in the comments
+            return super().save(*args, **kwargs)
 
 
 class SpeciesBase(models.Model):
@@ -70,18 +84,17 @@ class SpeciesBase(models.Model):
         return self.latin_name
 
     @admin.display(description=_("Common Name"))
-    def get_common_name(self) -> str:
+    def get_common_name(self) -> str | None:
         """Return common name for currently used language."""
         current_lang = get_language()
         assert current_lang
-        print("LAAAAAAA", current_lang)
 
-        try:
-            common_name = self.common_names.get(
-                Q(language=current_lang) | Q(language=current_lang[:2])
-            )
-        except ObjectDoesNotExist:
-            return ""
+        common_name = self.common_names.filter(
+            Q(language=current_lang) | Q(language=current_lang[:2])
+        ).first()
+
+        if not common_name:
+            return None
 
         assert isinstance(common_name, CommonNameBase)
 
@@ -197,11 +210,8 @@ class SpeciesBase(models.Model):
             assert alpha2_lang
 
             if alpha2_lang in enabled_languages:
-                self.common_names.update_or_create(
-                    language=alpha2_lang,
-                    defaults={
-                        "name": name_data["vernacularName"],
-                    },
+                self.common_names.get_or_create(
+                    language=alpha2_lang, name=name_data["vernacularName"]
                 )
 
     def clean(self):
@@ -303,7 +313,7 @@ class FamilyCommonName(CommonNameBase):
         Family, on_delete=models.CASCADE, related_name="common_names"
     )
 
-    class Meta:
+    class Meta(CommonNameBase.Meta):
         unique_together = (
             "family",
             "language",
@@ -318,7 +328,7 @@ class GenusCommonName(CommonNameBase):
         Genus, on_delete=models.CASCADE, related_name="common_names"
     )
 
-    class Meta:
+    class Meta(CommonNameBase.Meta):
         unique_together = (
             "genus",
             "language",
@@ -333,7 +343,7 @@ class SpeciesCommonName(CommonNameBase):
         Species, on_delete=models.CASCADE, related_name="common_names"
     )
 
-    class Meta:
+    class Meta(CommonNameBase.Meta):
         unique_together = (
             "species",
             "language",

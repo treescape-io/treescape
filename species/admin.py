@@ -14,24 +14,24 @@ from .models import (
 )
 
 
-class FamilyCommonNameInline(admin.TabularInline):
+class CommonNameInlineBase(admin.TabularInline):
+    extra = 0
+
+
+class FamilyCommonNameInline(CommonNameInlineBase):
     model = FamilyCommonName
-    extra = 0
 
 
-class GenusCommonNameInline(admin.TabularInline):
+class GenusCommonNameInline(CommonNameInlineBase):
     model = GenusCommonName
-    extra = 0
 
 
-class SpeciesCommonNameInline(admin.TabularInline):
+class SpeciesCommonNameInline(CommonNameInlineBase):
     model = SpeciesCommonName
-    extra = 0
 
 
 class VarietyInline(admin.TabularInline):
     model = Variety
-    extra = 0
 
 
 class SpeciesAdminBase(admin.ModelAdmin):
