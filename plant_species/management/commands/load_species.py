@@ -15,29 +15,33 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Iterate over species_list.txt in local directory
-        with open(species_txt, "r") as species_file:
-            species_list = species_file.readlines()
+        try:
+            with open(species_txt, "r") as species_file:
+                species_list = species_file.readlines()
 
-        species_list = [s.strip() for s in species_list]
+            species_list = [s.strip() for s in species_list]
 
-        add_count = 0
-        synonym_count = 0
-        for species_name in tqdm(species_list):
-            try:
-                # Check literal name
-                Species.objects.get(latin_name=species_name)
-            except Species.DoesNotExist:
-                s = Species(latin_name=species_name)
+            add_count = 0
+            synonym_count = 0
+            for species_name in tqdm(species_list):
                 try:
-                    s.enrich_data()
-                except SpeciesAlreadyExists:
-                    # Skip synonyms
-                    synonym_count += 1
-                    continue
+                    # Check literal name
+                    Species.objects.get(latin_name=species_name)
+                except Species.DoesNotExist:
+                    s = Species(latin_name=species_name)
+                    try:
+                        s.enrich_data()
+                    except SpeciesAlreadyExists:
+                        # Skip synonyms
+                        synonym_count += 1
+                        continue
 
-                s.full_clean()
-                s.save()
-                add_count += 1
+                    s.full_clean()
+                    s.save()
+                    add_count += 1
+        except Exception as e:
+            # Catch and re-raise any exceptions.
+            CommandError(e)
 
         self.stdout.write(
             self.style.SUCCESS(
