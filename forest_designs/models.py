@@ -5,23 +5,9 @@ from django.contrib.gis.db import models
 from plant_species.models import Genus, Species, SpeciesVariety
 
 
-class Project(models.Model):
-    """Agroforestry Project."""
-
-    name = models.CharField(max_length=255, verbose_name=_("name"))
-
-    class Meta:
-        verbose_name = _("project")
-        verbose_name_plural = _("projects")
-
-    def __str__(self):
-        return self.name
-
-
 class Plant(models.Model):
     """Plant with specific location within design."""
 
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     genus = models.ForeignKey(Genus, on_delete=models.PROTECT, blank=True)
     species = models.ForeignKey(
         Species,
