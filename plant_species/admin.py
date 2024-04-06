@@ -55,6 +55,20 @@ class SpeciesAdminBase(admin.ModelAdmin):
         return super().add_view(request, form_url, extra_context)  # type: ignore
 
 
+@admin.register(SpeciesVariety)
+class SpeciesVarietyAdmin(admin.ModelAdmin):
+    list_display = ("name", "species")
+    list_display_filter = ("species__family",)
+    autocomplete_fields = ("species",)
+    search_fields = (
+        "name",
+        "species__latin_name",
+        "species__common_names__name",
+        "species__genus__latin_name",
+        "species__genus__common_names__name",
+    )
+
+
 @admin.register(Family)
 class FamilyAdmin(SpeciesAdminBase):
     list_display = ("latin_name", "get_common_name", "gbif_link")
@@ -68,6 +82,7 @@ class GenusAdmin(SpeciesAdminBase):
     list_filter = ("family",)
     search_fields = ["latin_name", "common_names__name", "family__latin_name"]
     inlines = [GenusCommonNameInline]
+    autocomplete_fields = ("family",)
 
 
 @admin.register(Species)
@@ -83,6 +98,7 @@ class SpeciesAdmin(SpeciesAdminBase):
         "genus__latin_name",
         "genus__family__latin_name",
     ]
+    autocomplete_fields = ("genus",)
     inlines = [SpeciesCommonNameInline, VarietyInline]
 
     def genus_family_link(self, obj):
