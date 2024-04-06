@@ -86,7 +86,10 @@ class SpeciesBase(models.Model):
     def get_common_name(self) -> str | None:
         """Return common name for currently used language."""
         current_lang = get_language()
-        assert current_lang
+
+        if not current_lang:
+            # Somehow, sometimes this is None, in which case we'll default to English.
+            current_lang = "en"
 
         common_name = self.common_names.filter(
             Q(language=current_lang) | Q(language=current_lang[:2])
@@ -360,7 +363,7 @@ class SpeciesVariety(models.Model):
 
     def __str__(self):
         """Returns the name of the variety and its species."""
-        return f"{self.name} - {self.species.latin_name}"
+        return f"{self.species} var. {self.name}"
 
     class Meta:
         verbose_name = _("variety")
