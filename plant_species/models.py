@@ -422,7 +422,7 @@ class SpeciesBase(models.Model):
         image_urls = self.get_image_urls()
         if image_urls:
             return mark_safe(
-                f'<img src="{image_urls[0]}" width="50%" alt="Image of {self}">'
+                f'<img src="{image_urls[0]}" style="height: 10em; width: 10em; object-fit: cover;" alt="Image of {self}">'
             )
         return _("Not available.")
 
