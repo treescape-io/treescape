@@ -35,7 +35,8 @@ class VarietyInline(admin.TabularInline):
 
 
 class SpeciesAdminBase(admin.ModelAdmin):
-    readonly_fields = ["gbif_id"]
+    readonly_fields = ("gbif_link",)
+    exclude = ("gbif_id",)
 
     def get_fields(self, request, obj=None):
         fields = super().get_fields(request, obj)
@@ -56,14 +57,14 @@ class SpeciesAdminBase(admin.ModelAdmin):
 
 @admin.register(Family)
 class FamilyAdmin(SpeciesAdminBase):
-    list_display = ("latin_name", "get_common_name")
+    list_display = ("latin_name", "get_common_name", "gbif_link")
     inlines = [FamilyCommonNameInline]
     search_fields = ["latin_name", "common_names__name"]
 
 
 @admin.register(Genus)
 class GenusAdmin(SpeciesAdminBase):
-    list_display = ("latin_name", "family", "get_common_name")
+    list_display = ("latin_name", "family", "get_common_name", "gbif_link")
     list_filter = ("family",)
     search_fields = ["latin_name", "common_names__name", "family__latin_name"]
     inlines = [GenusCommonNameInline]
@@ -71,7 +72,7 @@ class GenusAdmin(SpeciesAdminBase):
 
 @admin.register(Species)
 class SpeciesAdmin(SpeciesAdminBase):
-    list_display = ("latin_name", "get_common_name", "genus_family_link")
+    list_display = ("latin_name", "get_common_name", "genus_family_link", "gbif_link")
     list_select_related = ("genus",)
     list_filter = ("genus__family",)
     search_fields = [

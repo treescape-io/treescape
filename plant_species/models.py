@@ -9,6 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models, transaction
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from django.utils.safestring import mark_safe
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import get_language
@@ -101,6 +102,17 @@ class SpeciesBase(models.Model):
         assert isinstance(common_name, CommonNameBase)
 
         return common_name.name
+
+    @admin.display(
+        description="GBIF",
+    )
+    def gbif_link(self) -> str | None:
+        if self.gbif_id:
+            return mark_safe(
+                f'<a href="https://www.gbif.org/species/{self.gbif_id}/">{self.gbif_id}</a>'
+            )
+
+        return None
 
     def _enrich_gbif_name(self, rank):
         """Fetch species data from GBIF backbone based on the latin name and updates the instance."""
