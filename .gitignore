@@ -160,3 +160,5 @@ cython_debug/
 #.idea/
 
 public/django_static/
+media/
+static/

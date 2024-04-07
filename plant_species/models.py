@@ -1,13 +1,14 @@
+import wikipedia
+import requests
 import random
 import pycountry
 import typing
 
-from django.db.models.query import Q
-
-from pygbif import species, occurrences
-
+from django.core.files.base import ContentFile
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.template.defaultfilters import slugify
 from django.db import models, transaction
+from django.db.models.query import Q
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
@@ -15,6 +16,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import get_language
 from django.contrib import admin
+
+from pygbif import species, occurrences
+from django_advance_thumbnail import AdvanceThumbnailField
 
 from .exceptions import EnrichmentException, SpeciesAlreadyExists, SpeciesNotFound
 
@@ -64,8 +68,23 @@ class SpeciesBase(models.Model):
     """Abstract base class for species models."""
 
     latin_name = models.CharField(_("latin name"), max_length=255, unique=True)
-    gbif_id = models.IntegerField(
-        _("GBIF usageKey"), null=True, blank=True, unique=True
+    gbif_id = models.IntegerField(_("GBIF usageKey"), editable=False, unique=True)
+    image = models.ImageField(upload_to="plant_species/images/", null=True, blank=True)
+    image_thumbnail = AdvanceThumbnailField(
+        source_field="image",
+        upload_to="plant_species/images/thumbnails/",
+        null=True,
+        blank=True,
+        size=(512, 512),
+        editable=False,
+    )
+    image_large = AdvanceThumbnailField(
+        source_field="image",
+        upload_to="plant_species/images/large/",
+        null=True,
+        blank=True,
+        size=(2048, 2048),
+        editable=False,
     )
 
     if typing.TYPE_CHECKING:
@@ -110,10 +129,22 @@ class SpeciesBase(models.Model):
     def gbif_link(self) -> str | None:
         if self.gbif_id:
             return mark_safe(
-                f'<a href="https://www.gbif.org/species/{self.gbif_id}/">{self.gbif_id}</a>'
+                f'<a target="_blank" href="https://www.gbif.org/species/{self.gbif_id}/">{self.gbif_id}</a>'
             )
 
         return _("Not available.")
+
+    @admin.display(
+        description="Wikipedia",
+    )
+    def wikipedia_link(self) -> str | None:
+        """Get link for species Wikipedia page."""
+
+        wikipedia_page = self._get_wikipedia_page()
+
+        return mark_safe(
+            f'<a target="_blank" href="{wikipedia_page.url}">{self.latin_name}</a>'
+        )
 
     # TODO: Query Wikidata
     # Options:
@@ -122,6 +153,25 @@ class SpeciesBase(models.Model):
     #    this gets the id, then query the contents
     #    https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q732867&format=json
     # Ref: https://discourse.gbif.org/t/given-a-gbif-human-readable-webpage-for-a-species-how-to-find-the-api-call-for-each-item-on-the-page/3134/11
+
+    _wikipedia_page: wikipedia.WikipediaPage | None = None
+
+    def _get_wikipedia_page(self):
+        if not self._wikipedia_page:
+            assert self.latin_name
+
+            try:
+                self._wikipedia_page = wikipedia.page(
+                    title=self.latin_name, redirect=True
+                )
+            except wikipedia.PageError:
+                # Page doesn't exist
+                pass
+            # except wikipedia.DisambiguationError:
+            #     # Page is ambiguous.
+            #     pass
+
+        return self._wikipedia_page
 
     def get_image_urls(self) -> typing.List[str]:
         """Get URL of CC licensed images."""
@@ -416,17 +466,26 @@ class SpeciesBase(models.Model):
         return list(filter(lambda x: x is not None, map(_get_image_url, results)))
 
     @admin.display(
-        description="Image",
+        description="Thumbnail",
+    )
+    def get_thumbnail_html(self) -> str:
+        if self.image_thumbnail:
+            return mark_safe(
+                f'<img src="{self.image_thumbnail.url}" style="height: 128px; width: 128px; object-fit: cover;" alt="Thumbnail of {self}">'
+            )
+        return _("N/A")
+
+    @admin.display(
+        description="Image preview",
     )
     def get_image_html(self) -> str:
-        image_urls = self.get_image_urls()
-        if image_urls:
+        if self.image_large:
             return mark_safe(
-                f'<img src="{image_urls[0]}" style="height: 10em; width: 10em; object-fit: cover;" alt="Image of {self}">'
+                f'<img src="{self.image_large.url}" style="width: 25%" alt="Image of {self}">'
             )
-        return _("Not available.")
+        return _("N/A")
 
-    def _enrich_gbif_name(self, rank):
+    def enrich_gbif_name(self, rank):
         """Fetch species data from GBIF backbone based on the latin name and updates the instance."""
 
         assert self.latin_name, "Species name required to enrich data."
@@ -511,6 +570,32 @@ class SpeciesBase(models.Model):
         elif rank == "GENUS":
             self.family = _get_family(species_data)
 
+    def enrich_gbif_image(self):
+        """Get image from GBIF and store on `image` field."""
+        if self.image:
+            # Skip existing images.
+            return
+
+        image_urls = self.get_image_urls()
+
+        if image_urls:
+            for image_url in image_urls:
+                with requests.get(image_url) as response:
+                    assert self.latin_name
+                    if not response.headers["Content-Type"] in (
+                        "image/jpeg",
+                        "image/jpg",
+                    ):
+                        continue
+
+                    image_name = f"{slugify(self.latin_name)}.jpg"
+                    image_file = ContentFile(response.content)
+
+                    print(f"Saving {image_name}")
+                    self.image.save(image_name, image_file)
+
+                    break
+
     def enrich_gbif_common_names(self):
         """Fetch (missing) common names from GBIF in configured languages."""
         assert self.pk, "Needs to be saved before adding common names."
@@ -562,7 +647,8 @@ class Family(SpeciesBase):
         verbose_name_plural = _("families")
 
     def enrich_data(self):
-        self._enrich_gbif_name(rank="FAMILY")
+        self.enrich_gbif_name(rank="FAMILY")
+        self.enrich_gbif_image()
 
 
 class Genus(SpeciesBase):
@@ -575,7 +661,8 @@ class Genus(SpeciesBase):
         verbose_name_plural = _("genera")
 
     def enrich_data(self):
-        self._enrich_gbif_name(rank="GENUS")
+        self.enrich_gbif_name(rank="GENUS")
+        self.enrich_gbif_image()
 
 
 class Species(SpeciesBase):
@@ -588,7 +675,8 @@ class Species(SpeciesBase):
         verbose_name_plural = _("species")
 
     def enrich_data(self):
-        self._enrich_gbif_name(rank="SPECIES")
+        self.enrich_gbif_name(rank="SPECIES")
+        self.enrich_gbif_image()
 
 
 @receiver(post_save, sender=Family)

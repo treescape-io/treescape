@@ -36,8 +36,11 @@ class VarietyInline(admin.TabularInline):
 
 class SpeciesAdminBase(admin.ModelAdmin):
     save_on_top = True
-    readonly_fields = ("gbif_link", "get_image_html")
-    exclude = ("gbif_id",)
+    readonly_fields = (
+        "get_image_html",
+        "wikipedia_link",
+        "gbif_link",
+    )
     list_per_page = 5
 
     def get_fields(self, request, obj=None):
@@ -90,13 +93,13 @@ class GenusAdmin(SpeciesAdminBase):
 @admin.register(Species)
 class SpeciesAdmin(SpeciesAdminBase):
     list_display = (
-        "get_image_html",
+        "get_thumbnail_html",
         "latin_name",
         "get_common_name",
         "genus_family_link",
         "gbif_link",
     )
-    list_display_links = ("get_image_html", "latin_name", "get_common_name")
+    list_display_links = ("get_thumbnail_html", "latin_name", "get_common_name")
     list_select_related = ("genus",)
     list_filter = ("genus__family",)
     search_fields = [
