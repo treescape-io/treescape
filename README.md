@@ -24,11 +24,27 @@ Other/commercial licensing available upon request.
 * [Poetry](https://python-poetry.org/) 1.7.1
 
 ## Getting started
-1. Setup virtual environment and install Python dependencies: `poetry install`
-2. Activate virtual environment: `poetry shell`
-3. Create database: `./manage.py migrate`
-4. Create Django superuser: `./manage.py createsuperuser`
-5. Login to Django Admin: `http://localhost:8080/admin/`
+1. Setup virtual environment and install Python dependencies:
+   ```sh
+   poetry install
+   ```
+3. Activate virtual environment:
+   ```sh
+   poetry shell
+   ```
+4. Create database:
+   ```sh
+   ./manage.py migrate
+   ```
+6. Create Django superuser:
+   ```sh
+   ./manage.py createsuperuser
+   ```
+7. Start the Django development server:
+   ```sh
+   ./manage.py runserver
+   ```
+9. Navigate to http://localhost:8080/admin/ to access the Django Admin.
 
 ## Loading species data
 A list of ~500 species relevant to agroforestry is provided, data for which is automatically loaded from various sources (currently GBIF and Wikipedia, soon: more).
