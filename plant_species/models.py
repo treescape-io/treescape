@@ -651,7 +651,7 @@ class SpeciesBase(models.Model):
 class Family(SpeciesBase):
     """Represents a biological family, which is a higher classification group that contains one or more genera."""
 
-    class Meta:
+    class Meta(SpeciesBase.Meta):
         verbose_name = _("family")
         verbose_name_plural = _("families")
 
@@ -666,7 +666,7 @@ class Genus(SpeciesBase):
 
     family = models.ForeignKey(Family, on_delete=models.PROTECT, related_name="genera")
 
-    class Meta:
+    class Meta(SpeciesBase.Meta):
         verbose_name = _("genus")
         verbose_name_plural = _("genera")
 
@@ -681,7 +681,7 @@ class Species(SpeciesBase):
 
     genus = models.ForeignKey(Genus, on_delete=models.PROTECT, related_name="species")
 
-    class Meta:
+    class Meta(SpeciesBase.Meta):
         verbose_name = _("species")
         verbose_name_plural = _("species")
 
