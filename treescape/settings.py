@@ -30,8 +30,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
-# Application definition
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -54,6 +52,8 @@ LOGGING = {
 }
 
 
+# Application definition
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "plant_species",
     "forest_designs",
+    "species_data",
 ]
 
 MIDDLEWARE = [
