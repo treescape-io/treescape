@@ -32,10 +32,10 @@ class SpeciesCommonNameInline(CommonNameInlineBase):
 
 class VarietyInline(admin.TabularInline):
     model = SpeciesVariety
+    extra = 1
 
 
 class SpeciesAdminBase(admin.ModelAdmin):
-    save_on_top = True
     readonly_fields = (
         "get_image_html",
         "wikipedia_link",

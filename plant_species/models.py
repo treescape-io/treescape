@@ -1,3 +1,4 @@
+import logging
 import wikipedia
 import requests
 import random
@@ -12,6 +13,7 @@ from django.db.models.query import Q
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
+from django.utils.functional import cached_property
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import get_language
@@ -21,6 +23,9 @@ from pygbif import species, occurrences
 from django_advance_thumbnail import AdvanceThumbnailField
 
 from .exceptions import EnrichmentException, SpeciesAlreadyExists, SpeciesNotFound
+
+
+logger = logging.getLogger(__name__)
 
 
 def _convert_language_code(alpha_3):
@@ -68,6 +73,7 @@ class SpeciesBase(models.Model):
     """Abstract base class for species models."""
 
     latin_name = models.CharField(_("latin name"), max_length=255, unique=True)
+    description = models.TextField(_("description"), blank=True)
     gbif_id = models.IntegerField(_("GBIF usageKey"), editable=False, unique=True)
     image = models.ImageField(upload_to="plant_species/images/", null=True, blank=True)
     image_thumbnail = AdvanceThumbnailField(
@@ -140,10 +146,8 @@ class SpeciesBase(models.Model):
     def wikipedia_link(self) -> str | None:
         """Get link for species Wikipedia page."""
 
-        wikipedia_page = self._get_wikipedia_page()
-
         return mark_safe(
-            f'<a target="_blank" href="{wikipedia_page.url}">{self.latin_name}</a>'
+            f'<a target="_blank" href="{self.wikipedia_page.url}">{self.wikipedia_page.title}</a>'
         )
 
     # TODO: Query Wikidata
@@ -154,24 +158,23 @@ class SpeciesBase(models.Model):
     #    https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q732867&format=json
     # Ref: https://discourse.gbif.org/t/given-a-gbif-human-readable-webpage-for-a-species-how-to-find-the-api-call-for-each-item-on-the-page/3134/11
 
-    _wikipedia_page: wikipedia.WikipediaPage | None = None
+    @cached_property
+    def wikipedia_page(self):
+        assert self.latin_name
 
-    def _get_wikipedia_page(self):
-        if not self._wikipedia_page:
-            assert self.latin_name
+        try:
+            page: wikipedia.WikipediaPage = wikipedia.page(
+                title=self.latin_name, redirect=True
+            )
+            return page
+        except wikipedia.PageError:
+            # Page doesn't exist
+            pass
+        # except wikipedia.DisambiguationError:
+        #     # Page is ambiguous.
+        #     pass
 
-            try:
-                self._wikipedia_page = wikipedia.page(
-                    title=self.latin_name, redirect=True
-                )
-            except wikipedia.PageError:
-                # Page doesn't exist
-                pass
-            # except wikipedia.DisambiguationError:
-            #     # Page is ambiguous.
-            #     pass
-
-        return self._wikipedia_page
+        return None
 
     def get_image_urls(self) -> typing.List[str]:
         """Get URL of CC licensed images."""
@@ -591,7 +594,7 @@ class SpeciesBase(models.Model):
                     image_name = f"{slugify(self.latin_name)}.jpg"
                     image_file = ContentFile(response.content)
 
-                    print(f"Saving {image_name}")
+                    logger.debug("Saving image %s for %s", image_name, self.latin_name)
                     self.image.save(image_name, image_file)
 
                     break
@@ -625,6 +628,12 @@ class SpeciesBase(models.Model):
                     language=alpha2_lang, name=name_data["vernacularName"]
                 )
 
+    def enrich_wikipedia(self):
+        if not self.description and self.wikipedia_page:
+            assert isinstance(self.wikipedia_page, wikipedia.WikipediaPage)
+            logger.debug("Adding description for %s from Wikpedia", self.latin_name)
+            self.description = self.wikipedia_page.summary.strip()
+
     def clean(self):
         if not self.pk:
             try:
@@ -649,6 +658,7 @@ class Family(SpeciesBase):
     def enrich_data(self):
         self.enrich_gbif_name(rank="FAMILY")
         self.enrich_gbif_image()
+        self.enrich_wikipedia()
 
 
 class Genus(SpeciesBase):
@@ -663,6 +673,7 @@ class Genus(SpeciesBase):
     def enrich_data(self):
         self.enrich_gbif_name(rank="GENUS")
         self.enrich_gbif_image()
+        self.enrich_wikipedia()
 
 
 class Species(SpeciesBase):
@@ -677,6 +688,7 @@ class Species(SpeciesBase):
     def enrich_data(self):
         self.enrich_gbif_name(rank="SPECIES")
         self.enrich_gbif_image()
+        self.enrich_wikipedia()
 
 
 @receiver(post_save, sender=Family)
