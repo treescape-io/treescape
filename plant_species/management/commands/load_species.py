@@ -41,7 +41,7 @@ class Command(BaseCommand):
                     add_count += 1
         except Exception as e:
             # Catch and re-raise any exceptions.
-            CommandError(e)
+            raise CommandError(e)
 
         self.stdout.write(
             self.style.SUCCESS(

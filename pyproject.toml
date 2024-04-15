@@ -16,6 +16,8 @@ tqdm = "^4.66.2"
 django-advance-thumbnail = "^1.0.0"
 wikipedia = "^1.4.0"
 django-composite-field = {git = "https://github.com/treescape-io/django-composite-field.git", rev = "main", develop = true}
+langchain-openai = "^0.1.3"
+langchain = "^0.1.16"
 
 [tool.poetry.group.dev.dependencies]
 pyright = "^1.1.356"

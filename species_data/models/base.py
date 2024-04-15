@@ -20,6 +20,9 @@ class CategorizedPlantPropertyBase(models.Model):
         abstract = True
         ordering = ["name"]
 
+    def __str__(self):
+        return self.name
+
 
 class PlantPropertiesBase(models.Model):
     """Abstract base class for properties of a species."""
