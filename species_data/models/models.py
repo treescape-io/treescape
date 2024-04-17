@@ -1,9 +1,15 @@
+from typing import NamedTuple
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from plant_species.models import Genus, Family, Species, SpeciesVariety
+from species_data.fields import DecimalEstimatedRange, DurationEstimatedRange
+
+from ..enrichment.chains import SpeciesEnrichmentChain
 
 from .base import PlantPropertiesBase
+from .source import SourceType
 
 from .categories import (
     GrowthHabit,
@@ -72,6 +78,13 @@ from .categories import (
 #         verbose_name = _("genus properties")
 #         verbose_name_plural = _("genus properties")
 
+# TODO: Memoized classmethod on SpeciesProperties
+
+
+class EnrichmentSource(NamedTuple):
+    content: str
+    source_type: SourceType
+
 
 class SpeciesProperties(PlantPropertiesBase):
     species = models.ForeignKey(Species, on_delete=models.CASCADE)
@@ -87,14 +100,6 @@ class SpeciesProperties(PlantPropertiesBase):
     light_preference = models.ManyToManyField(
         LightPreference, through=SpeciesLightPreference
     )
-
-    class Meta:
-        verbose_name = _("species properties")
-        verbose_name_plural = _("species properties")
-
-    class Meta:
-        verbose_name = _("species properties")
-        verbose_name_plural = _("species properties")
 
     class Meta:
         verbose_name = _("species properties")
