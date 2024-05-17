@@ -163,3 +163,6 @@ public/django_static/
 media/
 static/
 .DS_Store
+
+# QGIS
+qgis_project/*~
