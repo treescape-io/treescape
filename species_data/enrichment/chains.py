@@ -37,6 +37,3 @@ def get_enrichment_chain():
     chain = prompt | model | output_parser
 
     return chain
-
-
-SpeciesEnrichmentChain = get_enrichment_chain()

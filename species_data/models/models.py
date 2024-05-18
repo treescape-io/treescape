@@ -6,8 +6,6 @@ from django.utils.translation import gettext_lazy as _
 from plant_species.models import Genus, Family, Species, SpeciesVariety
 from species_data.fields import DecimalEstimatedRange, DurationEstimatedRange
 
-from ..enrichment.chains import SpeciesEnrichmentChain
-
 from .base import PlantPropertiesBase
 from .source import SourceType
 
