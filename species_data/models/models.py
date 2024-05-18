@@ -102,3 +102,9 @@ class SpeciesProperties(PlantPropertiesBase):
     class Meta:
         verbose_name = _("species properties")
         verbose_name_plural = _("species properties")
+
+    def __str__(self):
+        if self.species:
+            return str(self.species)
+
+        return super().__str__()

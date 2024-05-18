@@ -36,4 +36,4 @@ class Source(models.Model):
         ordering = ["name"]
 
     def __str__(self):
-        return self.name
+        return f"{self.source_type}: {self.name}"
