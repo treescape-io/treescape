@@ -24,6 +24,65 @@ from .chains import get_enrichment_chain
 logger = logging.getLogger(__name__)
 
 
+def set_decimalrange_property(
+    species_properties: SpeciesProperties,
+    plant_data: dict,
+    prop_name: str,
+    source: Source,
+):
+    """Sets a decimal range property on a SpeciesProperties instance."""
+    plant_prop = plant_data[prop_name]
+
+    logger.debug(
+        f"Setting {prop_name} on {species_properties.species}. Data: {plant_prop}"
+    )
+
+    property_list = ["minimum", "typical", "maximum", "confidence"]
+    for property_name in property_list:
+        setattr(
+            species_properties,
+            f"{prop_name}_{property_name}",
+            plant_prop.get(property_name),
+        )
+
+    setattr(species_properties, f"{prop_name}_source", source)
+
+
+def set_category_property(
+    species_properties: SpeciesProperties,
+    plant_data: dict,
+    prop_name: str,
+    source: Source,
+):
+    """Sets a category property on a SpeciesProperties instance."""
+    category_data = plant_data[prop_name]
+
+    for value in category_data["values"]:
+        # Derive category_class, the other side of the M2M)
+        # and through_class (what links them) them
+        # using prop_name on species_properties.
+        # Both category_class and through_class are Django models,
+        # as is SpeciesProperties.
+        category_class = getattr(species_properties, prop_name).related_model
+        through_class = getattr(species_properties, prop_name).through
+
+        # Sometimes value is empty!?
+        if value:
+            props = {
+                "species": species_properties,
+                "source": source,
+                "confidence": category_data["confidence"],
+            }
+
+            try:
+                props[prop_name] = category_class.objects.get(slug=value)
+            except category_class.DoesNotExist:
+                print(f"Warning! {prop_name} with slug {value} not found!")
+                continue
+
+            through_class.objects.update_or_create(**props)
+
+
 def enrich_species_data(species: Species, llm: BaseLLM):
     """Retrieves and stores additional data about a plant species using a language model."""
 
@@ -60,10 +119,12 @@ def enrich_species_data(species: Species, llm: BaseLLM):
 
     (source_type, created) = SourceType.objects.get_or_create(name="Wikipedia")
     (source, created) = Source.objects.get_or_create(
-        name=species.wikipedia_page.title,
-        source_type=source_type,
         url=f"https://en.wikipedia.org/w/index.php?title={species.wikipedia_page.title}&oldid={species.wikipedia_page.revision_id}",
-        date=datetime.datetime.now(),
+        defaults={
+            "name": species.wikipedia_page.title,
+            "source_type": source_type,
+            "date": datetime.datetime.now(),
+        },
     )
 
     (species_properties, created) = SpeciesProperties.objects.get_or_create(
@@ -71,40 +132,10 @@ def enrich_species_data(species: Species, llm: BaseLLM):
     )
 
     range_properties = ["height", "width"]
-    for prop in range_properties:
+    for prop_name in range_properties:
         # TODO: Only update when confidence is higher!
-        if prop in plant_data:
-            plant_prop = plant_data[prop]
-
-            logger.info(
-                f"Setting {prop} on {species_properties.species}. Data: {plant_prop}"
-            )
-
-            # if plant_prop["minimum"]:
-            #     setattr(
-            #         species_properties,
-            #         f"{prop}_minimum",
-            #         decimal.Decimal(plant_prop["minimum"]),
-            #     )
-            # if plant_prop["typical"]:
-            #     setattr(
-            #         species_properties,
-            #         f"{prop}_typical",
-            #         decimal.Decimal(plant_prop["typical"]),
-            #     )
-            if plant_prop["maximum"]:
-                setattr(
-                    species_properties,
-                    f"{prop}_maximum",
-                    decimal.Decimal(plant_prop["maximum"]),
-                )
-
-            if plant_prop["confidence"]:
-                setattr(
-                    species_properties, f"{prop}_confidence", plant_prop["confidence"]
-                )
-
-            setattr(species_properties, f"{prop}_source", source)
+        if prop_name in plant_data:
+            set_decimalrange_property(species_properties, plant_data, prop_name, source)
 
     species_properties.clean()
     species_properties.save()
@@ -121,23 +152,6 @@ def enrich_species_data(species: Species, llm: BaseLLM):
         ("climate_zone", ClimateZone, SpeciesClimateZone),
     ]
 
-    for category_name, category_class, through_class in categories:
-        if category_name in plant_data:
-            category_data = plant_data[category_name]
-
-            for value in category_data["values"]:
-                # Sometimes value is empty!?
-                if value:
-                    props = {
-                        "species": species_properties,
-                        "source": source,
-                        "confidence": category_data["confidence"],
-                    }
-
-                    try:
-                        props[category_name] = category_class.objects.get(slug=value)
-                    except category_class.DoesNotExist:
-                        print(f"Warning! {category_name} with slug {value} not found!")
-                        continue
-
-                    (obj, created) = through_class.objects.update_or_create(**props)
+    for prop_name, category_class, through_class in categories:
+        if prop_name in plant_data:
+            set_category_property(species_properties, plant_data, prop_name, source)

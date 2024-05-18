@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 class SourceType(models.Model):
     """Type of source, e.g. Wikipedia, Trefle, GPT4 etc."""
 
-    name = models.CharField(_("name"), max_length=255)
+    name = models.CharField(_("name"), max_length=255, unique=True)
 
     class Meta:
         verbose_name = _("source type")
