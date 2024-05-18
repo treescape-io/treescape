@@ -1,4 +1,4 @@
-from langchain_openai import OpenAI
+from langchain_core.language_models import BaseLLM
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
 
@@ -6,10 +6,8 @@ from langchain_core.prompts import PromptTemplate
 from .models import get_species_data_model
 
 
-def get_enrichment_chain():
+def get_enrichment_chain(llm: BaseLLM):
     """Generates a chain for enriching plant species data using a language model."""
-
-    model = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0)
 
     prompt_template = """As a plant expert, return available information about the plant species '{latin_name}'. Base your answers exclusively on the following source:
 
@@ -34,6 +32,6 @@ def get_enrichment_chain():
         partial_variables={"format_instructions": format_instructions},
     )
 
-    chain = prompt | model | output_parser
+    chain = prompt | llm | output_parser
 
     return chain

@@ -1,12 +1,15 @@
 import pprint
 
+from langchain_core.language_models import BaseLLM
+
 from plant_species.models import Species
 from .chains import get_enrichment_chain
 
 
-def enrich_species_data(species: Species):
+def enrich_species_data(species: Species, llm: BaseLLM):
     """Retrieves and stores additional data about a plant species using a language model."""
-    chain = get_enrichment_chain()
+
+    chain = get_enrichment_chain(llm)
     assert species.wikipedia_page
     plant_data = chain.invoke(
         {

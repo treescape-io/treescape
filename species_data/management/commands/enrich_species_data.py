@@ -1,3 +1,4 @@
+from langchain_openai import OpenAI
 from tqdm import tqdm
 
 from django.core.management.base import BaseCommand, CommandError
@@ -12,13 +13,15 @@ class Command(BaseCommand):
     help = "Generates additional data about plant species using a language model."
 
     def handle(self, *args, **options):
+        llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0)
+
         try:
             species_list = Species.objects.all()[:5]
 
             with tqdm(species_list) as pbar:
                 for species in pbar:
                     pbar.set_description(f"Processing {species}")
-                    enrich_species_data(species)
+                    enrich_species_data(species, llm)
 
         except Exception as e:
             # Catch and re-raise any exceptions.
