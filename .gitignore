@@ -166,3 +166,4 @@ static/
 
 # QGIS
 qgis_project/*~
+.aider*

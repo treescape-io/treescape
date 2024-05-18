@@ -23,6 +23,7 @@ django-types = "^0.19.1"
 ruff = "^0.3.4"
 ipdb = "^0.13.13"
 prettyprinter = "^0.18.0"
+aider-chat = "^0.35.0"
 
 [build-system]
 requires = ["poetry-core"]
