@@ -85,7 +85,7 @@ class EnrichmentSource(NamedTuple):
 
 
 class SpeciesProperties(PlantPropertiesBase):
-    species = models.ForeignKey(Species, on_delete=models.CASCADE)
+    species = models.OneToOneField(Species, on_delete=models.CASCADE)
     growth_habits = models.ManyToManyField(GrowthHabit, through=SpeciesGrowthHabit)
     climate_zones = models.ManyToManyField(ClimateZone, through=SpeciesClimateZone)
     human_uses = models.ManyToManyField(HumanUse, through=SpeciesHumanUse)

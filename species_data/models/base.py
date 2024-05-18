@@ -1,4 +1,5 @@
 from django.db import models
+from django.template.defaultfilters import slugify
 from django.utils.translation import gettext_lazy as _
 
 from .source import Source
@@ -13,7 +14,8 @@ from species_data.fields import (
 class CategorizedPlantPropertyBase(models.Model):
     """Abstract base model for categorization of species."""
 
-    name = models.CharField(_("name"), max_length=255)
+    name = models.CharField(_("name"), max_length=255, unique=True)
+    slug = models.SlugField(_("slug"), max_length=255, unique=True, blank=True)
     description = models.TextField()
 
     class Meta:
@@ -22,6 +24,12 @@ class CategorizedPlantPropertyBase(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+
+        super().save(*args, **kwargs)
 
 
 class PlantPropertiesBase(models.Model):

@@ -52,6 +52,8 @@ class CommonNameBase(models.Model):
         """Returns the common name and its language."""
         return self.name
 
+        super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = _("common name")
         verbose_name_plural = _("common names")
@@ -72,7 +74,10 @@ class CommonNameBase(models.Model):
 class SpeciesBase(models.Model):
     """Abstract base class for species models."""
 
-    latin_name = models.CharField(_("latin name"), max_length=255, unique=True)
+    latin_name = models.CharField(
+        _("latin name"), max_length=255, unique=True, blank=True
+    )
+    slug = models.SlugField(_("slug"), max_length=255, unique=True)
     description = models.TextField(_("description"), blank=True)
     gbif_id = models.IntegerField(_("GBIF usageKey"), editable=False, unique=True)
     image = models.ImageField(upload_to="plant_species/images/", null=True, blank=True)
@@ -632,9 +637,12 @@ class SpeciesBase(models.Model):
 
     def enrich_wikipedia(self):
         if not self.description and self.wikipedia_page:
-            assert isinstance(self.wikipedia_page, wikipedia.WikipediaPage)
-            logger.debug("Adding description for %s from Wikpedia", self.latin_name)
-            self.description = self.wikipedia_page.summary.strip()
+            wikipedia_page = self.wikipedia_page
+            if isinstance(wikipedia_page, wikipedia.WikipediaPage):
+                logger.debug(
+                    "Adding description for %s from Wikipedia", self.latin_name
+                )
+                self.description = wikipedia_page.summary.strip()
 
     def clean(self):
         if not self.pk:
@@ -644,6 +652,13 @@ class SpeciesBase(models.Model):
                 raise ValidationError(e)
 
         super().clean()
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            assert self.latin_name
+            self.slug = slugify(self.latin_name)
+
+        super().save(*args, **kwargs)
 
     class Meta:
         abstract = True

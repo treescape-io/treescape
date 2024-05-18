@@ -12,24 +12,12 @@ class GrowthHabit(CategorizedPlantPropertyBase):
         verbose_name_plural = _("growth habits")
 
 
-class GrowthHabitThroughBase(CategorizedSpeciesPropertyThroughBase):
-    class Meta(GrowthHabit.Meta, CategorizedSpeciesPropertyThroughBase.Meta):
-        ordering = None
-
-
-# class FamilyGrowthHabit(CategorizedSpeciesPropertyThroughBase):
-#     family = models.ForeignKey("FamilyProperties", on_delete=models.CASCADE)
-#     growth_habit = models.ForeignKey(GrowthHabit, on_delete=models.CASCADE)
-
-
-# class GenusGrowthHabit(CategorizedSpeciesPropertyThroughBase):
-#     genus = models.ForeignKey("GenusProperties", on_delete=models.CASCADE)
-#     growth_habit = models.ForeignKey(GrowthHabit, on_delete=models.CASCADE)
-
-
 class SpeciesGrowthHabit(CategorizedSpeciesPropertyThroughBase):
     species = models.ForeignKey("SpeciesProperties", on_delete=models.CASCADE)
     growth_habit = models.ForeignKey(GrowthHabit, on_delete=models.CASCADE)
+
+    class Meta(CategorizedSpeciesPropertyThroughBase.Meta):
+        unique_together = ("species", "growth_habit")
 
 
 class ClimateZone(CategorizedPlantPropertyBase):
@@ -92,24 +80,12 @@ class ClimateZone(CategorizedPlantPropertyBase):
         return f"{self.main_group}{self.seasonal_precipitation or ''}{self.heat_level or ''}: {self.name}"
 
 
-class ClimateZoneThroughBase(CategorizedSpeciesPropertyThroughBase):
-    class Meta(ClimateZone.Meta, CategorizedSpeciesPropertyThroughBase.Meta):
-        ordering = None
-
-
-# class FamilyClimateZone(CategorizedSpeciesPropertyThroughBase):
-#     family = models.ForeignKey("FamilyProperties", on_delete=models.CASCADE)
-#     climate_zone = models.ForeignKey(ClimateZone, on_delete=models.CASCADE)
-
-
-# class GenusClimateZone(CategorizedSpeciesPropertyThroughBase):
-#     genus = models.ForeignKey("GenusProperties", on_delete=models.CASCADE)
-#     climate_zone = models.ForeignKey(ClimateZone, on_delete=models.CASCADE)
-
-
 class SpeciesClimateZone(CategorizedSpeciesPropertyThroughBase):
     species = models.ForeignKey("SpeciesProperties", on_delete=models.CASCADE)
     climate_zone = models.ForeignKey(ClimateZone, on_delete=models.CASCADE)
+
+    class Meta(CategorizedSpeciesPropertyThroughBase.Meta):
+        unique_together = ("species", "climate_zone")
 
 
 class HumanUse(CategorizedPlantPropertyBase):
@@ -135,19 +111,12 @@ class HumanUse(CategorizedPlantPropertyBase):
         ordering = ("use_type", "name")
 
 
-# class FamilyHumanUse(CategorizedSpeciesPropertyThroughBase):
-#     family = models.ForeignKey("FamilyProperties", on_delete=models.CASCADE)
-#     human_use = models.ForeignKey(HumanUse, on_delete=models.CASCADE)
-
-
-# class GenusHumanUse(CategorizedSpeciesPropertyThroughBase):
-#     genus = models.ForeignKey("GenusProperties", on_delete=models.CASCADE)
-#     human_use = models.ForeignKey(HumanUse, on_delete=models.CASCADE)
-
-
 class SpeciesHumanUse(CategorizedSpeciesPropertyThroughBase):
     species = models.ForeignKey("SpeciesProperties", on_delete=models.CASCADE)
     human_use = models.ForeignKey(HumanUse, on_delete=models.CASCADE)
+
+    class Meta(CategorizedSpeciesPropertyThroughBase.Meta):
+        unique_together = ("species", "human_use")
 
 
 class HumanUseThroughBase(CategorizedSpeciesPropertyThroughBase):
@@ -178,19 +147,12 @@ class EcologicalRoleThroughBase(CategorizedSpeciesPropertyThroughBase):
     )
 
 
-# class FamilyEcologicalRole(CategorizedSpeciesPropertyThroughBase):
-#     family = models.ForeignKey("FamilyProperties", on_delete=models.CASCADE)
-#     ecological_role = models.ForeignKey(EcologicalRole, on_delete=models.CASCADE)
-
-
-# class GenusEcologicalRole(CategorizedSpeciesPropertyThroughBase):
-#     genus = models.ForeignKey("GenusProperties", on_delete=models.CASCADE)
-#     ecological_role = models.ForeignKey(EcologicalRole, on_delete=models.CASCADE)
-
-
 class SpeciesEcologicalRole(CategorizedSpeciesPropertyThroughBase):
     species = models.ForeignKey("SpeciesProperties", on_delete=models.CASCADE)
     ecological_role = models.ForeignKey(EcologicalRole, on_delete=models.CASCADE)
+
+    class Meta(CategorizedSpeciesPropertyThroughBase.Meta):
+        unique_together = ("species", "ecological_role")
 
 
 class SoilPreference(CategorizedPlantPropertyBase):
@@ -207,24 +169,12 @@ class SoilPreference(CategorizedPlantPropertyBase):
         verbose_name_plural = _("soil textures")
 
 
-class SoilPreferenceThroughBase(CategorizedSpeciesPropertyThroughBase):
-    class Meta(SoilPreference.Meta, CategorizedSpeciesPropertyThroughBase.Meta):
-        ordering = None
-
-
-# class FamilySoilPreference(CategorizedSpeciesPropertyThroughBase):
-#     family = models.ForeignKey("FamilyProperties", on_delete=models.CASCADE)
-#     soil_texture = models.ForeignKey(SoilPreference, on_delete=models.CASCADE)
-
-
-# class GenusSoilPreference(CategorizedSpeciesPropertyThroughBase):
-#     genus = models.ForeignKey("GenusProperties", on_delete=models.CASCADE)
-#     soil_texture = models.ForeignKey(SoilPreference, on_delete=models.CASCADE)
-
-
 class SpeciesSoilPreference(CategorizedSpeciesPropertyThroughBase):
     species = models.ForeignKey("SpeciesProperties", on_delete=models.CASCADE)
     soil_texture = models.ForeignKey(SoilPreference, on_delete=models.CASCADE)
+
+    class Meta(CategorizedSpeciesPropertyThroughBase.Meta):
+        unique_together = ("species", "soil_texture")
 
 
 class LightPreference(CategorizedPlantPropertyBase):
@@ -235,21 +185,9 @@ class LightPreference(CategorizedPlantPropertyBase):
         verbose_name_plural = _("light preferences")
 
 
-class LightPreferenceThroughBase(CategorizedSpeciesPropertyThroughBase):
-    class Meta(LightPreference.Meta, CategorizedSpeciesPropertyThroughBase.Meta):
-        ordering = None
-
-
-# class FamilyLightPreference(CategorizedSpeciesPropertyThroughBase):
-#     family = models.ForeignKey("FamilyProperties", on_delete=models.CASCADE)
-#     light_preference = models.ForeignKey(LightPreference, on_delete=models.CASCADE)
-
-
-# class GenusLightPreference(CategorizedSpeciesPropertyThroughBase):
-#     genus = models.ForeignKey("GenusProperties", on_delete=models.CASCADE)
-#     light_preference = models.ForeignKey(LightPreference, on_delete=models.CASCADE)
-
-
 class SpeciesLightPreference(CategorizedSpeciesPropertyThroughBase):
     species = models.ForeignKey("SpeciesProperties", on_delete=models.CASCADE)
     light_preference = models.ForeignKey(LightPreference, on_delete=models.CASCADE)
+
+    class Meta(CategorizedSpeciesPropertyThroughBase.Meta):
+        unique_together = ("species", "light_preference")

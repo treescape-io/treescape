@@ -4,11 +4,12 @@ from langchain_community.llms.fake import FakeListLLM
 from species_data.enrichment.enrich import enrich_species_data
 from plant_species.models import Species
 
+
 class EnrichSpeciesDataTest(TestCase):
     def test_enrich_species_data(self):
         responses = [
             '{"action": "Python REPL", "action_input": "print(2 + 2)"}',
-            '{"final_answer": 4}'
+            '{"final_answer": 4}',
         ]
         llm = FakeListLLM(responses=responses)
 
