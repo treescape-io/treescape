@@ -50,42 +50,6 @@ class DecimalEstimatedRange(CompositeField):
     - minimum
     - typical
     - maximum
-    - confidence (FloatField, range 0-1)
-    """
-
-    minimum = models.DecimalField(
-        _("%(parent_verbose_name)s minimum"),
-        null=True,
-        blank=True,
-        max_digits=3,
-        decimal_places=1,
-    )
-    typical = models.DecimalField(
-        _("%(parent_verbose_name)s typical"),
-        null=True,
-        blank=True,
-        max_digits=3,
-        decimal_places=1,
-    )
-    maximum = models.DecimalField(
-        _("%(parent_verbose_name)s maximum"),
-        null=True,
-        blank=True,
-        max_digits=3,
-        decimal_places=1,
-    )
-    confidence = ConfidenceField(verbose_name=_("%(parent_verbose_name)s confidence"))
-    source = SourceField(verbose_name=_("%(parent_verbose_name)s source"))
-
-
-class DecimalEstimatedRange(CompositeField):
-    """
-    Field representing an integer range estimate.
-
-    It consists of the following 'sub' fields:
-    - minimum
-    - typical
-    - maximum
     - confidence (DecimalField, range 0-1)
     """
 
@@ -110,8 +74,8 @@ class DecimalEstimatedRange(CompositeField):
         max_digits=2,
         decimal_places=1,
     )
-    confidence = ConfidenceField(verbose_name=_("%(parent_verbose_name)s confidence"))
-    source = SourceField(verbose_name=_("%(parent_verbose_name)s source"))
+    confidence = ConfidenceField(verbose_name=_("%(parent_verbose_name)s confidence"))  # pyright: ignore[reportCallIssue]
+    source = SourceField(verbose_name=_("%(parent_verbose_name)s source"))  # pyright: ignore[reportCallIssue]
 
 
 class DurationEstimatedRange(CompositeField):
@@ -141,4 +105,4 @@ class DurationEstimatedRange(CompositeField):
         blank=True,
     )
     confidence = ConfidenceField(verbose_name=_("%(parent_verbose_name)s confidence"))
-    source = SourceField(verbose_name=_("%(parent_verbose_name)s source"))
+    source = SourceField(verbose_name=_("%(parent_verbose_name)s source"))  # pyright: ignore[reportCallIssue]

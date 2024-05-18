@@ -76,20 +76,20 @@ class SpeciesBase(models.Model):
     description = models.TextField(_("description"), blank=True)
     gbif_id = models.IntegerField(_("GBIF usageKey"), editable=False, unique=True)
     image = models.ImageField(upload_to="plant_species/images/", null=True, blank=True)
-    image_thumbnail = AdvanceThumbnailField(
-        source_field="image",
+    image_thumbnail = AdvanceThumbnailField(  # pyright: ignore[reportCallIssue]
+        source_field="image",  # pyright: ignore[reportCallIssue]
         upload_to="plant_species/images/thumbnails/",
         null=True,
         blank=True,
-        size=(512, 512),
+        size=(512, 512),  # pyright: ignore[reportCallIssue]
         editable=False,
     )
-    image_large = AdvanceThumbnailField(
-        source_field="image",
+    image_large = AdvanceThumbnailField(  # pyright: ignore[reportCallIssue]
+        source_field="image",  # pyright: ignore[reportCallIssue]
         upload_to="plant_species/images/large/",
         null=True,
         blank=True,
-        size=(2048, 2048),
+        size=(2048, 2048),  # pyright: ignore[reportCallIssue]
         editable=False,
     )
 
@@ -146,9 +146,11 @@ class SpeciesBase(models.Model):
     def wikipedia_link(self) -> str | None:
         """Get link for species Wikipedia page."""
 
-        return mark_safe(
-            f'<a target="_blank" href="{self.wikipedia_page.url}">{self.wikipedia_page.title}</a>'
-        )
+        if self.wikipedia_page:
+            return mark_safe(
+                f'<a target="_blank" href="{self.wikipedia_page.url}">{self.wikipedia_page.title}</a>'
+            )
+        return _("Not available.")
 
     # TODO: Query Wikidata
     # Options:
@@ -466,7 +468,7 @@ class SpeciesBase(models.Model):
 
             return None
 
-        return list(filter(lambda x: x is not None, map(_get_image_url, results)))
+        return [url for url in map(_get_image_url, results) if url is not None]
 
     @admin.display(
         description="Thumbnail",
