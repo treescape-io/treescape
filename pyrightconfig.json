@@ -1,4 +1,7 @@
 {
 	"typeCheckingMode": "basic",
-	"reportIncompatibleVariableOverride": false
+	"reportIncompatibleVariableOverride": false,
+	"ignore": [
+		"qgis_project"
+	]
 }
