@@ -1,3 +1,4 @@
+import datetime
 import logging
 import decimal
 import enum
@@ -12,7 +13,7 @@ from langchain_core.pydantic_v1 import (
 )
 from species_data.models import SpeciesProperties
 from species_data.models.base import CategorizedPlantPropertyBase
-from species_data.fields import DecimalEstimatedRange
+from species_data.fields import DecimalEstimatedRange, DurationEstimatedRange
 
 
 logger = logging.getLogger(__name__)
@@ -28,6 +29,11 @@ def get_species_data_model():
         minimum: Optional[decimal.Decimal] = Field(max_digits=3, decimal_places=1)
         typical: Optional[decimal.Decimal] = Field(max_digits=3, decimal_places=1)
         maximum: Optional[decimal.Decimal] = Field(max_digits=3, decimal_places=1)
+
+    class DurationRangeField(ConfidenceModel):
+        minimum: Optional[datetime.timedelta]
+        typical: Optional[datetime.timedelta]
+        maximum: Optional[datetime.timedelta]
 
     def generate_django_enum(django_model: Type[CategorizedPlantPropertyBase]) -> Any:
         """Generates a string Enum based on the name field of the Django model instances."""
@@ -58,13 +64,17 @@ def get_species_data_model():
         """Determine the Django model field type based on the property field type."""
         field_type = None
         if isinstance(property_field, DecimalEstimatedRange):
-            logger.debug(f"Adding DecimalRangeField property '{property_field}'.")
+            logger.info(f"Adding DecimalRangeField property '{property_field}'.")
             field_type = DecimalRangeField
 
-        if isinstance(property_field, ManyToManyField) and issubclass(
+        elif isinstance(property_field, DurationEstimatedRange):
+            logger.info(f"Adding DecimalRangeField property '{property_field}'.")
+            field_type = DurationRangeField
+
+        elif isinstance(property_field, ManyToManyField) and issubclass(
             property_field.related_model, CategorizedPlantPropertyBase
         ):
-            logger.debug(f"Adding multiselect property '{property_field}'.")
+            logger.info(f"Adding multiselect property '{property_field}'.")
             field_type = generate_django_multiselect_field(property_field.related_model)
 
         if field_type:
