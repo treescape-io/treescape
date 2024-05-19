@@ -13,7 +13,7 @@ class Command(BaseCommand):
     help = "Generates additional data about plant species using a language model."
 
     def handle(self, *args, **options):
-        llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+        llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
 
         # try:
         species_list = Species.objects.all()[:5]

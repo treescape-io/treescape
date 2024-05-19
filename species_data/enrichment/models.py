@@ -64,17 +64,17 @@ def get_species_data_model():
         """Determine the Django model field type based on the property field type."""
         field_type = None
         if isinstance(property_field, DecimalEstimatedRange):
-            logger.info(f"Adding DecimalRangeField property '{property_field}'.")
+            logger.debug(f"Adding DecimalRangeField property '{property_field}'.")
             field_type = DecimalRangeField
 
         elif isinstance(property_field, DurationEstimatedRange):
-            logger.info(f"Adding DecimalRangeField property '{property_field}'.")
+            logger.debug(f"Adding DecimalRangeField property '{property_field}'.")
             field_type = DurationRangeField
 
         elif isinstance(property_field, ManyToManyField) and issubclass(
             property_field.related_model, CategorizedPlantPropertyBase
         ):
-            logger.info(f"Adding multiselect property '{property_field}'.")
+            logger.debug(f"Adding multiselect property '{property_field}'.")
             field_type = generate_django_multiselect_field(property_field.related_model)
 
         if field_type:

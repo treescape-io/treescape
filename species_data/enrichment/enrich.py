@@ -1,7 +1,6 @@
 import logging
-import decimal
 import datetime
-from langchain_core.language_models import BaseLLM
+from langchain_core.language_models import BaseLanguageModel
 
 from plant_species.models import Species
 from species_data.models import (
@@ -83,7 +82,7 @@ def set_category_property(
             through_class.objects.update_or_create(**props)
 
 
-def enrich_species_data(species: Species, llm: BaseLLM):
+def enrich_species_data(species: Species, llm: BaseLanguageModel):
     """Retrieves and stores additional data about a plant species using a language model."""
 
     chain = get_enrichment_chain(llm)
@@ -117,19 +116,17 @@ def enrich_species_data(species: Species, llm: BaseLLM):
     #                            'ornamental-flowers',
     #                            'ornamental-foliage']}
 
-    (source_type, created) = SourceType.objects.get_or_create(name="Wikipedia")
-    (source, created) = Source.objects.get_or_create(
+    source_type = SourceType.objects.get_or_create(name="Wikipedia")[0]
+    source = Source.objects.get_or_create(
         url=f"https://en.wikipedia.org/w/index.php?title={species.wikipedia_page.title}&oldid={species.wikipedia_page.revision_id}",
         defaults={
             "name": species.wikipedia_page.title,
             "source_type": source_type,
             "date": datetime.datetime.now(),
         },
-    )
+    )[0]
 
-    (species_properties, created) = SpeciesProperties.objects.get_or_create(
-        species=species
-    )
+    species_properties = SpeciesProperties.objects.get_or_create(species=species)[0]
 
     range_properties = ["height", "width"]
     for prop_name in range_properties:
