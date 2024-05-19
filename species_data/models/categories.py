@@ -175,19 +175,3 @@ class SpeciesSoilPreference(CategorizedSpeciesPropertyThroughBase):
 
     class Meta(CategorizedSpeciesPropertyThroughBase.Meta):
         unique_together = ("species", "soil_texture")
-
-
-class LightPreference(CategorizedPlantPropertyBase):
-    """Light preference, e.g. full sun, partial shade, full shade etc."""
-
-    class Meta(CategorizedPlantPropertyBase.Meta):
-        verbose_name = _("light preference")
-        verbose_name_plural = _("light preferences")
-
-
-class SpeciesLightPreference(CategorizedSpeciesPropertyThroughBase):
-    species = models.ForeignKey("SpeciesProperties", on_delete=models.CASCADE)
-    light_preference = models.ForeignKey(LightPreference, on_delete=models.CASCADE)
-
-    class Meta(CategorizedSpeciesPropertyThroughBase.Meta):
-        unique_together = ("species", "light_preference")

@@ -40,6 +40,8 @@ class PlantPropertiesBase(models.Model):
 
     soil_acidity = DecimalEstimatedRange(verbose_name=_("preferred soil acidity (pH)"))
 
+    sun_hours = DurationEstimatedRange(verbose_name=_("hours of direct sun per day"))
+
     production_start = DurationEstimatedRange(verbose_name=_("production start"))
     production_peak = DurationEstimatedRange(verbose_name=_("production peak"))
     lifetime = DurationEstimatedRange(verbose_name=_("lifetime"))

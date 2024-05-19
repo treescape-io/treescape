@@ -7,7 +7,6 @@ from .models import (
     HumanUse,
     EcologicalRole,
     SoilPreference,
-    LightPreference,
     # FamilyGrowthHabit,
     # GenusGrowthHabit,
     SpeciesGrowthHabit,
@@ -23,9 +22,6 @@ from .models import (
     # FamilySoilPreference,
     # GenusSoilPreference,
     SpeciesSoilPreference,
-    # FamilyLightPreference,
-    # GenusLightPreference,
-    SpeciesLightPreference,
     # FamilyProperties,
     # GenusProperties,
     SpeciesProperties,
@@ -145,17 +141,6 @@ class SpeciesSoilPreferenceInline(CategoryInlineBase):
     model = SpeciesSoilPreference
 
 
-# class FamilyLightPreferenceInline(CategoryInlineBase):
-#     model = FamilyLightPreference
-
-# class GenusLightPreferenceInline(CategoryInlineBase):
-#     model = GenusLightPreference
-
-
-class SpeciesLightPreferenceInline(CategoryInlineBase):
-    model = SpeciesLightPreference
-
-
 _autocomplete_source_fields = [
     "height_source",
     "width_source",
@@ -209,7 +194,6 @@ class SpeciesPropertiesAdmin(admin.ModelAdmin):
         SpeciesHumanUseInline,
         SpeciesEcologicalRoleInline,
         SpeciesSoilPreferenceInline,
-        SpeciesLightPreferenceInline,
     ]
     list_display = ("species",)
     search_fields = (

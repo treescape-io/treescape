@@ -1,10 +1,8 @@
 from typing import NamedTuple
 from django.db import models
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from plant_species.models import Genus, Family, Species, SpeciesVariety
-from species_data.fields import DecimalEstimatedRange, DurationEstimatedRange
+from plant_species.models import Species
 
 from .base import PlantPropertiesBase
 from .source import SourceType
@@ -30,10 +28,6 @@ from .categories import (
     # FamilySoilPreference,
     # GenusSoilPreference,
     SpeciesSoilPreference,
-    LightPreference,
-    # FamilyLightPreference,
-    # GenusLightPreference,
-    SpeciesLightPreference,
 )
 
 
@@ -94,9 +88,6 @@ class SpeciesProperties(PlantPropertiesBase):
     )
     soil_preference = models.ManyToManyField(
         SoilPreference, through=SpeciesSoilPreference
-    )
-    light_preference = models.ManyToManyField(
-        LightPreference, through=SpeciesLightPreference
     )
 
     class Meta:
