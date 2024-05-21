@@ -6,11 +6,11 @@ from plant_species.models import Species, Genus, Family
 
 def get_species():
     # TODO: Proper mocks, not requiring internet access.
-    family = Family.objects.create(latin_name="Family", gbif_id="34343")
-    genus = Genus.objects.create(latin_name="Genus", gbif_id="3435123", family=family)
+    family = Family.objects.create(latin_name="Family", gbif_id=34343)
+    genus = Genus.objects.create(latin_name="Genus", gbif_id=3435123, family=family)
 
     species = Species.objects.create(
-        latin_name="Quercus robur", gbif_id="34343", genus=genus
+        latin_name="Quercus robur", gbif_id=34343, genus=genus
     )
 
     return species
