@@ -41,7 +41,7 @@ LOGGING = {
         "level": "INFO",
     },
     "loggers": {
-        "plant_species": {
+        "species_data": {
             "handlers": ["console"],
             "level": "DEBUG",
             "propagate": False,
