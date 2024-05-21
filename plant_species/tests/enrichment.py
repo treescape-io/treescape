@@ -61,3 +61,30 @@ class GBIFTestCase(TestCase):
 
         expected_urls = ["https://example.com/image1.jpg"]
         self.assertEqual(gbif.get_image_urls(12345), expected_urls)
+
+    def test_convert_language_code(self):
+        self.assertEqual(gbif._convert_language_code("eng"), "en")
+        self.assertEqual(gbif._convert_language_code("fra"), "fr")
+        self.assertEqual(gbif._convert_language_code("deu"), "de")
+
+    @patch("plant_species.enrichment.gbif.species.name_usage")
+    def test_get_common_names(self, mock_name_usage):
+        mock_name_usage.return_value = {
+            "results": [
+                {"language": "eng", "vernacularName": "House Sparrow"},
+                {"language": "fra", "vernacularName": "Moineau domestique"},
+                {"language": "deu", "vernacularName": "Haussperling"},
+                {"language": "spa", "vernacularName": "Gorrión común"},
+            ]
+        }
+
+        enabled_languages = ["en", "fr", "de"]
+        expected_common_names = [
+            {"language": "en", "name": "House Sparrow"},
+            {"language": "fr", "name": "Moineau domestique"},
+            {"language": "de", "name": "Haussperling"},
+        ]
+
+        self.assertEqual(
+            gbif.get_common_names(12345, enabled_languages), expected_common_names
+        )

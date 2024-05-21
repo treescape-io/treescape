@@ -1,7 +1,6 @@
 import logging
 import wikipedia
 import requests
-import pycountry
 import typing
 
 from django.core.files.base import ContentFile
@@ -22,20 +21,10 @@ from pygbif import species
 from django_advance_thumbnail import AdvanceThumbnailField
 
 from .exceptions import EnrichmentException, SpeciesAlreadyExists, SpeciesNotFound
-from plant_species.enrichment.gbif import get_image_urls
+from plant_species.enrichment.gbif import get_image_urls, get_common_names
 
 
 logger = logging.getLogger(__name__)
-
-
-def _convert_language_code(alpha_3):
-    """Convert ISO 639-2 code to ISO 639-1 using pycountry."""
-
-    assert alpha_3
-    country = pycountry.languages.get(alpha_3=alpha_3)
-    assert country
-
-    return country.alpha_2
 
 
 class CommonNameBase(models.Model):
@@ -318,29 +307,13 @@ class SpeciesBase(models.Model):
         assert self.pk, "Needs to be saved before adding common names."
         assert self.gbif_id, "GBIF id required to fetch common names."
 
-        names_data = species.name_usage(self.gbif_id, data="vernacularNames")
-
-        assert isinstance(names_data, dict)
-        results = names_data["results"]
-
         enabled_languages = [lang[0] for lang in settings.LANGUAGES]
+        common_names = get_common_names(self.gbif_id, enabled_languages)
 
-        assert isinstance(results, list)
-        for name_data in results:
-            assert isinstance(name_data, dict)
-            assert "language" in name_data
-            assert "vernacularName" in name_data and name_data["vernacularName"]
-
-            if not name_data["language"]:
-                continue
-
-            alpha2_lang = _convert_language_code(name_data["language"])
-            assert alpha2_lang
-
-            if alpha2_lang in enabled_languages:
-                self.common_names.get_or_create(
-                    language=alpha2_lang, name=name_data["vernacularName"]
-                )
+        for name_data in common_names:
+            self.common_names.get_or_create(
+                language=name_data["language"], name=name_data["name"]
+            )
 
     def enrich_wikipedia(self):
         if not self.description and self.wikipedia_page:

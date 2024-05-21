@@ -1,6 +1,7 @@
 import typing
+import pycountry
 
-from pygbif import occurrences
+from pygbif import occurrences, species
 
 _valid_licenses = (
     # CC-BY
@@ -292,3 +293,42 @@ def get_image_urls(taxonKey: int) -> typing.List[str]:
     assert isinstance(results, list)
 
     return [url for url in map(_get_image_url, results) if url is not None]
+
+
+def _convert_language_code(alpha_3):
+    """Convert ISO 639-2 code to ISO 639-1 using pycountry."""
+
+    assert alpha_3
+    country = pycountry.languages.get(alpha_3=alpha_3)
+    assert country
+
+    return country.alpha_2
+
+
+def get_common_names(
+    gbif_id: int, enabled_languages: typing.List[str]
+) -> typing.List[typing.Dict[str, str]]:
+    """Fetch common names from GBIF for the given gbif_id and return them as a list of dictionaries."""
+    names_data = species.name_usage(gbif_id, data="vernacularNames")
+    assert isinstance(names_data, dict)
+    results = names_data["results"]
+    assert isinstance(results, list)
+
+    common_names = []
+    for name_data in results:
+        assert isinstance(name_data, dict)
+        assert "language" in name_data
+        assert "vernacularName" in name_data and name_data["vernacularName"]
+
+        if not name_data["language"]:
+            continue
+
+        alpha2_lang = _convert_language_code(name_data["language"])
+        assert alpha2_lang
+
+        if alpha2_lang in enabled_languages:
+            common_names.append(
+                {"language": alpha2_lang, "name": name_data["vernacularName"]}
+            )
+
+    return common_names
