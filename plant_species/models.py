@@ -13,7 +13,7 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
 from django.utils.functional import cached_property
-from django.db.models.signals import ModelSignal, post_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import get_language
 from django.contrib import admin

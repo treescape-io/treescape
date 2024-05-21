@@ -26,7 +26,6 @@ from .models import (
     # GenusProperties,
     SpeciesProperties,
 )
-from django.utils.translation import gettext_lazy as _
 
 
 @admin.register(SourceType)
