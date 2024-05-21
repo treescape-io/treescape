@@ -47,7 +47,9 @@ Other/commercial licensing available upon request.
 9. Navigate to http://localhost:8080/admin/ to access the Django Admin.
 
 ## Loading species data
-A list of ~500 species relevant to agroforestry is provided, data for which is automatically loaded from various sources (currently GBIF and Wikipedia, soon: more).
+### Species list
+A list of ~500 species relevant to agroforestry is provided, data for which is automatically loaded from various sources (currently GBIF and Wikipedia, soon: more). The command below will add the species, genus and family.
 
-`./manage.py load_species`
+`./manage.py load_species species_list.txt`
 
+Note that loading species is idempotent, meaning that no action is performed trying to load a species twice.

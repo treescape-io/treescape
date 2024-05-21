@@ -70,7 +70,7 @@ class SpeciesBase(models.Model):
     latin_name = models.CharField(
         _("latin name"), max_length=255, unique=True, blank=True
     )
-    slug = models.SlugField(_("slug"), max_length=255, unique=True)
+    slug = models.SlugField(_("slug"), max_length=255, unique=True, blank=True)
     description = models.TextField(_("description"), blank=True)
     gbif_id = models.IntegerField(_("GBIF usageKey"), editable=False, unique=True)
     image = models.ImageField(upload_to="plant_species/images/", null=True, blank=True)
@@ -284,7 +284,7 @@ class SpeciesBase(models.Model):
             try:
                 self.enrich()
             except EnrichmentException as e:
-                raise ValidationError(e)
+                raise ValidationError(e) from e
 
         super().clean()
 
