@@ -3,6 +3,8 @@ import pycountry
 
 from pygbif import occurrences, species
 
+from .exceptions import SpeciesNotFound
+
 _valid_licenses = (
     # CC-BY
     "http://creativecommons.org/licenses/by/4.0/legalcode",
@@ -332,3 +334,31 @@ def get_common_names(
             )
 
     return common_names
+
+
+def get_latin_names(
+    latin_name: str, rank: str
+) -> typing.Dict[str, typing.Optional[str]]:
+    """Fetch species data from GBIF backbone based on the latin name and rank."""
+    assert latin_name, "Species name required to enrich data."
+    assert rank in ["FAMILY", "GENUS", "SPECIES"]
+
+    species_data = species.name_backbone(
+        name=latin_name,
+        rank=rank,
+        kingdom="plants",
+        limit=2,
+        strict=False,
+    )
+
+    if species_data["matchType"] != "EXACT":
+        raise SpeciesNotFound(f"No unique match species '{latin_name}'.")
+
+    return {
+        "species": species_data.get("species"),
+        "genus": species_data.get("genus"),
+        "family": species_data.get("family"),
+        "speciesKey": species_data.get("speciesKey"),
+        "genusKey": species_data.get("genusKey"),
+        "familyKey": species_data.get("familyKey"),
+    }

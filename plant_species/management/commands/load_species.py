@@ -3,8 +3,8 @@ from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
 
-from ...exceptions import SpeciesAlreadyExists
-from ...models import Species
+from plant_species.enrichment.exceptions import SpeciesAlreadyExists
+from plant_species.models import Species
 
 # Path to species_list.txt, getting current directory where script resides.
 species_txt = Path(__file__).resolve().parent / "species_list.txt"

@@ -3,6 +3,7 @@ import wikipedia
 import requests
 import typing
 
+from enum import Enum
 from django.core.files.base import ContentFile
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.template.defaultfilters import slugify
@@ -12,19 +13,32 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
 from django.utils.functional import cached_property
-from django.db.models.signals import post_save
+from django.db.models.signals import ModelSignal, post_save
 from django.dispatch import receiver
 from django.utils.translation import get_language
 from django.contrib import admin
 
-from pygbif import species
 from django_advance_thumbnail import AdvanceThumbnailField
 
-from .exceptions import EnrichmentException, SpeciesAlreadyExists, SpeciesNotFound
-from plant_species.enrichment.gbif import get_image_urls, get_common_names
+from plant_species.enrichment.exceptions import (
+    EnrichmentException,
+    SpeciesAlreadyExists,
+)
+
+from plant_species.enrichment.gbif import (
+    get_image_urls,
+    get_common_names,
+    get_latin_names,
+)
 
 
 logger = logging.getLogger(__name__)
+
+
+class Rank(Enum):
+    FAMILY = "FAMILY"
+    GENUS = "GENUS"
+    SPECIES = "SPECIES"
 
 
 class CommonNameBase(models.Model):
@@ -190,50 +204,12 @@ class SpeciesBase(models.Model):
             )
         return _("N/A")
 
-    def enrich_gbif_name(self, rank):
+    def enrich_gbif_name(self, rank: Rank):
         """Fetch species data from GBIF backbone based on the latin name and updates the instance."""
 
         assert self.latin_name, "Species name required to enrich data."
-        assert rank in ["FAMILY", "GENUS", "SPECIES"]
+        species_data = get_latin_names(self.latin_name, rank.value)
 
-        # Calls https://techdocs.gbif.org/en/openapi/v1/species#/Searching%20names/matchNames
-        species_data = species.name_backbone(
-            name=self.latin_name,
-            rank=rank,
-            kingdom="plants",
-            limit=2,  # We're basically resolving here - don't need a list!,
-            strict=False,  # Never match a taxon in the upper classification
-        )
-
-        """ Returns something like this:
-        {'canonicalName': 'Quercus robur',
-         'class': 'Magnoliopsida',
-         'classKey': 220,
-         'confidence': 98,
-         'family': 'Fagaceae',
-         'familyKey': 4689,
-         'genus': 'Quercus',
-         'genusKey': 2877951,
-         'kingdom': 'Plantae',
-         'kingdomKey': 6,
-         'matchType': 'EXACT',
-         'order': 'Fagales',
-         'orderKey': 1354,
-         'phylum': 'Tracheophyta',
-         'phylumKey': 7707728,
-         'rank': 'SPECIES',
-         'scientificName': 'Quercus robur L.',
-         'species': 'Quercus robur',
-         'speciesKey': 2878688,
-         'status': 'ACCEPTED',
-         'synonym': False,
-         'usageKey': 2878688}
-         """
-
-        if species_data["matchType"] != "EXACT":
-            raise SpeciesNotFound(f"No unique match species '{self.latin_name}'.")
-
-        # Use the first non-empty key. Note that synonyms have a different usageKey, so we can't use that.
         self.gbif_id = next(
             filter(
                 None,
@@ -261,9 +237,9 @@ class SpeciesBase(models.Model):
             filter(
                 None,
                 (
-                    species_data.get("species"),
-                    species_data.get("genus"),
-                    species_data.get("family"),
+                    species_data["species"],
+                    species_data["genus"],
+                    species_data["family"],
                 ),
             ),
             None,
@@ -281,7 +257,7 @@ class SpeciesBase(models.Model):
             # Skip existing images.
             return
 
-        assert self.gbif_id
+        assert isinstance(self.gbif_id, int)
         image_urls = get_image_urls(self.gbif_id)
 
         if image_urls:
@@ -308,6 +284,8 @@ class SpeciesBase(models.Model):
         assert self.gbif_id, "GBIF id required to fetch common names."
 
         enabled_languages = [lang[0] for lang in settings.LANGUAGES]
+
+        assert isinstance(self.gbif_id, int)
         common_names = get_common_names(self.gbif_id, enabled_languages)
 
         for name_data in common_names:
@@ -353,7 +331,7 @@ class Family(SpeciesBase):
         verbose_name_plural = _("families")
 
     def enrich_data(self):
-        self.enrich_gbif_name(rank="FAMILY")
+        self.enrich_gbif_name(rank=Rank.FAMILY)
         self.enrich_gbif_image()
         self.enrich_wikipedia()
 
@@ -368,7 +346,7 @@ class Genus(SpeciesBase):
         verbose_name_plural = _("genera")
 
     def enrich_data(self):
-        self.enrich_gbif_name(rank="GENUS")
+        self.enrich_gbif_name(rank=Rank.GENUS)
         self.enrich_gbif_image()
         self.enrich_wikipedia()
 
@@ -383,7 +361,7 @@ class Species(SpeciesBase):
         verbose_name_plural = _("species")
 
     def enrich_data(self):
-        self.enrich_gbif_name(rank="SPECIES")
+        self.enrich_gbif_name(rank=Rank.SPECIES)
         self.enrich_gbif_image()
         self.enrich_wikipedia()
 
