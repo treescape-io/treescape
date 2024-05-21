@@ -52,8 +52,6 @@ class CommonNameBase(models.Model):
         """Returns the common name and its language."""
         return self.name
 
-        super().save(*args, **kwargs)
-
     class Meta:
         verbose_name = _("common name")
         verbose_name_plural = _("common names")
