@@ -99,11 +99,10 @@ class SpeciesBase(models.Model):
     )
 
     if typing.TYPE_CHECKING:
-        from types import MethodType
         from django.db.models.manager import RelatedManager
 
         common_names: RelatedManager[CommonNameBase]
-        enrich_data: MethodType
+        _rank: Rank
 
     def __str__(self):
         """Returns the Latin name of the family."""
@@ -276,14 +275,15 @@ class SpeciesBase(models.Model):
                 )
                 self.description = wikipedia_page.summary.strip()
 
-    def clean(self):
-        if not self.pk:
-            try:
-                self.enrich_data()
-            except EnrichmentException as e:
-                raise ValidationError(e)
+    def enrich(self):
+        self.enrich_gbif_name(rank=self._rank)
+        self.enrich_gbif_image()
+        self.enrich_wikipedia()
 
-        super().clean()
+    def enrich_related(self):
+        assert self.pk, "Instance needs to be saved before enrich_related() is called."
+
+        self.enrich_gbif_common_names()
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -304,10 +304,7 @@ class Family(SpeciesBase):
         verbose_name = _("family")
         verbose_name_plural = _("families")
 
-    def enrich_data(self):
-        self.enrich_gbif_name(rank=Rank.FAMILY)
-        self.enrich_gbif_image()
-        self.enrich_wikipedia()
+    _rank = Rank.FAMILY
 
 
 class Genus(SpeciesBase):
@@ -319,10 +316,7 @@ class Genus(SpeciesBase):
         verbose_name = _("genus")
         verbose_name_plural = _("genera")
 
-    def enrich_data(self):
-        self.enrich_gbif_name(rank=Rank.GENUS)
-        self.enrich_gbif_image()
-        self.enrich_wikipedia()
+    _rank = Rank.GENUS
 
 
 class Species(SpeciesBase):
@@ -334,28 +328,7 @@ class Species(SpeciesBase):
         verbose_name = _("species")
         verbose_name_plural = _("species")
 
-    def enrich_data(self):
-        self.enrich_gbif_name(rank=Rank.SPECIES)
-        self.enrich_gbif_image()
-        self.enrich_wikipedia()
-
-
-@receiver(post_save, sender=Family)
-def enrich_family(sender, instance, created, **kwargs):
-    if created:
-        instance.enrich_gbif_common_names()
-
-
-@receiver(post_save, sender=Genus)
-def enrich_genus(sender, instance, created, **kwargs):
-    if created:
-        instance.enrich_gbif_common_names()
-
-
-@receiver(post_save, sender=Species)
-def enrich_species(sender, instance, created, **kwargs):
-    if created:
-        instance.enrich_gbif_common_names()
+    _rank = Rank.GENUS
 
 
 def _get_family(species_data: dict) -> Family:
