@@ -1,3 +1,4 @@
+import enum
 import typing
 from django.core.files.base import ContentFile
 import pycountry
@@ -357,12 +358,16 @@ def get_common_names(
     return common_names
 
 
+class Rank(enum.Enum):
+    FAMILY = "FAMILY"
+    GENUS = "GENUS"
+    SPECIES = "SPECIES"
+
+
 def get_latin_names(
-    latin_name: str, rank: str
+    latin_name: str, rank: Rank
 ) -> typing.Dict[str, typing.Optional[str]]:
     """Fetch species data from GBIF backbone based on the latin name and rank."""
-    assert latin_name, "Species name required to enrich data."
-    assert rank in ["FAMILY", "GENUS", "SPECIES"]
 
     species_data = species.name_backbone(
         name=latin_name,

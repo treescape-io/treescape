@@ -113,6 +113,10 @@ class SpeciesAdmin(SpeciesAdminBase):
     autocomplete_fields = ("genus",)
     inlines = [SpeciesCommonNameInline, VarietyInline]
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        obj.enrich_related()
+
     def genus_family_link(self, obj):
         genus_url = reverse("admin:plant_species_genus_change", args=[obj.genus.pk])
         family_url = reverse(

@@ -1,8 +1,8 @@
 import logging
 import typing
 
-from enum import Enum
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist
+from django.forms import ValidationError
 from django.template.defaultfilters import slugify
 from django.db import models, transaction
 from django.db.models.query import Q
@@ -10,8 +10,6 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
 from django.utils.functional import cached_property
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.utils.translation import get_language
 from django.contrib import admin
 
@@ -26,18 +24,13 @@ from plant_species.enrichment.gbif import (
     get_image,
     get_common_names,
     get_latin_names,
+    Rank,
 )
 
 from plant_species.enrichment.wikipedia import get_wikipedia_page
 
 
 logger = logging.getLogger(__name__)
-
-
-class Rank(Enum):
-    FAMILY = "FAMILY"
-    GENUS = "GENUS"
-    SPECIES = "SPECIES"
 
 
 class CommonNameBase(models.Model):
@@ -116,6 +109,10 @@ class SpeciesBase(models.Model):
     @admin.display(description=_("Common Name"))
     def get_common_name(self) -> str | None:
         """Return common name for currently used language."""
+
+        if not self.pk:
+            return None
+
         current_lang = get_language()
 
         if not current_lang:
@@ -190,11 +187,11 @@ class SpeciesBase(models.Model):
             )
         return _("N/A")
 
-    def enrich_gbif_name(self, rank: Rank):
+    def enrich_gbif_backbone(self):
         """Fetch species data from GBIF backbone based on the latin name and updates the instance."""
 
         assert self.latin_name, "Species name required to enrich data."
-        species_data = get_latin_names(self.latin_name, rank.value)
+        species_data = get_latin_names(self.latin_name, self._rank)
 
         self.gbif_id = next(
             filter(
@@ -231,10 +228,10 @@ class SpeciesBase(models.Model):
             None,
         )
 
-        if rank == "SPECIES":
+        if self._rank is Rank.SPECIES:
             self.genus = _get_genus(species_data)
 
-        elif rank == "GENUS":
+        if self._rank is not Rank.FAMILY:
             self.family = _get_family(species_data)
 
     def enrich_gbif_image(self):
@@ -268,15 +265,11 @@ class SpeciesBase(models.Model):
 
     def enrich_wikipedia(self):
         if not self.description and self.wikipedia_page:
-            wikipedia_page = self.wikipedia_page
-            if isinstance(wikipedia_page, wikipedia.WikipediaPage):
-                logger.debug(
-                    "Adding description for %s from Wikipedia", self.latin_name
-                )
-                self.description = wikipedia_page.summary.strip()
+            logger.debug("Adding description for %s from Wikipedia", self.latin_name)
+            self.description = self.wikipedia_page.summary.strip()
 
     def enrich(self):
-        self.enrich_gbif_name(rank=self._rank)
+        self.enrich_gbif_backbone()
         self.enrich_gbif_image()
         self.enrich_wikipedia()
 
@@ -284,6 +277,16 @@ class SpeciesBase(models.Model):
         assert self.pk, "Instance needs to be saved before enrich_related() is called."
 
         self.enrich_gbif_common_names()
+
+    def clean(self):
+        if not self.pk:
+            # Do this here in order to propagate user-friendly ValidationErrors.
+            try:
+                self.enrich()
+            except EnrichmentException as e:
+                raise ValidationError(e)
+
+        super().clean()
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -328,7 +331,7 @@ class Species(SpeciesBase):
         verbose_name = _("species")
         verbose_name_plural = _("species")
 
-    _rank = Rank.GENUS
+    _rank = Rank.SPECIES
 
 
 def _get_family(species_data: dict) -> Family:

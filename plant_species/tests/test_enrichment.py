@@ -63,37 +63,35 @@ class GBIFTestCase(TestCase):
         expected_urls = ["https://example.com/image1.jpg"]
         self.assertEqual(gbif._get_image_urls(12345), expected_urls)
 
-    @patch('plant_species.enrichment.gbif._get_image_urls')
-    @patch('requests.get')
+    @patch("plant_species.enrichment.gbif._get_image_urls")
+    @patch("requests.get")
     def test_get_image(self, mock_get, mock_get_image_urls):
         # Mock the _get_image_urls to return a list of image URLs
-        mock_get_image_urls.return_value = ['http://example.com/image.jpg']
+        mock_get_image_urls.return_value = ["http://example.com/image.jpg"]
 
         # Mock the requests.get to return a response with image content
         mock_response = MagicMock()
-        mock_response.__enter__.return_value.headers = {'Content-Type': 'image/jpeg'}
-        mock_response.__enter__.return_value.content = b'image content'
+        mock_response.__enter__.return_value.headers = {"Content-Type": "image/jpeg"}
+        mock_response.__enter__.return_value.content = b"image content"
         mock_get.return_value = mock_response
-
 
         # Call the get_image function
         result = gbif.get_image(12345)
 
-
         # Assert that the result is a ContentFile with the expected content
-        self.assertIsInstance(result, ContentFile)
-        self.assertEqual(result.read(), b'image content')
+        assert isinstance(result, ContentFile)
+        self.assertEqual(result.read(), b"image content")
 
-    @patch('plant_species.enrichment.gbif._get_image_urls')
-    @patch('requests.get')
+    @patch("plant_species.enrichment.gbif._get_image_urls")
+    @patch("requests.get")
     def test_get_image_no_valid_images(self, mock_get, mock_get_image_urls):
         # Mock the _get_image_urls to return a list of image URLs
-        mock_get_image_urls.return_value = ['http://example.com/image.png']
+        mock_get_image_urls.return_value = ["http://example.com/image.png"]
 
         # Mock the requests.get to return a response with non-JPEG content
         mock_response = MagicMock()
-        mock_response.headers = {'Content-Type': 'image/png'}
-        mock_response.content = b'image content'
+        mock_response.headers = {"Content-Type": "image/png"}
+        mock_response.content = b"image content"
         mock_get.return_value = mock_response
 
         # Call the get_image function
@@ -133,11 +131,11 @@ class WikipediaTestCase(TestCase):
     def test_get_wikipedia_page_success(self, mock_page):
         mock_page.return_value = MagicMock(title="Test Page")
         page = wikipedia.get_wikipedia_page("Test Page")
-        self.assertIsNotNone(page)
+        assert page
         self.assertEqual(page.title, "Test Page")
 
     @patch("plant_species.enrichment.wikipedia.wikipedia.page")
     def test_get_wikipedia_page_failure(self, mock_page):
-        mock_page.side_effect = wikipedia.wikipedia.PageError(title="Test Page")
+        mock_page.side_effect = wikipedia.wikipedia.PageError(pageid=18630637)
         page = wikipedia.get_wikipedia_page("Test Page")
         self.assertIsNone(page)

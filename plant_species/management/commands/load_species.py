@@ -1,7 +1,7 @@
 from tqdm import tqdm
 from pathlib import Path
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from plant_species.enrichment.exceptions import SpeciesAlreadyExists
 from plant_species.models import Species
@@ -15,33 +15,32 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Iterate over species_list.txt in local directory
-        try:
-            with open(species_txt, "r") as species_file:
-                species_list = species_file.readlines()
+        with open(species_txt, "r") as species_file:
+            species_list = species_file.readlines()
 
-            species_list = [s.strip() for s in species_list]
+        species_list = [s.strip() for s in species_list]
 
-            add_count = 0
-            synonym_count = 0
-            for species_name in tqdm(species_list):
-                try:
-                    # Check literal name
-                    Species.objects.get(latin_name=species_name)
-                except Species.DoesNotExist:
+        add_count = 0
+        synonym_count = 0
+
+        with tqdm(species_list) as pbar:
+            for species_name in pbar:
+                if not Species.objects.filter(latin_name=species_name).exists():
                     s = Species(latin_name=species_name)
                     try:
-                        s.enrich_data()
+                        s.enrich()
                     except SpeciesAlreadyExists:
-                        # Skip synonyms
                         synonym_count += 1
+                        pbar.write(f"Skipping synonym species: {species_name}.")
                         continue
 
                     s.full_clean()
                     s.save()
+                    s.enrich_related()
+
                     add_count += 1
-        except Exception as e:
-            # Catch and re-raise any exceptions.
-            raise CommandError(e)
+                else:
+                    pbar.write(f"Skipping existing species: {species_name}.")
 
         self.stdout.write(
             self.style.SUCCESS(
