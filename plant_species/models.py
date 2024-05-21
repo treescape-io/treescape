@@ -1,9 +1,7 @@
 import logging
-import requests
 import typing
 
 from enum import Enum
-from django.core.files.base import ContentFile
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.template.defaultfilters import slugify
 from django.db import models, transaction
@@ -25,7 +23,7 @@ from plant_species.enrichment.exceptions import (
 )
 
 from plant_species.enrichment.gbif import (
-    get_image_urls,
+    get_image,
     get_common_names,
     get_latin_names,
 )
@@ -247,25 +245,12 @@ class SpeciesBase(models.Model):
             return
 
         assert isinstance(self.gbif_id, int), "gbif_id not an integer"
-        image_urls = get_image_urls(self.gbif_id)
-
-        if image_urls:
-            for image_url in image_urls:
-                with requests.get(image_url) as response:
-                    if response.headers["Content-Type"] not in (
-                        "image/jpeg",
-                        "image/jpg",
-                    ):
-                        continue
-
-                    assert self.latin_name
-                    image_name = f"{slugify(self.latin_name)}.jpg"
-                    image_file = ContentFile(response.content)
-
-                    logger.debug("Saving image %s for %s", image_name, self.latin_name)
-                    self.image.save(image_name, image_file)
-
-                    break
+        image_file = get_image(self.gbif_id)
+        if image_file:
+            assert self.latin_name
+            image_name = f"{slugify(self.latin_name)}.jpg"
+            logger.debug("Saving image %s for %s", image_name, self.latin_name)
+            self.image.save(image_name, image_file)
 
     def enrich_gbif_common_names(self):
         """Fetch (missing) common names from GBIF in configured languages."""

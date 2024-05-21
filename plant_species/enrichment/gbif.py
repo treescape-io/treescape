@@ -1,7 +1,9 @@
 import typing
+from django.core.files.base import ContentFile
 import pycountry
 
 from pygbif import occurrences, species
+import requests
 
 from .exceptions import SpeciesNotFound
 
@@ -29,7 +31,7 @@ def _get_image_url(occurrence: dict) -> str | None:
     return None
 
 
-def get_image_urls(taxonKey: int) -> typing.List[str]:
+def _get_image_urls(taxonKey: int) -> typing.List[str]:
     """Get URL of CC licensed images."""
     occurrence_data = occurrences.search(
         taxonKey, mediatype="StillImage", basisOfRecord="HUMAN_OBSERVATION"
@@ -295,6 +297,25 @@ def get_image_urls(taxonKey: int) -> typing.List[str]:
     assert isinstance(results, list)
 
     return [url for url in map(_get_image_url, results) if url is not None]
+
+
+def get_image(gbif_id: int) -> ContentFile | None:
+    """Fetch image from GBIF and return as ContentFile."""
+    image_urls = _get_image_urls(gbif_id)
+
+    if image_urls:
+        for image_url in image_urls:
+            with requests.get(image_url) as response:
+                if response.headers["Content-Type"] not in (
+                    "image/jpeg",
+                    "image/jpg",
+                ):
+                    continue
+
+                # Pick the first JPEG image returned.
+                content_file = ContentFile(response.content)
+                return content_file
+    return None
 
 
 def _convert_language_code(alpha_3):
