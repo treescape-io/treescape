@@ -1,5 +1,4 @@
 import logging
-import wikipedia
 import requests
 import typing
 
@@ -30,6 +29,8 @@ from plant_species.enrichment.gbif import (
     get_common_names,
     get_latin_names,
 )
+
+from plant_species.enrichment.wikipedia import get_wikipedia_page
 
 
 logger = logging.getLogger(__name__)
@@ -168,21 +169,9 @@ class SpeciesBase(models.Model):
 
     @cached_property
     def wikipedia_page(self):
-        assert self.latin_name
+        assert self.latin_name, "latin_name needs to be set"
 
-        try:
-            page: wikipedia.WikipediaPage = wikipedia.page(
-                title=self.latin_name, redirect=True
-            )
-            return page
-        except wikipedia.PageError:
-            # Page doesn't exist
-            pass
-        # except wikipedia.DisambiguationError:
-        #     # Page is ambiguous.
-        #     pass
-
-        return None
+        return get_wikipedia_page(self.latin_name)
 
     @admin.display(
         description="Thumbnail",
@@ -257,7 +246,7 @@ class SpeciesBase(models.Model):
             # Skip existing images.
             return
 
-        assert isinstance(self.gbif_id, int)
+        assert isinstance(self.gbif_id, int), "gbif_id not an integer"
         image_urls = get_image_urls(self.gbif_id)
 
         if image_urls:
@@ -285,7 +274,7 @@ class SpeciesBase(models.Model):
 
         enabled_languages = [lang[0] for lang in settings.LANGUAGES]
 
-        assert isinstance(self.gbif_id, int)
+        assert isinstance(self.gbif_id, int), "gbif_id not an integer"
         common_names = get_common_names(self.gbif_id, enabled_languages)
 
         for name_data in common_names:

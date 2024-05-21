@@ -1,7 +1,8 @@
 from django.test import TestCase
 from unittest.mock import patch
 
-from plant_species.enrichment import gbif
+from plant_species.enrichment import gbif, wikipedia
+from unittest.mock import patch, MagicMock
 
 
 class GBIFTestCase(TestCase):
@@ -88,3 +89,16 @@ class GBIFTestCase(TestCase):
         self.assertEqual(
             gbif.get_common_names(12345, enabled_languages), expected_common_names
         )
+class WikipediaTestCase(TestCase):
+    @patch("plant_species.enrichment.wikipedia.wikipedia.page")
+    def test_get_wikipedia_page_success(self, mock_page):
+        mock_page.return_value = MagicMock(title="Test Page")
+        page = wikipedia.get_wikipedia_page("Test Page")
+        self.assertIsNotNone(page)
+        self.assertEqual(page.title, "Test Page")
+
+    @patch("plant_species.enrichment.wikipedia.wikipedia.page")
+    def test_get_wikipedia_page_failure(self, mock_page):
+        mock_page.side_effect = wikipedia.wikipedia.PageError(title="Test Page")
+        page = wikipedia.get_wikipedia_page("Test Page")
+        self.assertIsNone(page)
