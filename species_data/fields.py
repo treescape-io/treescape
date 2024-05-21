@@ -57,21 +57,21 @@ class DecimalEstimatedRange(CompositeField):
         _("%(parent_verbose_name)s minimum"),
         null=True,
         blank=True,
-        max_digits=2,
+        max_digits=3,
         decimal_places=1,
     )
     typical = models.DecimalField(
         _("%(parent_verbose_name)s typical"),
         null=True,
         blank=True,
-        max_digits=2,
+        max_digits=3,
         decimal_places=1,
     )
     maximum = models.DecimalField(
         _("%(parent_verbose_name)s maximum"),
         null=True,
         blank=True,
-        max_digits=2,
+        max_digits=3,
         decimal_places=1,
     )
     confidence = ConfidenceField(verbose_name=_("%(parent_verbose_name)s confidence"))  # pyright: ignore[reportCallIssue]

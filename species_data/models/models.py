@@ -1,10 +1,8 @@
 from typing import NamedTuple
 from django.db import models
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from plant_species.models import Genus, Family, Species, SpeciesVariety
-from species_data.fields import DecimalEstimatedRange, DurationEstimatedRange
+from plant_species.models import Species
 
 from .base import PlantPropertiesBase
 from .source import SourceType
@@ -30,10 +28,6 @@ from .categories import (
     # FamilySoilPreference,
     # GenusSoilPreference,
     SpeciesSoilPreference,
-    LightPreference,
-    # FamilyLightPreference,
-    # GenusLightPreference,
-    SpeciesLightPreference,
 )
 
 
@@ -85,7 +79,7 @@ class EnrichmentSource(NamedTuple):
 
 
 class SpeciesProperties(PlantPropertiesBase):
-    species = models.ForeignKey(Species, on_delete=models.CASCADE)
+    species = models.OneToOneField(Species, on_delete=models.CASCADE)
     growth_habits = models.ManyToManyField(GrowthHabit, through=SpeciesGrowthHabit)
     climate_zones = models.ManyToManyField(ClimateZone, through=SpeciesClimateZone)
     human_uses = models.ManyToManyField(HumanUse, through=SpeciesHumanUse)
@@ -95,10 +89,13 @@ class SpeciesProperties(PlantPropertiesBase):
     soil_preference = models.ManyToManyField(
         SoilPreference, through=SpeciesSoilPreference
     )
-    light_preference = models.ManyToManyField(
-        LightPreference, through=SpeciesLightPreference
-    )
 
     class Meta:
         verbose_name = _("species properties")
         verbose_name_plural = _("species properties")
+
+    def __str__(self):
+        if self.species:
+            return str(self.species)
+
+        return super().__str__()

@@ -1,4 +1,4 @@
-from langchain_core.language_models import BaseLLM
+from langchain_core.language_models import BaseLanguageModel
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
 
@@ -6,7 +6,7 @@ from langchain_core.prompts import PromptTemplate
 from .models import get_species_data_model
 
 
-def get_enrichment_chain(llm: BaseLLM):
+def get_enrichment_chain(llm: BaseLanguageModel):
     """Generates a chain for enriching plant species data using a language model."""
 
     prompt_template = """As a plant expert, return available information about the plant species '{latin_name}'. Base your answers exclusively on the following source:

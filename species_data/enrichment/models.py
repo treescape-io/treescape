@@ -1,14 +1,22 @@
+import datetime
+import logging
 import decimal
 import enum
 
-from typing import Type, Optional, Set, Any
+from typing import Tuple, Type, Optional, Set, Any
 
-from django.db.models import Model as DjangoModel
-from django.utils.text import slugify
+from django.db.models.fields.related import ManyToManyField
+from langchain_core.pydantic_v1 import (
+    BaseModel,
+    Field,
+    create_model,
+)
+from species_data.models import SpeciesProperties
+from species_data.models.base import CategorizedPlantPropertyBase
+from species_data.fields import DecimalEstimatedRange, DurationEstimatedRange
 
-from langchain_core.pydantic_v1 import BaseModel, Field, create_model
 
-from species_data.models import GrowthHabit, HumanUse, EcologicalRole, ClimateZone
+logger = logging.getLogger(__name__)
 
 
 def get_species_data_model():
@@ -22,19 +30,25 @@ def get_species_data_model():
         typical: Optional[decimal.Decimal] = Field(max_digits=3, decimal_places=1)
         maximum: Optional[decimal.Decimal] = Field(max_digits=3, decimal_places=1)
 
-    def generate_django_enum(django_model: Type[DjangoModel]) -> Any:
+    class DurationRangeField(ConfidenceModel):
+        minimum: Optional[datetime.timedelta]
+        typical: Optional[datetime.timedelta]
+        maximum: Optional[datetime.timedelta]
+
+    def generate_django_enum(django_model: Type[CategorizedPlantPropertyBase]) -> Any:
         """Generates a string Enum based on the name field of the Django model instances."""
         # Retrieve all distinct name values from the Django model
         objects = django_model.objects.all()
 
-        # Create a dictionary for enum where the keys and values are both slugified names of the objects
-        obj_dict = {slugify(str(obj)): slugify(str(obj)) for obj in objects}
+        obj_dict = {obj.slug: obj.slug for obj in objects}
 
         # Create and return an enum with a name based on the Django model's name
         obj_enum = enum.Enum(f"{django_model.__name__}Enum", obj_dict)
         return obj_enum
 
-    def generate_django_multiselect_field(django_model: Type[DjangoModel]):
+    def generate_django_multiselect_field(
+        django_model: Type[CategorizedPlantPropertyBase],
+    ) -> Type[BaseModel]:
         """Generates a field allowing the selection of multiple options based on a given Django model."""
         model_enum = generate_django_enum(django_model)
 
@@ -46,20 +60,35 @@ def get_species_data_model():
 
         return model
 
-    class BaseSpeciesData(BaseModel):
-        # TODO: Generate all these fields by iterating over the models.
-        height: DecimalRangeField = Field(description="mature plant height in meters")
-        width: DecimalRangeField = Field(
-            description="mature plant canopy diameter in meters"
-        )
+    def get_model_field(property_field) -> Optional[Tuple[str, Tuple[Any, Any]]]:
+        """Determine the Django model field type based on the property field type."""
+        field_type = None
+        if isinstance(property_field, DecimalEstimatedRange):
+            logger.debug(f"Adding DecimalRangeField property '{property_field}'.")
+            field_type = DecimalRangeField
 
-    model = create_model(
-        "SpeciesData",
-        __base__=BaseSpeciesData,
-        growth_habits=(generate_django_multiselect_field(GrowthHabit), ...),
-        human_uses=(generate_django_multiselect_field(HumanUse), ...),
-        ecological_roles=(generate_django_multiselect_field(EcologicalRole), ...),
-        climate_zones=(generate_django_multiselect_field(ClimateZone), ...),
-    )
+        elif isinstance(property_field, DurationEstimatedRange):
+            logger.debug(f"Adding DecimalRangeField property '{property_field}'.")
+            field_type = DurationRangeField
+
+        elif isinstance(property_field, ManyToManyField) and issubclass(
+            property_field.related_model, CategorizedPlantPropertyBase
+        ):
+            logger.debug(f"Adding multiselect property '{property_field}'.")
+            field_type = generate_django_multiselect_field(property_field.related_model)
+
+        if field_type:
+            return property_field.name, (field_type, ...)
+
+        return None
+
+    model_fields = {
+        result[0]: result[1]
+        for property_field in SpeciesProperties._meta.get_fields()
+        for result in [get_model_field(property_field)]
+        if result is not None
+    }
+
+    model = create_model("SpeciesData", **model_fields)  # type: ignore
 
     return model
