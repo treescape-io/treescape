@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.utils.text import slugify
 
-from .models import Family, Genus, Species
+from plant_species.models import Family, Genus, Species
 
 
 class SpeciesBaseTestCase(TestCase):
