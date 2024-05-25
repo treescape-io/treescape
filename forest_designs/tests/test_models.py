@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
@@ -5,74 +6,76 @@ from forest_designs.models import Plant, PlantImage, PlantLog
 from plant_species.models import Genus, Species, SpeciesVariety, Family
 
 
-class PlantTestCase(TestCase):
+class SpeciesTestMixin:
+    @classmethod
+    def setUpTestData(cls):
+        # Set up data for the whole TestCase
+        cls.family = Family.objects.create(latin_name="Rosaceae", gbif_id=1)
+        cls.genus = Genus.objects.create(
+            latin_name="Rosa", gbif_id=2, family=cls.family
+        )
+        cls.species = Species.objects.create(
+            latin_name="Rosa rubiginosa", gbif_id=3, genus=cls.genus
+        )
+        cls.variety = SpeciesVariety.objects.create(
+            name="TestVariety", species=cls.species
+        )
+
+
+class PlantTestCase(SpeciesTestMixin, TestCase):
     """Test all methods on Plant."""
 
     def test_clean_method(self):
         """Test the clean method of Plant model."""
 
-        family = Family.objects.create(latin_name="TestFamily", gbif_id=1)
-        genus = Genus.objects.create(latin_name="TestGenus", gbif_id=2, family=family)
-        species = Species.objects.create(
-            latin_name="TestSpecies", genus=genus, gbif_id=3
-        )
-        variety = SpeciesVariety.objects.create(name="TestVariety", species=species)
-
-        plant = Plant(variety=variety, location="POINT(0 0)")
+        plant = Plant(variety=self.variety, location="POINT(0 0)")
         plant.clean()
 
-        self.assertEqual(plant.species, species)
-        self.assertEqual(plant.genus, genus)
+        self.assertEqual(plant.species, self.species)
+        self.assertEqual(plant.genus, self.genus)
 
     def test_get_name_method(self):
         """Test the get_name method of Plant model."""
 
-        family = Family.objects.create(latin_name="TestFamily1", gbif_id=1)
-        genus = Genus.objects.create(latin_name="TestGenus1", gbif_id=2, family=family)
-        species = Species.objects.create(
-            latin_name="TestSpecies1", genus=genus, gbif_id=3
-        )
-        variety = SpeciesVariety.objects.create(name="TestVariety1", species=species)
-
         # Test with variety
-        plant = Plant(variety=variety, location="POINT(0 0)")
-        self.assertEqual(plant.get_name(), str(variety))
+        plant = Plant(variety=self.variety, location="POINT(0 0)")
+        self.assertEqual(plant.get_name(), str(self.variety))
 
         # Test with species
-        plant = Plant(species=species, location="POINT(0 0)")
-        self.assertEqual(plant.get_name(), str(species))
+        plant = Plant(species=self.species, location="POINT(0 0)")
+        self.assertEqual(plant.get_name(), str(self.species))
 
         # Test with genus
-        plant = Plant(genus=genus, location="POINT(0 0)")
-        self.assertEqual(plant.get_name(), str(genus))
+        plant = Plant(genus=self.genus, location="POINT(0 0)")
+        self.assertEqual(plant.get_name(), str(self.genus))
 
         # Test with no variety, species, or genus
         plant = Plant(location="POINT(0 0)")
         self.assertIsNone(plant.get_name())
-        """Test the clean method of Plant model."""
 
-        family = Family.objects.create(latin_name="TestFamily2", gbif_id=4)
-        genus = Genus.objects.create(latin_name="TestGenus2", gbif_id=5, family=family)
-        species = Species.objects.create(
-            latin_name="TestSpecies2", genus=genus, gbif_id=6
+    def test_save_method(self):
+        """Test the save method of Plant model."""
+
+        # Test save with variety
+        plant = Plant(
+            variety=self.variety,
+            species=self.species,
+            genus=self.genus,
+            location="POINT(0 0)",
         )
-        variety = SpeciesVariety.objects.create(name="TestVariety2", species=species)
+        plant.save()
 
-        plant = Plant(variety=variety, location="POINT(0 0)")
-        plant.clean()
+        plant = Plant.objects.get(id=plant.pk)
+        self.assertEqual(plant.species, self.species)
+        self.assertEqual(plant.genus, self.genus)
 
-        self.assertEqual(plant.species, species)
-        self.assertEqual(plant.genus, genus)
+        # Test save with no variety, species, or genus
+        plant = Plant(location="POINT(3 3)")
+        with self.assertRaises(IntegrityError):
+            plant.save()
 
     def test_constraints(self):
         """Test the constraints on the Plant model."""
-
-        family = Family.objects.create(latin_name="TestFamily3", gbif_id=7)
-        genus = Genus.objects.create(latin_name="TestGenus3", gbif_id=8, family=family)
-        species = Species.objects.create(
-            latin_name="TestSpecies3", genus=genus, gbif_id=9
-        )
-        variety = SpeciesVariety.objects.create(name="TestVariety3", species=species)
 
         # Test with no species, genus, or variety
         plant = Plant(location="POINT(0 0)")
@@ -80,21 +83,21 @@ class PlantTestCase(TestCase):
             plant.full_clean()
 
         # Test with genus only
-        plant = Plant(genus=genus, location="POINT(0 0)")
+        plant = Plant(genus=self.genus, location="POINT(0 0)")
         try:
             plant.clean()
         except ValidationError:
             self.fail("Plant.clean() raised ValidationError unexpectedly!")
 
         # Test with species only
-        plant = Plant(species=species, location="POINT(0 0)")
+        plant = Plant(species=self.species, location="POINT(0 0)")
         try:
             plant.clean()
         except ValidationError:
             self.fail("Plant.clean() raised ValidationError unexpectedly!")
 
         # Test with variety only
-        plant = Plant(variety=variety, location="POINT(0 0)")
+        plant = Plant(variety=self.variety, location="POINT(0 0)")
         try:
             plant.clean()
         except ValidationError:
