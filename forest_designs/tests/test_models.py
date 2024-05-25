@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.core.exceptions import ValidationError
 
 from forest_designs.models import Plant, PlantImage, PlantLog
 from plant_species.models import Genus, Species, SpeciesVariety, Family
@@ -62,3 +63,39 @@ class PlantTestCase(TestCase):
 
         self.assertEqual(plant.species, species)
         self.assertEqual(plant.genus, genus)
+
+    def test_constraints(self):
+        """Test the constraints on the Plant model."""
+
+        family = Family.objects.create(latin_name="TestFamily3", gbif_id=7)
+        genus = Genus.objects.create(latin_name="TestGenus3", gbif_id=8, family=family)
+        species = Species.objects.create(
+            latin_name="TestSpecies3", genus=genus, gbif_id=9
+        )
+        variety = SpeciesVariety.objects.create(name="TestVariety3", species=species)
+
+        # Test with no species, genus, or variety
+        plant = Plant(location="POINT(0 0)")
+        with self.assertRaises(ValidationError):
+            plant.full_clean()
+
+        # Test with genus only
+        plant = Plant(genus=genus, location="POINT(0 0)")
+        try:
+            plant.clean()
+        except ValidationError:
+            self.fail("Plant.clean() raised ValidationError unexpectedly!")
+
+        # Test with species only
+        plant = Plant(species=species, location="POINT(0 0)")
+        try:
+            plant.clean()
+        except ValidationError:
+            self.fail("Plant.clean() raised ValidationError unexpectedly!")
+
+        # Test with variety only
+        plant = Plant(variety=variety, location="POINT(0 0)")
+        try:
+            plant.clean()
+        except ValidationError:
+            self.fail("Plant.clean() raised ValidationError unexpectedly!")
