@@ -2,7 +2,13 @@ from django.db import IntegrityError
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
-from forest_designs.models import Plant, PlantImage, PlantLog, PlantLogKind
+from forest_designs.models import (
+    Plant,
+    PlantImage,
+    PlantLog,
+    PlantLogKind,
+    PlantImageKind,
+)
 from plant_species.tests.test_models import SpeciesTestMixin
 
 
@@ -81,7 +87,9 @@ class PlantTestCase(SpeciesTestMixin, TestCase):
         except ValidationError:
             self.fail("Plant.clean() raised ValidationError unexpectedly!")
 
-    def test_save_plant_log(self):
+
+class PlantLogTestCase(SpeciesTestMixin, TestCase):
+    def test_save(self):
         """Test the save method of PlantLog model."""
 
         plant = Plant(variety=self.variety, location="POINT(0 0)")
@@ -94,3 +102,28 @@ class PlantTestCase(SpeciesTestMixin, TestCase):
         saved_plant_log = PlantLog.objects.get(id=plant_log.pk)
         self.assertEqual(saved_plant_log.notes, "Test log entry")
         self.assertEqual(saved_plant_log.plant, plant)
+
+
+class PlantImageTestCase(SpeciesTestMixin, TestCase):
+    def test_save(self):
+        """Test the save method of PlantImage model."""
+
+        plant = Plant(variety=self.variety, location="POINT(0 0)")
+        plant.save()
+
+        kind = PlantImageKind.objects.create(name="Test Image Type")
+        plant_image = PlantImage(
+            plant=plant,
+            kind=kind,
+            date="2023-01-01T00:00:00Z",
+            image="path/to/image.jpg",
+        )
+        plant_image.save()
+
+        saved_plant_image = PlantImage.objects.get(id=plant_image.pk)
+        self.assertEqual(saved_plant_image.plant, plant)
+        self.assertEqual(saved_plant_image.kind, kind)
+        self.assertEqual(
+            saved_plant_image.date.isoformat(), "2023-01-01T00:00:00+00:00"
+        )
+        self.assertEqual(saved_plant_image.image, "path/to/image.jpg")
