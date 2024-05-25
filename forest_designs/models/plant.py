@@ -24,7 +24,9 @@ class Plant(models.Model):
         help_text=_("When specified, species and genus are automatically set."),
     )
 
-    location = models.PointField(_("location"), unique=True, tolerance=0.05)
+    location = models.PointField(
+        _("location"), unique=True, tolerance=0.05, spatial_index=True
+    )
     notes = models.TextField(_("notes"), blank=True)
 
     def get_name(self) -> str | None:
