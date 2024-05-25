@@ -25,6 +25,7 @@ class Plant(models.Model):
     )
 
     location = models.PointField(unique=True, tolerance=0.05)
+    notes = models.TextField(blank=True)
 
     def get_name(self) -> str | None:
         """Return plant name, based on the level of detail given."""
@@ -64,3 +65,53 @@ class Plant(models.Model):
         ]
         verbose_name = _("plant")
         verbose_name_plural = _("plants")
+
+
+class PlantImage(models.Model):
+    """Image of a plant."""
+
+    plant = models.ForeignKey("Plant", on_delete=models.CASCADE, related_name="images")
+    date = models.DateTimeField(_("date"), db_index=True)
+
+    image = models.ImageField(upload_to="plant_images")
+
+    def __str__(self) -> str:
+        return f"{self.plant} image"
+
+    class Meta:
+        verbose_name = _("plant image")
+        verbose_name_plural = _("plant images")
+        ordering = ("plant", "-date")
+
+
+class PlantLogType(models.Model):
+    """Represents a type of plant log."""
+
+    name = models.CharField(_("name"), max_length=255, unique=True)
+
+    def __str__(self) -> str:
+        return self.name
+
+    class Meta:
+        verbose_name = _("plant log type")
+        verbose_name_plural = _("plant log types")
+        ordering = ["name"]
+
+
+class PlantLog(models.Model):
+    """Represents a chronological record of events related to a plant."""
+
+    plant = models.ForeignKey(Plant, on_delete=models.CASCADE, related_name="logs")
+    date = models.DateTimeField(
+        auto_now_add=True, help_text=_("Timestamp of the log entry.")
+    )
+    log_type = models.ForeignKey(PlantLogType, on_delete=models.PROTECT)
+    notes = models.TextField()
+
+    def __str__(self) -> str:
+        return f"{self.date} {self.log_type} for {self.plant}"
+
+    class Meta:
+        verbose_name = _("plant log")
+        verbose_name_plural = _("plant logs")
+        ordering = ["-date"]
