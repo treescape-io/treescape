@@ -30,9 +30,12 @@ class Plant(models.Model):
     def get_name(self) -> str | None:
         """Return plant name, based on the level of detail given."""
 
-        for field in (self.variety, self.species, self.genus):
-            if field:
-                return str(field)
+        if self.variety_id:  # pyright: ignore reportAttributeAccessIssue
+            return str(self.variety)
+        if self.species_id:  # pyright: ignore reportAttributeAccessIssue
+            return str(self.species)
+        if self.genus_id:  # pyright: ignore reportAttributeAccessIssue
+            return str(self.genus)
 
         return None
 
