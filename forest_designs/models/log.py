@@ -18,10 +18,10 @@ class PlantLog(models.Model):
 
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE, related_name="logs")
     date = models.DateTimeField(
-        auto_now_add=True, help_text=_("Timestamp of the log entry.")
+        _("date"), auto_now_add=True, help_text=_("Timestamp of the log entry.")
     )
     kind = models.ForeignKey(PlantLogKind, on_delete=models.PROTECT)
-    notes = models.TextField()
+    notes = models.TextField(_("notes"))
 
     def __str__(self) -> str:
         return f"{self.date} {self.kind} for {self.plant}"

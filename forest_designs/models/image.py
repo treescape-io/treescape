@@ -19,7 +19,7 @@ class PlantImage(models.Model):
     date = models.DateTimeField(_("date"), db_index=True)
 
     kind = models.ForeignKey(PlantImageKind, on_delete=models.PROTECT)
-    image = models.ImageField(upload_to="plant_images")
+    image = models.ImageField(_("image"), upload_to="plant_images")
 
     def __str__(self) -> str:
         return f"{self.plant} image"
