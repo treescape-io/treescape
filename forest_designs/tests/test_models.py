@@ -2,7 +2,7 @@ from django.db import IntegrityError
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
-from forest_designs.models import Plant, PlantImage, PlantLog, PlantLogType
+from forest_designs.models import Plant, PlantImage, PlantLog, PlantLogKind
 from plant_species.tests.test_models import SpeciesTestMixin
 
 
@@ -87,8 +87,8 @@ class PlantTestCase(SpeciesTestMixin, TestCase):
         plant = Plant(variety=self.variety, location="POINT(0 0)")
         plant.save()
 
-        log_type = PlantLogType.objects.create(name="Test Log Type")
-        plant_log = PlantLog(plant=plant, log_type=log_type, notes="Test log entry")
+        kind = PlantLogKind.objects.create(name="Test Log Type")
+        plant_log = PlantLog(plant=plant, kind=kind, notes="Test log entry")
         plant_log.save()
 
         saved_plant_log = PlantLog.objects.get(id=plant_log.pk)

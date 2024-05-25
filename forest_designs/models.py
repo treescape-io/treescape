@@ -87,8 +87,8 @@ class PlantImage(models.Model):
         ordering = ("plant", "-date")
 
 
-class PlantLogType(models.Model):
-    """Represents a type of plant log."""
+class PlantLogKind(models.Model):
+    """Represents a kind of plant log."""
 
     name = models.CharField(_("name"), max_length=255, unique=True)
 
@@ -108,11 +108,11 @@ class PlantLog(models.Model):
     date = models.DateTimeField(
         auto_now_add=True, help_text=_("Timestamp of the log entry.")
     )
-    log_type = models.ForeignKey(PlantLogType, on_delete=models.PROTECT)
+    kind = models.ForeignKey(PlantLogKind, on_delete=models.PROTECT)
     notes = models.TextField()
 
     def __str__(self) -> str:
-        return f"{self.date} {self.log_type} for {self.plant}"
+        return f"{self.date} {self.kind} for {self.plant}"
 
     class Meta:
         verbose_name = _("plant log")
