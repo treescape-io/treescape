@@ -2,10 +2,10 @@ from unittest.mock import patch
 from django.test import TestCase
 from django.utils.text import slugify
 
-from plant_species.models import Family, Genus, Species
+from plant_species.models import Family, Genus, Species, SpeciesVariety
 
 
-class SpeciesBaseTestCase(TestCase):
+class SpeciesTestMixin:
     @classmethod
     def setUpTestData(cls):
         # Set up data for the whole TestCase
@@ -16,7 +16,12 @@ class SpeciesBaseTestCase(TestCase):
         cls.species = Species.objects.create(
             latin_name="Rosa rubiginosa", gbif_id=3, genus=cls.genus
         )
+        cls.variety = SpeciesVariety.objects.create(
+            name="TestVariety", species=cls.species
+        )
 
+
+class SpeciesBaseTestCase(SpeciesTestMixin, TestCase):
     def test_family_save(self):
         self.family.save()
         assert self.family.latin_name

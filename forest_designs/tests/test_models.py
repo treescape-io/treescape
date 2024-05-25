@@ -3,23 +3,7 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 
 from forest_designs.models import Plant, PlantImage, PlantLog
-from plant_species.models import Genus, Species, SpeciesVariety, Family
-
-
-class SpeciesTestMixin:
-    @classmethod
-    def setUpTestData(cls):
-        # Set up data for the whole TestCase
-        cls.family = Family.objects.create(latin_name="Rosaceae", gbif_id=1)
-        cls.genus = Genus.objects.create(
-            latin_name="Rosa", gbif_id=2, family=cls.family
-        )
-        cls.species = Species.objects.create(
-            latin_name="Rosa rubiginosa", gbif_id=3, genus=cls.genus
-        )
-        cls.variety = SpeciesVariety.objects.create(
-            name="TestVariety", species=cls.species
-        )
+from plant_species.tests.test_models import SpeciesTestMixin
 
 
 class PlantTestCase(SpeciesTestMixin, TestCase):
