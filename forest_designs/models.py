@@ -43,7 +43,7 @@ class Plant(models.Model):
         assert isinstance(self.location, GEOSGeometry)
         return f"{self.get_name()} {self.location.coord_seq}"
 
-    def clean(self):
+    def save(self, *args, **kwargs):
         # If variety specified, override species.
         if self.variety:
             self.species = self.variety.species
@@ -52,7 +52,7 @@ class Plant(models.Model):
         if self.species:
             self.genus = self.species.genus
 
-        super().clean()
+        super().save(*args, **kwargs)
 
     class Meta:
         # One of species, genus or variety needs to be set.

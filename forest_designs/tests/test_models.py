@@ -9,14 +9,6 @@ from plant_species.tests.test_models import SpeciesTestMixin
 class PlantTestCase(SpeciesTestMixin, TestCase):
     """Test all methods on Plant."""
 
-    def test_clean_method(self):
-        """Test the clean method of Plant model."""
-
-        plant = Plant(variety=self.variety, genus=self.genus, location="POINT(0 0)")
-        plant.clean()
-
-        self.assertEqual(plant.species, self.species)
-        self.assertEqual(plant.genus, self.genus)
 
     def test_get_name_method(self):
         """Test the get_name method of Plant model."""
@@ -50,6 +42,9 @@ class PlantTestCase(SpeciesTestMixin, TestCase):
         plant.save()
 
         plant = Plant.objects.get(id=plant.pk)
+        self.assertEqual(plant.species, self.species)
+        self.assertEqual(plant.genus, self.genus)
+
         self.assertEqual(plant.species, self.species)
         self.assertEqual(plant.genus, self.genus)
 
