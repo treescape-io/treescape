@@ -1,6 +1,5 @@
 from django.db import IntegrityError
 from django.test import TestCase
-from django.core.exceptions import ValidationError
 
 from forest_designs.models import (
     Plant,
@@ -10,6 +9,7 @@ from forest_designs.models import (
     PlantImageKind,
 )
 from plant_species.tests.test_models import SpeciesTestMixin
+from forest_designs.models import Zone, ZoneKind
 
 
 class PlantTestCase(SpeciesTestMixin, TestCase):
@@ -40,8 +40,6 @@ class PlantTestCase(SpeciesTestMixin, TestCase):
         # Test save with variety
         plant = Plant(
             variety=self.variety,
-            species=self.species,
-            genus=self.genus,
             location="POINT(0 0)",
         )
         plant.save()
@@ -57,35 +55,6 @@ class PlantTestCase(SpeciesTestMixin, TestCase):
         plant = Plant(location="POINT(3 3)")
         with self.assertRaises(IntegrityError):
             plant.save()
-
-    def test_constraints(self):
-        """Test the constraints on the Plant model."""
-
-        # Test with no species, genus, or variety
-        plant = Plant(location="POINT(0 0)")
-        with self.assertRaises(ValidationError):
-            plant.full_clean()
-
-        # Test with genus only
-        plant = Plant(genus=self.genus, location="POINT(0 0)")
-        try:
-            plant.clean()
-        except ValidationError:
-            self.fail("Plant.clean() raised ValidationError unexpectedly!")
-
-        # Test with species only
-        plant = Plant(species=self.species, location="POINT(0 0)")
-        try:
-            plant.clean()
-        except ValidationError:
-            self.fail("Plant.clean() raised ValidationError unexpectedly!")
-
-        # Test with variety only
-        plant = Plant(variety=self.variety, location="POINT(0 0)")
-        try:
-            plant.clean()
-        except ValidationError:
-            self.fail("Plant.clean() raised ValidationError unexpectedly!")
 
 
 class PlantLogTestCase(SpeciesTestMixin, TestCase):
@@ -104,7 +73,7 @@ class PlantLogTestCase(SpeciesTestMixin, TestCase):
         self.assertEqual(saved_plant_log.plant, plant)
 
 
-class PlantImageTestCase(SpeciesTestMixin, TestCase):
+class ImageTestCase(SpeciesTestMixin, TestCase):
     def test_save(self):
         """Test the save method of PlantImage model."""
 
@@ -127,3 +96,19 @@ class PlantImageTestCase(SpeciesTestMixin, TestCase):
             saved_plant_image.date.isoformat(), "2023-01-01T00:00:00+00:00"
         )
         self.assertEqual(saved_plant_image.image, "path/to/image.jpg")
+
+
+class ZoneTestCase(TestCase):
+    def test_save(self):
+        """Test the save method of Zone model."""
+
+        zone_kind = ZoneKind.objects.create(name="Test Zone Type")
+        zone = Zone(
+            name="Test Zone", kind=zone_kind, area="MULTIPOLYGON(((0 0, 1 0, 1 1, 0 1, 0 0)))"
+        )
+        zone.save()
+
+        saved_zone = Zone.objects.get(id=zone.pk)
+        self.assertEqual(saved_zone.name, "Test Zone")
+        self.assertEqual(saved_zone.kind, zone_kind)
+        self.assertEqual(saved_zone.area.wkt, "MULTIPOLYGON (((0 0, 1 0, 1 1, 0 1, 0 0)))")

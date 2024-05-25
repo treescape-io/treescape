@@ -1,0 +1,32 @@
+from django.utils.translation import gettext_lazy as _
+from django.contrib.gis.db import models
+
+from .base import KindBase
+from .plant import Plant
+
+
+class PlantLogKind(KindBase):
+    """Represents a kind of plant log."""
+
+    class Meta(KindBase.Meta):
+        verbose_name = _("plant log type")
+        verbose_name_plural = _("plant log types")
+
+
+class PlantLog(models.Model):
+    """Represents a chronological record of events related to a plant."""
+
+    plant = models.ForeignKey(Plant, on_delete=models.CASCADE, related_name="logs")
+    date = models.DateTimeField(
+        auto_now_add=True, help_text=_("Timestamp of the log entry.")
+    )
+    kind = models.ForeignKey(PlantLogKind, on_delete=models.PROTECT)
+    notes = models.TextField()
+
+    def __str__(self) -> str:
+        return f"{self.date} {self.kind} for {self.plant}"
+
+    class Meta:
+        verbose_name = _("plant log")
+        verbose_name_plural = _("plant logs")
+        ordering = ["-date"]
