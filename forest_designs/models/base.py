@@ -6,6 +6,7 @@ class KindBase(models.Model):
     """Base class for kinds of stuff (zones, images, logs)."""
 
     name = models.CharField(_("name"), max_length=255, unique=True)
+    description = models.TextField(_("description"), blank=True)
 
     def __str__(self) -> str:
         return self.name
