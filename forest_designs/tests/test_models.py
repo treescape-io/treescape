@@ -12,7 +12,7 @@ class PlantTestCase(SpeciesTestMixin, TestCase):
     def test_clean_method(self):
         """Test the clean method of Plant model."""
 
-        plant = Plant(variety=self.variety, location="POINT(0 0)")
+        plant = Plant(variety=self.variety, genus=self.genus, location="POINT(0 0)")
         plant.clean()
 
         self.assertEqual(plant.species, self.species)
@@ -22,7 +22,7 @@ class PlantTestCase(SpeciesTestMixin, TestCase):
         """Test the get_name method of Plant model."""
 
         # Test with variety
-        plant = Plant(variety=self.variety, location="POINT(0 0)")
+        plant = Plant(variety=self.variety, genus=self.genus, location="POINT(0 0)")
         self.assertEqual(plant.get_name(), str(self.variety))
 
         # Test with species
@@ -86,3 +86,15 @@ class PlantTestCase(SpeciesTestMixin, TestCase):
             plant.clean()
         except ValidationError:
             self.fail("Plant.clean() raised ValidationError unexpectedly!")
+    def test_save_plant_log(self):
+        """Test the save method of PlantLog model."""
+
+        plant = Plant(variety=self.variety, location="POINT(0 0)")
+        plant.save()
+
+        plant_log = PlantLog(plant=plant, log_entry="Test log entry")
+        plant_log.save()
+
+        saved_plant_log = PlantLog.objects.get(id=plant_log.pk)
+        self.assertEqual(saved_plant_log.log_entry, "Test log entry")
+        self.assertEqual(saved_plant_log.plant, plant)
