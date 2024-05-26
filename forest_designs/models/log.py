@@ -1,3 +1,5 @@
+import datetime
+
 from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.db import models
 
@@ -18,7 +20,9 @@ class PlantLog(models.Model):
 
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE, related_name="logs")
     date = models.DateTimeField(
-        _("date"), auto_now_add=True, help_text=_("Timestamp of the log entry.")
+        _("date"),
+        help_text=_("Timestamp of the log entry."),
+        default=datetime.datetime.now,
     )
     kind = models.ForeignKey(PlantLogKind, on_delete=models.PROTECT)
     notes = models.TextField(_("notes"))
