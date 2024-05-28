@@ -123,6 +123,8 @@ Note that loading species is idempotent, meaning that no action is performed try
 Code for this lives in: `plant_species/enrichment`.
 Images are automatically downloaded to `media/plant_species/images`.
 
+Your Pull Requests with additional species are greatly appreciated!
+
 ### Enrich species data
 Retrieve data from textual sources (currently Wikipedia), process them into structurede data using LLM's:
 
