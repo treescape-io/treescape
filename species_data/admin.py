@@ -187,6 +187,8 @@ _autocomplete_source_fields = [
 
 @admin.register(SpeciesProperties)
 class SpeciesPropertiesAdmin(admin.ModelAdmin):
+    list_display = ("species",)
+
     inlines = [
         SpeciesGrowthHabitInline,
         SpeciesClimateZoneInline,
@@ -194,7 +196,6 @@ class SpeciesPropertiesAdmin(admin.ModelAdmin):
         SpeciesEcologicalRoleInline,
         SpeciesSoilPreferenceInline,
     ]
-    list_display = ("species",)
     search_fields = (
         "species__latin_name",
         "species__common_names__name",
@@ -204,3 +205,13 @@ class SpeciesPropertiesAdmin(admin.ModelAdmin):
         "species__genus__family__common_names__name",
     )
     autocomplete_fields = ["species"] + _autocomplete_source_fields
+
+    list_filter = (
+        "growth_habits",
+        "climate_zones",
+        "human_uses",
+        "ecological_roles",
+        # "soil_preference",
+        "species__genus__family",
+    )
+    list_select_related = ("species",)

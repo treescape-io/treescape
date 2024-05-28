@@ -13,9 +13,14 @@ class Command(BaseCommand):
     help = "Generates additional data about plant species using a language model."
 
     def handle(self, *args, **options):
-        llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
+        llm = ChatOpenAI(
+            model="gpt-3.5-turbo-0125",
+            temperature=0,
+            model_kwargs={"response_format": {"type": "json_object"}},
+            max_tokens=512,  # Increases available tokens for input.
+        )
 
-        species_list = Species.objects.all()[:5]
+        species_list = Species.objects.filter(properties__isnull=True)
 
         with tqdm(species_list) as pbar:
             for species in pbar:

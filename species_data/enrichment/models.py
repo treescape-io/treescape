@@ -26,9 +26,9 @@ def get_species_data_model():
         confidence: decimal.Decimal = Field(gt=0, lt=1, decimal_places=1, max_digits=2)
 
     class DecimalRangeField(ConfidenceModel):
-        minimum: Optional[decimal.Decimal] = Field(max_digits=3, decimal_places=1)
-        typical: Optional[decimal.Decimal] = Field(max_digits=3, decimal_places=1)
-        maximum: Optional[decimal.Decimal] = Field(max_digits=3, decimal_places=1)
+        minimum: Optional[decimal.Decimal] = Field(max_digits=5, decimal_places=1)
+        typical: Optional[decimal.Decimal] = Field(max_digits=5, decimal_places=1)
+        maximum: Optional[decimal.Decimal] = Field(max_digits=5, decimal_places=1)
 
     class DurationRangeField(ConfidenceModel):
         minimum: Optional[datetime.timedelta]
@@ -67,9 +67,10 @@ def get_species_data_model():
             logger.debug(f"Adding DecimalRangeField property '{property_field}'.")
             field_type = DecimalRangeField
 
-        elif isinstance(property_field, DurationEstimatedRange):
-            logger.debug(f"Adding DecimalRangeField property '{property_field}'.")
-            field_type = DurationRangeField
+        # Skip for MVP as we'll need to properly implement ISO durations (including months and years).
+        # elif isinstance(property_field, DurationEstimatedRange):
+        #     logger.debug(f"Adding DecimalRangeField property '{property_field}'.")
+        #     field_type = DurationRangeField
 
         elif isinstance(property_field, ManyToManyField) and issubclass(
             property_field.related_model, CategorizedPlantPropertyBase

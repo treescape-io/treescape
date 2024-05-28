@@ -378,7 +378,7 @@ def get_latin_names(
     )
 
     if species_data["matchType"] != "EXACT":
-        raise SpeciesNotFound(f"No unique match species '{latin_name}'.")
+        raise SpeciesNotFound(f"No unique match for {rank}: '{latin_name}'.")
 
     return {
         "species": species_data.get("species"),

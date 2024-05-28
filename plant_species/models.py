@@ -205,6 +205,8 @@ class SpeciesBase(models.Model):
             None,
         )
 
+        assert self.gbif_id, f"No GBIF id for {self.latin_name}"
+
         # Validate uniqueness (deal with synonyms)
         try:
             existing_species = self.__class__.objects.get(gbif_id=self.gbif_id)
@@ -227,12 +229,18 @@ class SpeciesBase(models.Model):
             ),
             None,
         )
+        assert self.latin_name, "Latin name should never be empty."
 
         if self._rank is Rank.SPECIES:
             self.genus = _get_genus(species_data)
+            assert self.genus, "Returned plant species should never be null."
 
-        if self._rank is not Rank.FAMILY:
+        elif self._rank is Rank.GENUS:
             self.family = _get_family(species_data)
+            assert self.family, "Returned plant family should never be null."
+
+        else:
+            assert self._rank is Rank.FAMILY, f"Unknown rank: {self._rank}"
 
     def enrich_gbif_image(self):
         """Get image from GBIF and store on `image` field."""
@@ -269,7 +277,9 @@ class SpeciesBase(models.Model):
             self.description = self.wikipedia_page.summary.strip()
 
     def enrich(self):
-        self.enrich_gbif_backbone()
+        if not self.gbif_id:
+            self.enrich_gbif_backbone()
+
         self.enrich_gbif_image()
         self.enrich_wikipedia()
 
@@ -313,7 +323,9 @@ class Family(SpeciesBase):
 class Genus(SpeciesBase):
     """Represents a biological genus, which is a group containing one or more species."""
 
-    family = models.ForeignKey(Family, on_delete=models.PROTECT, related_name="genera")
+    family = models.ForeignKey(
+        Family, on_delete=models.PROTECT, related_name="genera", blank=True
+    )
 
     class Meta(SpeciesBase.Meta):
         verbose_name = _("genus")
@@ -325,7 +337,9 @@ class Genus(SpeciesBase):
 class Species(SpeciesBase):
     """Represents a biological species with a Latin name."""
 
-    genus = models.ForeignKey(Genus, on_delete=models.PROTECT, related_name="species")
+    genus = models.ForeignKey(
+        Genus, on_delete=models.PROTECT, related_name="species", blank=True
+    )
 
     class Meta(SpeciesBase.Meta):
         verbose_name = _("species")
@@ -336,25 +350,41 @@ class Species(SpeciesBase):
 
 def _get_family(species_data: dict) -> Family:
     """Returns a Family instance based on GBIF species data."""
+    assert "familyKey" in species_data and species_data["familyKey"]
+
     try:
         return Family.objects.get(gbif_id=species_data["familyKey"])
     except Family.DoesNotExist:
-        return Family.objects.create(
+        obj = Family(
             gbif_id=species_data["familyKey"],
             latin_name=species_data["family"],
         )
+        obj.full_clean()
+        obj.save()
+
+        obj.enrich_related()
+
+        return obj
 
 
 def _get_genus(species_data: dict) -> Genus:
     """Returns a Genus instance based on GBIF species data."""
+    assert "genusKey" in species_data and species_data["genusKey"]
+
     try:
         return Genus.objects.get(gbif_id=species_data["genusKey"])
     except Genus.DoesNotExist:
-        return Genus.objects.create(
+        obj = Genus(
             family=_get_family(species_data),
             gbif_id=species_data["genusKey"],
             latin_name=species_data["genus"],
         )
+        obj.full_clean()
+        obj.save()
+
+        obj.enrich_related()
+
+        return obj
 
 
 class FamilyCommonName(CommonNameBase):

@@ -9,14 +9,21 @@ from .models import get_species_data_model
 def get_enrichment_chain(llm: BaseLanguageModel):
     """Generates a chain for enriching plant species data using a language model."""
 
-    prompt_template = """As a plant expert, return available information about the plant species '{latin_name}'. Base your answers exclusively on the following source:
+    prompt_template = """As a plant expert, return available information about the plant species '{latin_name}'.
+
+    Base your answers exclusively on the following source:
 
     Source:
     ```
     {source_content}
     ```
 
-    Important: requested information is optional, do not return values for information not provided in the source.
+    Important guidelines:
+    - Requested information is optional, do not return values for information not provided in the source.
+    - When minimum, maximum or typical values are not specified, return `null`. Never guess a value!
+    - Specify length units in meters.
+    - Return at most 1 decimal for numbers.
+    - Width concerns the canopy width of a plant, not the trunk.
 
     {format_instructions}
     """

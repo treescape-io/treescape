@@ -29,7 +29,10 @@ class Command(BaseCommand):
         with open(filename, "r") as species_file:
             species_list = species_file.readlines()
 
-        species_list = [s.strip() for s in species_list]
+        # Allow comments in species list.
+        species_list = [
+            s.strip() for s in species_list if not s.lstrip().startswith("#")
+        ]
 
         add_count = 0
         synonym_count = 0
@@ -37,19 +40,37 @@ class Command(BaseCommand):
         with tqdm(species_list) as pbar:
             for species_name in pbar:
                 if not Species.objects.filter(latin_name=species_name).exists():
-                    s = Species(latin_name=species_name)
+                    pbar.write(f"Adding '{species_name}'.")
+
+                    species = Species(latin_name=species_name)
 
                     # Do this before full_clean to properly capture SpeciesAlreadyExists.
                     try:
-                        s.full_clean()
+                        species.full_clean()
                     except ValidationError as e:
-                        if isinstance(e.__cause__, SpeciesAlreadyExists):
+                        if isinstance(e.__cause__, SpeciesAlreadyExists) or any(
+                            # In some cases, we have several ValidationError's, like show:
+                            # django.core.exceptions.ValidationError: {
+                            #   'genus': ['This field cannot be null.'],
+                            #   '__all__': ["Species 'Acacia nilotica' already  exists under name 'Vachellia nilotica'."],
+                            #   'gbif_id': ['Species with this GBIF usageKey already exists.']
+                            # }
+                            [
+                                isinstance(e[0].__cause__, SpeciesAlreadyExists)
+                                for e in e.error_dict.values()
+                            ]
+                        ):
                             synonym_count += 1
-                            pbar.write(f"Skipping synonym species: {species_name}.")
+                            pbar.write(f"Skipping synonym species: '{species_name}'.")
                             continue
 
-                    s.save()
-                    s.enrich_related()
+                        # Unexpected exception, re-raise.
+                        raise Exception(
+                            f"ValidationError for {species_name}: {str(e)}"
+                        ) from e
+
+                    species.save()
+                    species.enrich_related()
 
                     add_count += 1
                 else:
