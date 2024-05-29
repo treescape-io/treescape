@@ -227,8 +227,10 @@ def create_climate_zones(apps, schema_editor):
     ]
 
     for obj in climate_zones:
-        obj["slug"] = slugify(str(obj))
-        ClimateZone.objects.create(**obj)
+        obj["slug"] = slugify(obj["name"])
+        created_obj = ClimateZone(**obj)
+        created_obj.full_clean()
+        created_obj.save()
 
 
 def create_initial_growth_habits(apps, schema_editor):
@@ -260,7 +262,9 @@ def create_initial_growth_habits(apps, schema_editor):
 
     for obj in growth_habits:
         obj["slug"] = slugify(str(obj))
-        GrowthHabit.objects.create(**obj)
+        created_obj = GrowthHabit(**obj)
+        created_obj.full_clean()
+        created_obj.save()
 
 
 def create_human_uses(apps, schema_editor):
@@ -365,7 +369,9 @@ def create_human_uses(apps, schema_editor):
 
     for obj in human_uses:
         obj["slug"] = slugify(str(obj))
-        HumanUse.objects.create(**obj)
+        created_obj = HumanUse(**obj)
+        created_obj.full_clean()
+        created_obj.save()
 
 
 def create_ecological_roles(apps, schema_editor):
@@ -435,7 +441,9 @@ def create_ecological_roles(apps, schema_editor):
 
     for obj in ecological_roles:
         obj["slug"] = slugify(str(obj))
-        EcologicalRole.objects.create(**obj)
+        created_obj = EcologicalRole(**obj)
+        created_obj.full_clean()
+        created_obj.save()
 
 
 class Migration(migrations.Migration):
