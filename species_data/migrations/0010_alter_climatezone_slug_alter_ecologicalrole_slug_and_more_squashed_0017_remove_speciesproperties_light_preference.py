@@ -7,186 +7,290 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('species_data', '0010_alter_climatezone_slug_alter_ecologicalrole_slug_and_more'), ('species_data', '0011_alter_source_url_alter_speciesproperties_species'), ('species_data', '0012_alter_speciesproperties_species'), ('species_data', '0013_remove_growthhabitthroughbase_source_and_more'), ('species_data', '0014_alter_speciesproperties_height_maximum_and_more'), ('species_data', '0015_alter_sourcetype_name'), ('species_data', '0016_speciesproperties_sun_hours_confidence_and_more'), ('species_data', '0017_remove_speciesproperties_light_preference')]
+    replaces = [
+        (
+            "species_data",
+            "0010_alter_climatezone_slug_alter_ecologicalrole_slug_and_more",
+        ),
+        ("species_data", "0011_alter_source_url_alter_speciesproperties_species"),
+        ("species_data", "0012_alter_speciesproperties_species"),
+        ("species_data", "0013_remove_growthhabitthroughbase_source_and_more"),
+        ("species_data", "0014_alter_speciesproperties_height_maximum_and_more"),
+        ("species_data", "0015_alter_sourcetype_name"),
+        ("species_data", "0016_speciesproperties_sun_hours_confidence_and_more"),
+        ("species_data", "0017_remove_speciesproperties_light_preference"),
+    ]
 
     dependencies = [
-        ('plant_species', '0005_family_slug_genus_slug_species_slug_squashed_0008_alter_family_latin_name_alter_family_slug_and_more'),
-        ('species_data', '0007_climatezone_slug_ecologicalrole_slug_and_more_squashed_0009_alter_climatezone_name_alter_climatezone_slug_and_more'),
+        (
+            "species_data",
+            "0007_climatezone_slug_ecologicalrole_slug_and_more_squashed_0009_alter_climatezone_name_alter_climatezone_slug_and_more",
+        ),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='climatezone',
-            name='slug',
-            field=models.SlugField(blank=True, max_length=255, unique=True, verbose_name='slug'),
+            model_name="climatezone",
+            name="slug",
+            field=models.SlugField(
+                blank=True, max_length=255, unique=True, verbose_name="slug"
+            ),
         ),
         migrations.AlterField(
-            model_name='ecologicalrole',
-            name='slug',
-            field=models.SlugField(blank=True, max_length=255, unique=True, verbose_name='slug'),
+            model_name="ecologicalrole",
+            name="slug",
+            field=models.SlugField(
+                blank=True, max_length=255, unique=True, verbose_name="slug"
+            ),
         ),
         migrations.AlterField(
-            model_name='growthhabit',
-            name='slug',
-            field=models.SlugField(blank=True, max_length=255, unique=True, verbose_name='slug'),
+            model_name="growthhabit",
+            name="slug",
+            field=models.SlugField(
+                blank=True, max_length=255, unique=True, verbose_name="slug"
+            ),
         ),
         migrations.AlterField(
-            model_name='humanuse',
-            name='slug',
-            field=models.SlugField(blank=True, max_length=255, unique=True, verbose_name='slug'),
+            model_name="humanuse",
+            name="slug",
+            field=models.SlugField(
+                blank=True, max_length=255, unique=True, verbose_name="slug"
+            ),
         ),
         migrations.AlterField(
-            model_name='lightpreference',
-            name='slug',
-            field=models.SlugField(blank=True, max_length=255, unique=True, verbose_name='slug'),
+            model_name="lightpreference",
+            name="slug",
+            field=models.SlugField(
+                blank=True, max_length=255, unique=True, verbose_name="slug"
+            ),
         ),
         migrations.AlterField(
-            model_name='soilpreference',
-            name='slug',
-            field=models.SlugField(blank=True, max_length=255, unique=True, verbose_name='slug'),
+            model_name="soilpreference",
+            name="slug",
+            field=models.SlugField(
+                blank=True, max_length=255, unique=True, verbose_name="slug"
+            ),
         ),
         migrations.AlterField(
-            model_name='source',
-            name='url',
-            field=models.URLField(unique=True, verbose_name='URL'),
+            model_name="source",
+            name="url",
+            field=models.URLField(unique=True, verbose_name="URL"),
         ),
         migrations.AlterField(
-            model_name='speciesproperties',
-            name='species',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='plant_species.species'),
+            model_name="speciesproperties",
+            name="species",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE, to="plant_species.species"
+            ),
         ),
         migrations.RemoveField(
-            model_name='growthhabitthroughbase',
-            name='source',
+            model_name="growthhabitthroughbase",
+            name="source",
         ),
         migrations.RemoveField(
-            model_name='lightpreferencethroughbase',
-            name='source',
+            model_name="lightpreferencethroughbase",
+            name="source",
         ),
         migrations.RemoveField(
-            model_name='soilpreferencethroughbase',
-            name='source',
+            model_name="soilpreferencethroughbase",
+            name="source",
         ),
         migrations.AlterUniqueTogether(
-            name='speciesclimatezone',
-            unique_together={('species', 'climate_zone')},
+            name="speciesclimatezone",
+            unique_together={("species", "climate_zone")},
         ),
         migrations.AlterUniqueTogether(
-            name='speciesecologicalrole',
-            unique_together={('species', 'ecological_role')},
+            name="speciesecologicalrole",
+            unique_together={("species", "ecological_role")},
         ),
         migrations.AlterUniqueTogether(
-            name='speciesgrowthhabit',
-            unique_together={('species', 'growth_habit')},
+            name="speciesgrowthhabit",
+            unique_together={("species", "growth_habit")},
         ),
         migrations.AlterUniqueTogether(
-            name='specieshumanuse',
-            unique_together={('species', 'human_use')},
+            name="specieshumanuse",
+            unique_together={("species", "human_use")},
         ),
         migrations.AlterUniqueTogether(
-            name='specieslightpreference',
+            name="specieslightpreference",
             unique_together=None,
         ),
         migrations.AlterUniqueTogether(
-            name='speciessoilpreference',
-            unique_together={('species', 'soil_texture')},
+            name="speciessoilpreference",
+            unique_together={("species", "soil_texture")},
         ),
         migrations.DeleteModel(
-            name='ClimateZoneThroughBase',
+            name="ClimateZoneThroughBase",
         ),
         migrations.DeleteModel(
-            name='GrowthHabitThroughBase',
+            name="GrowthHabitThroughBase",
         ),
         migrations.DeleteModel(
-            name='LightPreferenceThroughBase',
+            name="LightPreferenceThroughBase",
         ),
         migrations.DeleteModel(
-            name='SoilPreferenceThroughBase',
+            name="SoilPreferenceThroughBase",
         ),
         migrations.AlterField(
-            model_name='speciesproperties',
-            name='height_maximum',
-            field=models.DecimalField(blank=True, decimal_places=1, max_digits=3, null=True, verbose_name='%(parent_verbose_name)s maximum'),
+            model_name="speciesproperties",
+            name="height_maximum",
+            field=models.DecimalField(
+                blank=True,
+                decimal_places=1,
+                max_digits=3,
+                null=True,
+                verbose_name="%(parent_verbose_name)s maximum",
+            ),
         ),
         migrations.AlterField(
-            model_name='speciesproperties',
-            name='height_minimum',
-            field=models.DecimalField(blank=True, decimal_places=1, max_digits=3, null=True, verbose_name='%(parent_verbose_name)s minimum'),
+            model_name="speciesproperties",
+            name="height_minimum",
+            field=models.DecimalField(
+                blank=True,
+                decimal_places=1,
+                max_digits=3,
+                null=True,
+                verbose_name="%(parent_verbose_name)s minimum",
+            ),
         ),
         migrations.AlterField(
-            model_name='speciesproperties',
-            name='height_typical',
-            field=models.DecimalField(blank=True, decimal_places=1, max_digits=3, null=True, verbose_name='%(parent_verbose_name)s typical'),
+            model_name="speciesproperties",
+            name="height_typical",
+            field=models.DecimalField(
+                blank=True,
+                decimal_places=1,
+                max_digits=3,
+                null=True,
+                verbose_name="%(parent_verbose_name)s typical",
+            ),
         ),
         migrations.AlterField(
-            model_name='speciesproperties',
-            name='soil_acidity_maximum',
-            field=models.DecimalField(blank=True, decimal_places=1, max_digits=3, null=True, verbose_name='%(parent_verbose_name)s maximum'),
+            model_name="speciesproperties",
+            name="soil_acidity_maximum",
+            field=models.DecimalField(
+                blank=True,
+                decimal_places=1,
+                max_digits=3,
+                null=True,
+                verbose_name="%(parent_verbose_name)s maximum",
+            ),
         ),
         migrations.AlterField(
-            model_name='speciesproperties',
-            name='soil_acidity_minimum',
-            field=models.DecimalField(blank=True, decimal_places=1, max_digits=3, null=True, verbose_name='%(parent_verbose_name)s minimum'),
+            model_name="speciesproperties",
+            name="soil_acidity_minimum",
+            field=models.DecimalField(
+                blank=True,
+                decimal_places=1,
+                max_digits=3,
+                null=True,
+                verbose_name="%(parent_verbose_name)s minimum",
+            ),
         ),
         migrations.AlterField(
-            model_name='speciesproperties',
-            name='soil_acidity_typical',
-            field=models.DecimalField(blank=True, decimal_places=1, max_digits=3, null=True, verbose_name='%(parent_verbose_name)s typical'),
+            model_name="speciesproperties",
+            name="soil_acidity_typical",
+            field=models.DecimalField(
+                blank=True,
+                decimal_places=1,
+                max_digits=3,
+                null=True,
+                verbose_name="%(parent_verbose_name)s typical",
+            ),
         ),
         migrations.AlterField(
-            model_name='speciesproperties',
-            name='width_maximum',
-            field=models.DecimalField(blank=True, decimal_places=1, max_digits=3, null=True, verbose_name='%(parent_verbose_name)s maximum'),
+            model_name="speciesproperties",
+            name="width_maximum",
+            field=models.DecimalField(
+                blank=True,
+                decimal_places=1,
+                max_digits=3,
+                null=True,
+                verbose_name="%(parent_verbose_name)s maximum",
+            ),
         ),
         migrations.AlterField(
-            model_name='speciesproperties',
-            name='width_minimum',
-            field=models.DecimalField(blank=True, decimal_places=1, max_digits=3, null=True, verbose_name='%(parent_verbose_name)s minimum'),
+            model_name="speciesproperties",
+            name="width_minimum",
+            field=models.DecimalField(
+                blank=True,
+                decimal_places=1,
+                max_digits=3,
+                null=True,
+                verbose_name="%(parent_verbose_name)s minimum",
+            ),
         ),
         migrations.AlterField(
-            model_name='speciesproperties',
-            name='width_typical',
-            field=models.DecimalField(blank=True, decimal_places=1, max_digits=3, null=True, verbose_name='%(parent_verbose_name)s typical'),
+            model_name="speciesproperties",
+            name="width_typical",
+            field=models.DecimalField(
+                blank=True,
+                decimal_places=1,
+                max_digits=3,
+                null=True,
+                verbose_name="%(parent_verbose_name)s typical",
+            ),
         ),
         migrations.AlterField(
-            model_name='sourcetype',
-            name='name',
-            field=models.CharField(max_length=255, unique=True, verbose_name='name'),
+            model_name="sourcetype",
+            name="name",
+            field=models.CharField(max_length=255, unique=True, verbose_name="name"),
         ),
         migrations.AddField(
-            model_name='speciesproperties',
-            name='sun_hours_confidence',
-            field=species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='%(parent_verbose_name)s confidence'),
+            model_name="speciesproperties",
+            name="sun_hours_confidence",
+            field=species_data.fields.ConfidenceField(
+                blank=True,
+                decimal_places=1,
+                max_digits=2,
+                null=True,
+                validators=[
+                    django.core.validators.MinValueValidator(0.0),
+                    django.core.validators.MaxValueValidator(1.0),
+                ],
+                verbose_name="%(parent_verbose_name)s confidence",
+            ),
         ),
         migrations.AddField(
-            model_name='speciesproperties',
-            name='sun_hours_maximum',
-            field=models.DurationField(blank=True, null=True, verbose_name='%(parent_verbose_name)s maximum'),
+            model_name="speciesproperties",
+            name="sun_hours_maximum",
+            field=models.DurationField(
+                blank=True, null=True, verbose_name="%(parent_verbose_name)s maximum"
+            ),
         ),
         migrations.AddField(
-            model_name='speciesproperties',
-            name='sun_hours_minimum',
-            field=models.DurationField(blank=True, null=True, verbose_name='%(parent_verbose_name)s minimum'),
+            model_name="speciesproperties",
+            name="sun_hours_minimum",
+            field=models.DurationField(
+                blank=True, null=True, verbose_name="%(parent_verbose_name)s minimum"
+            ),
         ),
         migrations.AddField(
-            model_name='speciesproperties',
-            name='sun_hours_source',
-            field=species_data.fields.SourceField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='species_data.source', verbose_name='%(parent_verbose_name)s source'),
+            model_name="speciesproperties",
+            name="sun_hours_source",
+            field=species_data.fields.SourceField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="species_data.source",
+                verbose_name="%(parent_verbose_name)s source",
+            ),
         ),
         migrations.AddField(
-            model_name='speciesproperties',
-            name='sun_hours_typical',
-            field=models.DurationField(blank=True, null=True, verbose_name='%(parent_verbose_name)s typical'),
+            model_name="speciesproperties",
+            name="sun_hours_typical",
+            field=models.DurationField(
+                blank=True, null=True, verbose_name="%(parent_verbose_name)s typical"
+            ),
         ),
         migrations.RemoveField(
-            model_name='speciesproperties',
-            name='light_preference',
+            model_name="speciesproperties",
+            name="light_preference",
         ),
         migrations.DeleteModel(
-            name='SpeciesLightPreference',
+            name="SpeciesLightPreference",
         ),
         migrations.DeleteModel(
-            name='LightPreference',
+            name="LightPreference",
         ),
     ]

@@ -5,21 +5,26 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('plant_species', '0005_family_slug_genus_slug_species_slug_squashed_0008_alter_family_latin_name_alter_family_slug_and_more'),
-        ('species_data', '0010_alter_climatezone_slug_alter_ecologicalrole_slug_and_more'),
+        (
+            "species_data",
+            "0010_alter_climatezone_slug_alter_ecologicalrole_slug_and_more",
+        ),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='source',
-            name='url',
-            field=models.URLField(unique=True, verbose_name='URL'),
+            model_name="source",
+            name="url",
+            field=models.URLField(unique=True, verbose_name="URL"),
         ),
         migrations.AlterField(
-            model_name='speciesproperties',
-            name='species',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='plant_species.species', unique=True),
+            model_name="speciesproperties",
+            name="species",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="plant_species.species",
+                unique=True,
+            ),
         ),
     ]

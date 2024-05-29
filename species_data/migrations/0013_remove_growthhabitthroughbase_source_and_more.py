@@ -4,58 +4,57 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('species_data', '0012_alter_speciesproperties_species'),
+        ("species_data", "0012_alter_speciesproperties_species"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='growthhabitthroughbase',
-            name='source',
+            model_name="growthhabitthroughbase",
+            name="source",
         ),
         migrations.RemoveField(
-            model_name='lightpreferencethroughbase',
-            name='source',
+            model_name="lightpreferencethroughbase",
+            name="source",
         ),
         migrations.RemoveField(
-            model_name='soilpreferencethroughbase',
-            name='source',
+            model_name="soilpreferencethroughbase",
+            name="source",
         ),
         migrations.AlterUniqueTogether(
-            name='speciesclimatezone',
-            unique_together={('species', 'climate_zone')},
+            name="speciesclimatezone",
+            unique_together={("species", "climate_zone")},
         ),
         migrations.AlterUniqueTogether(
-            name='speciesecologicalrole',
-            unique_together={('species', 'ecological_role')},
+            name="speciesecologicalrole",
+            unique_together={("species", "ecological_role")},
         ),
         migrations.AlterUniqueTogether(
-            name='speciesgrowthhabit',
-            unique_together={('species', 'growth_habit')},
+            name="speciesgrowthhabit",
+            unique_together={("species", "growth_habit")},
         ),
         migrations.AlterUniqueTogether(
-            name='specieshumanuse',
-            unique_together={('species', 'human_use')},
+            name="specieshumanuse",
+            unique_together={("species", "human_use")},
         ),
         migrations.AlterUniqueTogether(
-            name='specieslightpreference',
-            unique_together={('species', 'light_preference')},
+            name="specieslightpreference",
+            unique_together={("species", "light_preference")},
         ),
         migrations.AlterUniqueTogether(
-            name='speciessoilpreference',
-            unique_together={('species', 'soil_texture')},
+            name="speciessoilpreference",
+            unique_together={("species", "soil_texture")},
         ),
         migrations.DeleteModel(
-            name='ClimateZoneThroughBase',
+            name="ClimateZoneThroughBase",
         ),
         migrations.DeleteModel(
-            name='GrowthHabitThroughBase',
+            name="GrowthHabitThroughBase",
         ),
         migrations.DeleteModel(
-            name='LightPreferenceThroughBase',
+            name="LightPreferenceThroughBase",
         ),
         migrations.DeleteModel(
-            name='SoilPreferenceThroughBase',
+            name="SoilPreferenceThroughBase",
         ),
     ]

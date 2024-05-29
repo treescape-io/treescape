@@ -8,355 +8,1216 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('plant_species', '0004_alter_family_options_alter_genus_options_and_more'),
+        ("plant_species", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='EcologicalRole',
+            name="EcologicalRole",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='name')),
-                ('description', models.TextField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="name")),
+                ("description", models.TextField()),
             ],
             options={
-                'verbose_name': 'ecological role',
-                'verbose_name_plural': 'ecological roles',
-                'ordering': ['name'],
-                'abstract': False,
+                "verbose_name": "ecological role",
+                "verbose_name_plural": "ecological roles",
+                "ordering": ["name"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='GrowthHabit',
+            name="GrowthHabit",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='name')),
-                ('description', models.TextField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="name")),
+                ("description", models.TextField()),
             ],
             options={
-                'verbose_name': 'growth habit',
-                'verbose_name_plural': 'growth habits',
-                'ordering': ['name'],
-                'abstract': False,
+                "verbose_name": "growth habit",
+                "verbose_name_plural": "growth habits",
+                "ordering": ["name"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='HumanUse',
+            name="HumanUse",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='name')),
-                ('description', models.TextField()),
-                ('use_type', models.CharField(choices=[('food', 'Food'), ('medicinal', 'Medicinal'), ('material', 'Material'), ('ornamental', 'Ornamental'), ('other', 'Other')], db_index=True, max_length=16, verbose_name='use type')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="name")),
+                ("description", models.TextField()),
+                (
+                    "use_type",
+                    models.CharField(
+                        choices=[
+                            ("food", "Food"),
+                            ("medicinal", "Medicinal"),
+                            ("material", "Material"),
+                            ("ornamental", "Ornamental"),
+                            ("other", "Other"),
+                        ],
+                        db_index=True,
+                        max_length=16,
+                        verbose_name="use type",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'human use',
-                'verbose_name_plural': 'human uses',
-                'ordering': ['name'],
-                'abstract': False,
+                "verbose_name": "human use",
+                "verbose_name_plural": "human uses",
+                "ordering": ["name"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='LightPreference',
+            name="LightPreference",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='name')),
-                ('description', models.TextField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="name")),
+                ("description", models.TextField()),
             ],
             options={
-                'verbose_name': 'light preference',
-                'verbose_name_plural': 'light preferences',
-                'ordering': ['name'],
-                'abstract': False,
+                "verbose_name": "light preference",
+                "verbose_name_plural": "light preferences",
+                "ordering": ["name"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='SoilPreference',
+            name="SoilPreference",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='name')),
-                ('description', models.TextField(blank=True, help_text='Optional description of soil preference.', verbose_name='description')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="name")),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="Optional description of soil preference.",
+                        verbose_name="description",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'soil texture',
-                'verbose_name_plural': 'soil textures',
-                'ordering': ['name'],
-                'abstract': False,
+                "verbose_name": "soil texture",
+                "verbose_name_plural": "soil textures",
+                "ordering": ["name"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Source',
+            name="Source",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='name')),
-                ('date', models.DateField(default=datetime.datetime.now, verbose_name='date')),
-                ('url', models.URLField(verbose_name='URL')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="name")),
+                (
+                    "date",
+                    models.DateField(
+                        default=datetime.datetime.now, verbose_name="date"
+                    ),
+                ),
+                ("url", models.URLField(verbose_name="URL")),
             ],
             options={
-                'verbose_name': 'source',
-                'verbose_name_plural': 'sources',
-                'ordering': ['name'],
+                "verbose_name": "source",
+                "verbose_name_plural": "sources",
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='SourceType',
+            name="SourceType",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='name')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="name")),
             ],
             options={
-                'verbose_name': 'source type',
-                'verbose_name_plural': 'source types',
-                'ordering': ['name'],
+                "verbose_name": "source type",
+                "verbose_name_plural": "source types",
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='ClimateZone',
+            name="ClimateZone",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='name')),
-                ('description', models.TextField()),
-                ('main_group', models.CharField(choices=[('A', 'A: Tropical'), ('B', 'B: Dry'), ('C', 'C: Temperate'), ('D', 'D: Continental')], max_length=1, verbose_name='main group')),
-                ('seasonal_precipitation', models.CharField(blank=True, choices=[('S', 'S: Semi-Arid or steppe'), ('W', 'W: Arid Desert'), ('f', 'f: No dry season'), ('m', 'm: Monsoon'), ('w', 'w: Wet winter'), ('s', 's: Wet summer')], max_length=1, null=True, verbose_name='seasonal precipitation')),
-                ('heat_level', models.CharField(blank=True, choices=[('h', 'h: Hot arid'), ('k', 'k: Cold arid'), ('a', 'a: Hot summer'), ('b', 'b: Warm summer'), ('c', 'c: Cool summer'), ('d', 'd: Very cold winter')], max_length=1, null=True, verbose_name='heat level')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="name")),
+                ("description", models.TextField()),
+                (
+                    "main_group",
+                    models.CharField(
+                        choices=[
+                            ("A", "A: Tropical"),
+                            ("B", "B: Dry"),
+                            ("C", "C: Temperate"),
+                            ("D", "D: Continental"),
+                        ],
+                        max_length=1,
+                        verbose_name="main group",
+                    ),
+                ),
+                (
+                    "seasonal_precipitation",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("S", "S: Semi-Arid or steppe"),
+                            ("W", "W: Arid Desert"),
+                            ("f", "f: No dry season"),
+                            ("m", "m: Monsoon"),
+                            ("w", "w: Wet winter"),
+                            ("s", "s: Wet summer"),
+                        ],
+                        max_length=1,
+                        null=True,
+                        verbose_name="seasonal precipitation",
+                    ),
+                ),
+                (
+                    "heat_level",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("h", "h: Hot arid"),
+                            ("k", "k: Cold arid"),
+                            ("a", "a: Hot summer"),
+                            ("b", "b: Warm summer"),
+                            ("c", "c: Cool summer"),
+                            ("d", "d: Very cold winter"),
+                        ],
+                        max_length=1,
+                        null=True,
+                        verbose_name="heat level",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'climate zone',
-                'verbose_name_plural': 'climate zones',
-                'ordering': ('main_group', 'seasonal_precipitation', 'heat_level'),
-                'abstract': False,
-                'unique_together': {('main_group', 'seasonal_precipitation', 'heat_level')},
+                "verbose_name": "climate zone",
+                "verbose_name_plural": "climate zones",
+                "ordering": ("main_group", "seasonal_precipitation", "heat_level"),
+                "abstract": False,
+                "unique_together": {
+                    ("main_group", "seasonal_precipitation", "heat_level")
+                },
             },
         ),
         migrations.CreateModel(
-            name='SoilPreferenceThroughBase',
+            name="SoilPreferenceThroughBase",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='confidence')),
-                ('source', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.source')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="confidence",
+                    ),
+                ),
+                (
+                    "source",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.source",
+                    ),
+                ),
             ],
             options={
-                'ordering': None,
-                'abstract': False,
+                "ordering": None,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='LightPreferenceThroughBase',
+            name="LightPreferenceThroughBase",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='confidence')),
-                ('source', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.source')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="confidence",
+                    ),
+                ),
+                (
+                    "source",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.source",
+                    ),
+                ),
             ],
             options={
-                'ordering': None,
-                'abstract': False,
+                "ordering": None,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='HumanUseThroughBase',
+            name="HumanUseThroughBase",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='confidence')),
-                ('description', models.TextField(help_text='Description of specific human use.', verbose_name='description')),
-                ('source', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.source')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="confidence",
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        help_text="Description of specific human use.",
+                        verbose_name="description",
+                    ),
+                ),
+                (
+                    "source",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.source",
+                    ),
+                ),
             ],
             options={
-                'ordering': None,
-                'abstract': False,
+                "ordering": None,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='GrowthHabitThroughBase',
+            name="GrowthHabitThroughBase",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='confidence')),
-                ('source', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.source')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="confidence",
+                    ),
+                ),
+                (
+                    "source",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.source",
+                    ),
+                ),
             ],
             options={
-                'ordering': None,
-                'abstract': False,
+                "ordering": None,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='EcologicalRoleThroughBase',
+            name="EcologicalRoleThroughBase",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='confidence')),
-                ('description', models.TextField(blank=True, help_text='Optional description of specific ecological role.', verbose_name='description')),
-                ('source', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.source')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="confidence",
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="Optional description of specific ecological role.",
+                        verbose_name="description",
+                    ),
+                ),
+                (
+                    "source",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.source",
+                    ),
+                ),
             ],
             options={
-                'ordering': None,
-                'abstract': False,
+                "ordering": None,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='ClimateZoneThroughBase',
+            name="ClimateZoneThroughBase",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='confidence')),
-                ('source', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.source')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="confidence",
+                    ),
+                ),
+                (
+                    "source",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.source",
+                    ),
+                ),
             ],
             options={
-                'ordering': None,
-                'abstract': False,
+                "ordering": None,
+                "abstract": False,
             },
         ),
         migrations.AddField(
-            model_name='source',
-            name='source_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='species_data.sourcetype'),
+            model_name="source",
+            name="source_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                to="species_data.sourcetype",
+            ),
         ),
         migrations.CreateModel(
-            name='SpeciesClimateZone',
+            name="SpeciesClimateZone",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='confidence')),
-                ('climate_zone', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.climatezone')),
-                ('source', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.source')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="confidence",
+                    ),
+                ),
+                (
+                    "climate_zone",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.climatezone",
+                    ),
+                ),
+                (
+                    "source",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.source",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='SpeciesEcologicalRole',
+            name="SpeciesEcologicalRole",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='confidence')),
-                ('ecological_role', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.ecologicalrole')),
-                ('source', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.source')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="confidence",
+                    ),
+                ),
+                (
+                    "ecological_role",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.ecologicalrole",
+                    ),
+                ),
+                (
+                    "source",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.source",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='SpeciesGrowthHabit',
+            name="SpeciesGrowthHabit",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='confidence')),
-                ('growth_habit', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.growthhabit')),
-                ('source', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.source')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="confidence",
+                    ),
+                ),
+                (
+                    "growth_habit",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.growthhabit",
+                    ),
+                ),
+                (
+                    "source",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.source",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='SpeciesHumanUse',
+            name="SpeciesHumanUse",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='confidence')),
-                ('human_use', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.humanuse')),
-                ('source', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.source')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="confidence",
+                    ),
+                ),
+                (
+                    "human_use",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.humanuse",
+                    ),
+                ),
+                (
+                    "source",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.source",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='SpeciesLightPreference',
+            name="SpeciesLightPreference",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='confidence')),
-                ('light_preference', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.lightpreference')),
-                ('source', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.source')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="confidence",
+                    ),
+                ),
+                (
+                    "light_preference",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.lightpreference",
+                    ),
+                ),
+                (
+                    "source",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.source",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='SpeciesProperties',
+            name="SpeciesProperties",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('height_minimum', models.DecimalField(blank=True, decimal_places=1, max_digits=2, null=True, verbose_name='%(parent_verbose_name)s minimum')),
-                ('height_typical', models.DecimalField(blank=True, decimal_places=1, max_digits=2, null=True, verbose_name='%(parent_verbose_name)s typical')),
-                ('height_maximum', models.DecimalField(blank=True, decimal_places=1, max_digits=2, null=True, verbose_name='%(parent_verbose_name)s maximum')),
-                ('height_confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='%(parent_verbose_name)s confidence')),
-                ('width_minimum', models.DecimalField(blank=True, decimal_places=1, max_digits=2, null=True, verbose_name='%(parent_verbose_name)s minimum')),
-                ('width_typical', models.DecimalField(blank=True, decimal_places=1, max_digits=2, null=True, verbose_name='%(parent_verbose_name)s typical')),
-                ('width_maximum', models.DecimalField(blank=True, decimal_places=1, max_digits=2, null=True, verbose_name='%(parent_verbose_name)s maximum')),
-                ('width_confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='%(parent_verbose_name)s confidence')),
-                ('soil_acidity_minimum', models.DecimalField(blank=True, decimal_places=1, max_digits=2, null=True, verbose_name='%(parent_verbose_name)s minimum')),
-                ('soil_acidity_typical', models.DecimalField(blank=True, decimal_places=1, max_digits=2, null=True, verbose_name='%(parent_verbose_name)s typical')),
-                ('soil_acidity_maximum', models.DecimalField(blank=True, decimal_places=1, max_digits=2, null=True, verbose_name='%(parent_verbose_name)s maximum')),
-                ('soil_acidity_confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='%(parent_verbose_name)s confidence')),
-                ('production_start_minimum', models.DurationField(blank=True, null=True, verbose_name='%(parent_verbose_name)s minimum')),
-                ('production_start_typical', models.DurationField(blank=True, null=True, verbose_name='%(parent_verbose_name)s typical')),
-                ('production_start_maximum', models.DurationField(blank=True, null=True, verbose_name='%(parent_verbose_name)s maximum')),
-                ('production_start_confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='%(parent_verbose_name)s confidence')),
-                ('production_peak_minimum', models.DurationField(blank=True, null=True, verbose_name='%(parent_verbose_name)s minimum')),
-                ('production_peak_typical', models.DurationField(blank=True, null=True, verbose_name='%(parent_verbose_name)s typical')),
-                ('production_peak_maximum', models.DurationField(blank=True, null=True, verbose_name='%(parent_verbose_name)s maximum')),
-                ('production_peak_confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='%(parent_verbose_name)s confidence')),
-                ('lifetime_minimum', models.DurationField(blank=True, null=True, verbose_name='%(parent_verbose_name)s minimum')),
-                ('lifetime_typical', models.DurationField(blank=True, null=True, verbose_name='%(parent_verbose_name)s typical')),
-                ('lifetime_maximum', models.DurationField(blank=True, null=True, verbose_name='%(parent_verbose_name)s maximum')),
-                ('lifetime_confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='%(parent_verbose_name)s confidence')),
-                ('climate_zones', models.ManyToManyField(through='species_data.SpeciesClimateZone', to='species_data.climatezone')),
-                ('ecological_roles', models.ManyToManyField(through='species_data.SpeciesEcologicalRole', to='species_data.ecologicalrole')),
-                ('growth_habits', models.ManyToManyField(through='species_data.SpeciesGrowthHabit', to='species_data.growthhabit')),
-                ('height_source', species_data.fields.SourceField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='species_data.source', verbose_name='%(parent_verbose_name)s source')),
-                ('human_uses', models.ManyToManyField(through='species_data.SpeciesHumanUse', to='species_data.humanuse')),
-                ('lifetime_source', species_data.fields.SourceField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='species_data.source', verbose_name='%(parent_verbose_name)s source')),
-                ('light_preference', models.ManyToManyField(through='species_data.SpeciesLightPreference', to='species_data.lightpreference')),
-                ('production_peak_source', species_data.fields.SourceField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='species_data.source', verbose_name='%(parent_verbose_name)s source')),
-                ('production_start_source', species_data.fields.SourceField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='species_data.source', verbose_name='%(parent_verbose_name)s source')),
-                ('soil_acidity_source', species_data.fields.SourceField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='species_data.source', verbose_name='%(parent_verbose_name)s source')),
-                ('species', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='plant_species.species')),
-                ('width_source', species_data.fields.SourceField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='species_data.source', verbose_name='%(parent_verbose_name)s source')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "height_minimum",
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s minimum",
+                    ),
+                ),
+                (
+                    "height_typical",
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s typical",
+                    ),
+                ),
+                (
+                    "height_maximum",
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s maximum",
+                    ),
+                ),
+                (
+                    "height_confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="%(parent_verbose_name)s confidence",
+                    ),
+                ),
+                (
+                    "width_minimum",
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s minimum",
+                    ),
+                ),
+                (
+                    "width_typical",
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s typical",
+                    ),
+                ),
+                (
+                    "width_maximum",
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s maximum",
+                    ),
+                ),
+                (
+                    "width_confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="%(parent_verbose_name)s confidence",
+                    ),
+                ),
+                (
+                    "soil_acidity_minimum",
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s minimum",
+                    ),
+                ),
+                (
+                    "soil_acidity_typical",
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s typical",
+                    ),
+                ),
+                (
+                    "soil_acidity_maximum",
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s maximum",
+                    ),
+                ),
+                (
+                    "soil_acidity_confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="%(parent_verbose_name)s confidence",
+                    ),
+                ),
+                (
+                    "production_start_minimum",
+                    models.DurationField(
+                        blank=True,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s minimum",
+                    ),
+                ),
+                (
+                    "production_start_typical",
+                    models.DurationField(
+                        blank=True,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s typical",
+                    ),
+                ),
+                (
+                    "production_start_maximum",
+                    models.DurationField(
+                        blank=True,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s maximum",
+                    ),
+                ),
+                (
+                    "production_start_confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="%(parent_verbose_name)s confidence",
+                    ),
+                ),
+                (
+                    "production_peak_minimum",
+                    models.DurationField(
+                        blank=True,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s minimum",
+                    ),
+                ),
+                (
+                    "production_peak_typical",
+                    models.DurationField(
+                        blank=True,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s typical",
+                    ),
+                ),
+                (
+                    "production_peak_maximum",
+                    models.DurationField(
+                        blank=True,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s maximum",
+                    ),
+                ),
+                (
+                    "production_peak_confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="%(parent_verbose_name)s confidence",
+                    ),
+                ),
+                (
+                    "lifetime_minimum",
+                    models.DurationField(
+                        blank=True,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s minimum",
+                    ),
+                ),
+                (
+                    "lifetime_typical",
+                    models.DurationField(
+                        blank=True,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s typical",
+                    ),
+                ),
+                (
+                    "lifetime_maximum",
+                    models.DurationField(
+                        blank=True,
+                        null=True,
+                        verbose_name="%(parent_verbose_name)s maximum",
+                    ),
+                ),
+                (
+                    "lifetime_confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="%(parent_verbose_name)s confidence",
+                    ),
+                ),
+                (
+                    "climate_zones",
+                    models.ManyToManyField(
+                        through="species_data.SpeciesClimateZone",
+                        to="species_data.climatezone",
+                    ),
+                ),
+                (
+                    "ecological_roles",
+                    models.ManyToManyField(
+                        through="species_data.SpeciesEcologicalRole",
+                        to="species_data.ecologicalrole",
+                    ),
+                ),
+                (
+                    "growth_habits",
+                    models.ManyToManyField(
+                        through="species_data.SpeciesGrowthHabit",
+                        to="species_data.growthhabit",
+                    ),
+                ),
+                (
+                    "height_source",
+                    species_data.fields.SourceField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="+",
+                        to="species_data.source",
+                        verbose_name="%(parent_verbose_name)s source",
+                    ),
+                ),
+                (
+                    "human_uses",
+                    models.ManyToManyField(
+                        through="species_data.SpeciesHumanUse",
+                        to="species_data.humanuse",
+                    ),
+                ),
+                (
+                    "lifetime_source",
+                    species_data.fields.SourceField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="+",
+                        to="species_data.source",
+                        verbose_name="%(parent_verbose_name)s source",
+                    ),
+                ),
+                (
+                    "light_preference",
+                    models.ManyToManyField(
+                        through="species_data.SpeciesLightPreference",
+                        to="species_data.lightpreference",
+                    ),
+                ),
+                (
+                    "production_peak_source",
+                    species_data.fields.SourceField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="+",
+                        to="species_data.source",
+                        verbose_name="%(parent_verbose_name)s source",
+                    ),
+                ),
+                (
+                    "production_start_source",
+                    species_data.fields.SourceField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="+",
+                        to="species_data.source",
+                        verbose_name="%(parent_verbose_name)s source",
+                    ),
+                ),
+                (
+                    "soil_acidity_source",
+                    species_data.fields.SourceField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="+",
+                        to="species_data.source",
+                        verbose_name="%(parent_verbose_name)s source",
+                    ),
+                ),
+                (
+                    "species",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="plant_species.species",
+                    ),
+                ),
+                (
+                    "width_source",
+                    species_data.fields.SourceField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="+",
+                        to="species_data.source",
+                        verbose_name="%(parent_verbose_name)s source",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'species properties',
-                'verbose_name_plural': 'species properties',
+                "verbose_name": "species properties",
+                "verbose_name_plural": "species properties",
             },
         ),
         migrations.AddField(
-            model_name='specieslightpreference',
-            name='species',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.speciesproperties'),
+            model_name="specieslightpreference",
+            name="species",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="species_data.speciesproperties",
+            ),
         ),
         migrations.AddField(
-            model_name='specieshumanuse',
-            name='species',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.speciesproperties'),
+            model_name="specieshumanuse",
+            name="species",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="species_data.speciesproperties",
+            ),
         ),
         migrations.AddField(
-            model_name='speciesgrowthhabit',
-            name='species',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.speciesproperties'),
+            model_name="speciesgrowthhabit",
+            name="species",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="species_data.speciesproperties",
+            ),
         ),
         migrations.AddField(
-            model_name='speciesecologicalrole',
-            name='species',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.speciesproperties'),
+            model_name="speciesecologicalrole",
+            name="species",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="species_data.speciesproperties",
+            ),
         ),
         migrations.AddField(
-            model_name='speciesclimatezone',
-            name='species',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.speciesproperties'),
+            model_name="speciesclimatezone",
+            name="species",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="species_data.speciesproperties",
+            ),
         ),
         migrations.CreateModel(
-            name='SpeciesSoilPreference',
+            name="SpeciesSoilPreference",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('confidence', species_data.fields.ConfidenceField(blank=True, decimal_places=1, max_digits=2, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1.0)], verbose_name='confidence')),
-                ('soil_texture', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.soilpreference')),
-                ('source', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.source')),
-                ('species', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='species_data.speciesproperties')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "confidence",
+                    species_data.fields.ConfidenceField(
+                        blank=True,
+                        decimal_places=1,
+                        max_digits=2,
+                        null=True,
+                        validators=[
+                            django.core.validators.MinValueValidator(0.0),
+                            django.core.validators.MaxValueValidator(1.0),
+                        ],
+                        verbose_name="confidence",
+                    ),
+                ),
+                (
+                    "soil_texture",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.soilpreference",
+                    ),
+                ),
+                (
+                    "source",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.source",
+                    ),
+                ),
+                (
+                    "species",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="species_data.speciesproperties",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.AddField(
-            model_name='speciesproperties',
-            name='soil_preference',
-            field=models.ManyToManyField(through='species_data.SpeciesSoilPreference', to='species_data.soilpreference'),
+            model_name="speciesproperties",
+            name="soil_preference",
+            field=models.ManyToManyField(
+                through="species_data.SpeciesSoilPreference",
+                to="species_data.soilpreference",
+            ),
         ),
     ]

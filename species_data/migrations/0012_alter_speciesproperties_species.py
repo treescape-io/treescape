@@ -5,16 +5,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('plant_species', '0005_family_slug_genus_slug_species_slug_squashed_0008_alter_family_latin_name_alter_family_slug_and_more'),
-        ('species_data', '0011_alter_source_url_alter_speciesproperties_species'),
+        ("species_data", "0011_alter_source_url_alter_speciesproperties_species"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='speciesproperties',
-            name='species',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='plant_species.species'),
+            model_name="speciesproperties",
+            name="species",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE, to="plant_species.species"
+            ),
         ),
     ]
