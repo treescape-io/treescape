@@ -167,3 +167,5 @@ static/
 # QGIS
 qgis_project/*~
 .aider*
+fixtures/
+plant_species*.tar
