@@ -3,7 +3,6 @@ from rest_framework import viewsets
 from plant_species.models import Species, Genus, Family
 
 from .models import (
-    SpeciesProperties,
     ClimateZone,
     GrowthHabit,
     HumanUse,
@@ -15,7 +14,6 @@ from .serializers import (
     FamilyDataSerializer,
     GenusDataSerializer,
     SpeciesDataSerializer,
-    SpeciesPropertiesSerializer,
     ClimateZoneSerializer,
     GrowthHabitSerializer,
     HumanUseSerializer,
