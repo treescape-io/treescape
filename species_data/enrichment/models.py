@@ -13,7 +13,7 @@ from langchain_core.pydantic_v1 import (
 )
 from species_data.models import SpeciesProperties
 from species_data.models.base import CategorizedPlantPropertyBase
-from species_data.fields import DecimalEstimatedRange, DurationEstimatedRange
+from species_data.fields import DecimalEstimatedRange  # , DurationEstimatedRange
 
 
 logger = logging.getLogger(__name__)

@@ -7,16 +7,6 @@ from plant_species.models import Species
 from species_data.models import (
     Source,
     SourceType,
-    EcologicalRole,
-    GrowthHabit,
-    HumanUse,
-    ClimateZone,
-)
-from species_data.models.categories import (
-    SpeciesClimateZone,
-    SpeciesEcologicalRole,
-    SpeciesGrowthHabit,
-    SpeciesHumanUse,
 )
 from species_data.models.models import SpeciesProperties
 from .chains import get_enrichment_chain
