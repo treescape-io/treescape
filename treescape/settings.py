@@ -10,23 +10,37 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import environ
+
 from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Defaults for environ settings
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+
+
+# Take environment variables from .env file
+environ.Env.read_env(BASE_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-n!+1ni^guldnuc5@4y3ww$jtzb^=@vie+1ad1%^mf7=pw^7@v9"
+# Raises Django's ImproperlyConfigured
+# exception if SECRET_KEY not in os.environ
+SECRET_KEY = env("SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# False if not in os.environ because of casting above
+DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["treescape.app"]
 
 LOGGING = {
     "version": 1,
@@ -102,10 +116,8 @@ WSGI_APPLICATION = "treescape.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.contrib.gis.db.backends.spatialite",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    # read os.environ['DATABASE_URL']
+    "default": env.db_url(default=f'spatialite:///{BASE_DIR / "db.sqlite3"}')  # type: ignore
 }
 
 
@@ -137,6 +149,7 @@ LANGUAGES = [
     ("pt", _("Portuguese")),
     ("nl", _("Dutch")),
     ("en", _("English")),
+    ("es", _("Spanish")),
 ]
 
 TIME_ZONE = "UTC"

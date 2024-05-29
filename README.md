@@ -61,25 +61,37 @@ The data structure and web-interface are managed as a [Django](https://www.djang
    ```sh
    poetry shell
    ```
-3. Create database:
+3. Copy `.env.dist` to `.env` and update local settings. At minimum, set `SECRET_KEY`, `DEBUG=True` and `OPENAI_API_KEY`.
+4. Create and/or migrate database:
    ```sh
    ./manage.py migrate
    ```
-4. Load species data (see 'Load pre-generated data') or generate it ('Generating species data').
-5. Create Django superuser:
+5. Load species data (see 'Load pre-generated data') or generate it ('Generating species data').
+6. Create Django superuser:
    ```sh
    ./manage.py createsuperuser
    ```
-6. Start the Django development server:
+7. Start the Django development server:
    ```sh
    ./manage.py runserver
    ```
-9. Navigate to http://localhost:8080/admin/ to access the Django Admin.
+8. Navigate to http://localhost:8000/admin/ to access the Django
+   Admin or to http://localhost:8000/api/ to play with the API.
 
 ### QGIS
 In the `qgis_project` folder, a `forest_design.qgs` template is maintained, which can be directly opened by QGIS.We attempt to keep the QGIS project in sync, as a template, ready to start forest design.
 
 When opening QGIS, make sure to click 'Enable macros' in the notification to enable UI customizations in QGIS.
+
+## Configuration
+We're using [django-environ](https://django-environ.readthedocs.io/en/latest/index.html) for configuration, which reads environment variables from a local `.env`, which is not checked into version control -- as to guard secrets and keep differences between environments clear.
+
+The following variables can be defined:
+* `DATABASE_URL`: https://django-environ.readthedocs.io/en/latest/api.html#environ.Env.db_url
+* `OPENAI_API_KEY`: Required for enrichment.
+* `SECRET_KEY`: Used for security cookies etc. [Generate here](https://djecrety.ir/)
+* `DEBUG`: Set to `True` for local debugging.
+
 
 ## Managing species data
 ### Load pre-generated data
@@ -130,7 +142,4 @@ Retrieve data from textual sources (currently Wikipedia), process them into stru
 
 `./manage.py enrich_species_data`
 
-This requires you to export `OPENAI_API_KEY` in your environment:
-
-`export OPENAI_API_KEY=sk-<xxxxxx>`
-
+This requires you to configure `OPENAI_API_KEY` in `.env`.
