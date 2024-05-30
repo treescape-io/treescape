@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Treescape: Accelerate Agroforestry</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<style>
+		body {
+			background: url('/static/treescape/avatar_large.jpg') no-repeat center center fixed;
+			background-size: cover;
+		}
+
+		.bg-white-transparent {
+			background-color: rgba(255, 255, 255, 0.95);
+		}
+
+		ol.custom-counter {
+			counter-reset: my-counter;
+		}
+
+		ol.custom-counter li {
+			list-style: none;
+			counter-increment: my-counter;
+			margin-bottom: 1.5rem;
+			display: flex;
+			align-items: center;
+		}
+
+		ol.custom-counter li::before {
+			content: counter(my-counter);
+			font-size: 1.5rem;
+			color: white;
+			background-color: #4A5568;
+			/* Darker shade */
+			border-radius: 50%;
+			width: 2.5rem;
+			height: 2.5rem;
+			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+			margin-right: 1rem;
+		}
+	</style>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+	<div class="bg-white-transparent shadow-md rounded-lg p-8 max-w-md w-full mx-auto">
+		<div class="prose prose-lg text-center">
+			<h1 class="text-3xl font-bold">Treescape</h1>
+			<h2 class="text-xl font-semibold text-green-600">Accelerate Agroforestry</h2>
+			<div class="my-6">
+				<div style="padding:56.25% 0 0 0;position:relative;">
+					<iframe src="https://player.vimeo.com/video/941131235?h=35be62dce3"
+						style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0"
+						allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+				</div>
+				<script src="https://player.vimeo.com/api/player.js"></script>
+			</div>
+			<h3 class="text-lg mt-4">Welcome to our <em>Minimally</em> Viable Products:</h3>
+			<ol class="custom-counter mt-6 text-left">
+				<li class="mb-4">
+					<h4><a href="/api/" class="text-blue-500 hover:text-blue-700" title="API">Plant Data API + HTML data
+							explorer</a></h4>
+				</li>
+				<li class="mb-4">
+					<h4><a href="/admin/" class="text-blue-500 hover:text-blue-700" title="Admin">Admin Plant Data
+							Explorer</a><br> <span class="text-gray-600">(User: guest Pass: guest)</span></h4>
+				</li>
+				<li class="mb-4">
+					<h4><a href="/static/" class="text-blue-500 hover:text-blue-700" title="QGIS Project">Download QGIS
+							Offline Demo Project</a></h4>
+				</li>
+			</ol>
+
+			<div class="mt-8">
+				<h3 class="text-lg">What is Treescape?</h3>
+				<p>We're developing the best app for agroforestry. <br>Building the stack to plant a billion hectares.
+					<br>A sustainable use for AI.
+				</p>
+				<h4 class="text-blue-500 hover:text-blue-700"><a href="https://github.com/treescape-io"
+						title="Treescape One Pager">Check our One Pager</a></h4>
+			</div>
+
+			<div class="mt-8">
+				<h3 class="text-lg">Reach out!</h3>
+				<h4 class="text-blue-500 hover:text-blue-700"><a href="mailto:info@treescape.io"
+						title="Email">info@treescape.io</a></h4>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
