@@ -112,15 +112,28 @@ class SpeciesPropertiesSerializer(serializers.ModelSerializer):
             "ecological_roles",
         ]
 
-    height_source = SourceSerializer(read_only=True)
-    width_source = SourceSerializer(read_only=True)
+    height_source = serializers.HyperlinkedRelatedField(
+        view_name="source-detail", read_only=True
+    )
+    width_source = serializers.HyperlinkedRelatedField(
+        view_name="source-detail", read_only=True
+    )
 
     climate_zones = serializers.HyperlinkedRelatedField(
-        many=True, read_only=True, view_name="climate-zones-detail"
+        many=True, view_name="climatezone-detail", read_only=True, lookup_field="slug"
     )
-    growth_habits = GrowthHabitSerializer(many=True, read_only=True)
-    human_uses = HumanUseSerializer(many=True, read_only=True)
-    ecological_roles = EcologicalRoleSerializer(many=True, read_only=True)
+    growth_habits = serializers.HyperlinkedRelatedField(
+        many=True, view_name="growthhabit-detail", read_only=True, lookup_field="slug"
+    )
+    human_uses = serializers.HyperlinkedRelatedField(
+        many=True, view_name="humanuse-detail", read_only=True, lookup_field="slug"
+    )
+    ecological_roles = serializers.HyperlinkedRelatedField(
+        many=True,
+        view_name="ecologicalrole-detail",
+        read_only=True,
+        lookup_field="slug",
+    )
 
 
 class SpeciesDataSerializer(serializers.ModelSerializer):
