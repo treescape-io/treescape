@@ -115,7 +115,9 @@ class SpeciesPropertiesSerializer(serializers.ModelSerializer):
     height_source = SourceSerializer(read_only=True)
     width_source = SourceSerializer(read_only=True)
 
-    climate_zones = ClimateZoneSerializer(many=True, read_only=True)
+    climate_zones = serializers.HyperlinkedRelatedField(
+        many=True, read_only=True, view_name="climate-zones-detail"
+    )
     growth_habits = GrowthHabitSerializer(many=True, read_only=True)
     human_uses = HumanUseSerializer(many=True, read_only=True)
     ecological_roles = EcologicalRoleSerializer(many=True, read_only=True)
