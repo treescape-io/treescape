@@ -40,7 +40,7 @@ SECRET_KEY = env("SECRET_KEY")
 # False if not in os.environ because of casting above
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = ["treescape.app"]
+ALLOWED_HOSTS = ["treescape.app", "127.0.0.1", "localhost"]
 
 LOGGING = {
     "version": 1,
@@ -96,7 +96,7 @@ ROOT_URLCONF = "treescape.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "treescape" / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -164,6 +164,11 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "static"
+
+# Project-wide static files.
+STATICFILES_DIRS = [
+    BASE_DIR / "treescape" / "static",
+]
 
 MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_URL = "media/"
