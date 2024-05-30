@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.gis",
     "django_extensions",
+    "drf_redesign",
     "rest_framework",
     "plant_species",
     "forest_designs",
