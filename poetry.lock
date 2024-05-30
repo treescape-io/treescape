@@ -669,6 +669,21 @@ files = [
 django = ">=3.0"
 
 [[package]]
+name = "drf-redesign"
+version = "0.3.9"
+description = "Redesign of the browse-able api of Django REST Framework with Bootstrap 5"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "drf_redesign-0.3.9-py3-none-any.whl", hash = "sha256:1812c38c38b9b5c38423cea8faffcfd8e7e4e0d8220bea42c2b5e106f592f5e5"},
+    {file = "drf_redesign-0.3.9.tar.gz", hash = "sha256:35366b334f4ab1c13a04f800498fd677caad4268b4bc2f4fb563ac939dd86ceb"},
+]
+
+[package.dependencies]
+django = ">=3.0"
+djangorestframework = ">=3.14"
+
+[[package]]
 name = "exceptiongroup"
 version = "1.2.0"
 description = "Backport of PEP 654 (exception groups)"
@@ -2936,4 +2951,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "31928c8ca0f3d5210c936f2a3ec088f9d762816f73c6f69f8c0ec1703d050309"
+content-hash = "3764bd36b872351628a11c36d9c348ea330ac30344caf0be11720b4361f06e96"
