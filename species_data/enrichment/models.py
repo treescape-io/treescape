@@ -12,12 +12,26 @@ from langchain_core.pydantic_v1 import (
     Field,
     create_model,
 )
+from pydantic.v1.main import ModelMetaclass
 from species_data.models import SpeciesProperties
 from species_data.models.base import CategorizedPlantPropertyBase
 from species_data.fields import DecimalEstimatedRange  # , DurationEstimatedRange
 
 
 logger = logging.getLogger(__name__)
+
+
+# https://stackoverflow.com/questions/67699451/make-every-field-as-optional-with-pydantic
+class AllOptional(ModelMetaclass):
+    def __new__(cls, name, bases, namespaces, **kwargs):
+        annotations = namespaces.get("__annotations__", {})
+        for base in bases:
+            annotations.update(base.__annotations__)
+        for field in annotations:
+            if not field.startswith("__"):
+                annotations[field] = Optional[annotations[field]]
+        namespaces["__annotations__"] = annotations
+        return super().__new__(cls, name, bases, namespaces, **kwargs)
 
 
 def get_species_data_model() -> Type[BaseModel]:
@@ -93,6 +107,11 @@ def get_species_data_model() -> Type[BaseModel]:
         if result is not None
     }
 
-    model = create_model("SpeciesData", **model_fields)  # type: ignore
+    model = create_model("SpeciesModelBase", **model_fields)  # type: ignore
 
-    return model
+    # Make all properties optional.
+    # For some reason, specyfing Optional[field_type] in get_model_field() doesn't do it.
+    class SpeciesModel(model, metaclass=AllOptional):
+        pass
+
+    return SpeciesModel
