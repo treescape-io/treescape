@@ -1,3 +1,5 @@
+from pprint import pformat
+
 import decimal
 import logging
 import datetime
@@ -136,7 +138,7 @@ def enrich_species_data(species: Species, llm: BaseLanguageModel):
     #                            'ornamental-flowers',
     #                            'ornamental-foliage']}
 
-    logger.debug(f"Received data: {plant_data}")
+    logger.debug(f"Received data: {pformat(plant_data)}")
 
     source_type = SourceType.objects.get_or_create(name="Wikipedia")[0]
     source = Source.objects.get_or_create(
