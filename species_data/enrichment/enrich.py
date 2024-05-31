@@ -126,7 +126,7 @@ def enrich_species_data(species: Species, llm: BaseLanguageModel):
         return
 
     # Brute force token limit.
-    source_content = species.wikipedia_page.content[:50000]
+    source_content = species.wikipedia_page.content[:25000]
 
     plant_data = chain.invoke(
         {
