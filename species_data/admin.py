@@ -226,6 +226,5 @@ class SpeciesPropertiesAdmin(admin.ModelAdmin):
         "ecological_roles",
         "soil_preferences",
         "propagation_methods",
-        "species__genus__family",
     )
     list_select_related = ("species",)
