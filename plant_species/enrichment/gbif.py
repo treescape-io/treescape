@@ -363,6 +363,9 @@ class Rank(enum.Enum):
     GENUS = "GENUS"
     SPECIES = "SPECIES"
 
+    def __str__(self):
+        return self.name.lower()
+
 
 def get_latin_names(
     latin_name: str, rank: Rank
