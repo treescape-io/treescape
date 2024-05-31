@@ -50,6 +50,17 @@ Other/commercial licensing available upon request.
 * [Poetry](https://python-poetry.org/) 1.7.1
 
 ## Getting started
+### Geospatial requirements
+In order to do mapping, we're using geospatial libraries which, annoyingly, have to be installed on your system.
+
+Luckily, there are [Installation Instructions](https://docs.djangoproject.com/en/5.0/ref/contrib/gis/install/#geospatial-libraries). You might also want to install a spatial database, although the default, Spatialite, _might_ just work out of the box.
+
+### Docker
+We're explicitly open to Pull Requests for a docker-compose setup.
+
+### Nix
+We're also explicitly open to a PR for a NixOS package.
+
 ### Django
 The data structure and web-interface are managed as a [Django](https://www.djangoproject.com/) project. All the commands in these instructions are to be executing from within the repository's root.
 
