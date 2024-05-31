@@ -73,9 +73,10 @@ from .categories import (
 # TODO: Memoized classmethod on SpeciesProperties
 
 
-class EnrichmentSource(NamedTuple):
-    content: str
-    source_type: SourceType
+# Natural key lookups by species.slug
+class SpeciesPropertiesManager(models.Manager):
+    def get_by_natural_key(self, species_slug):
+        return self.get(species__slug=species_slug)
 
 
 class SpeciesProperties(PlantPropertiesBase):
@@ -91,6 +92,9 @@ class SpeciesProperties(PlantPropertiesBase):
     soil_preference = models.ManyToManyField(
         SoilPreference, through=SpeciesSoilPreference
     )
+
+    def natural_key(self):
+        return (self.species.slug,)
 
     class Meta:
         verbose_name = _("species properties")

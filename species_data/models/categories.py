@@ -12,9 +12,21 @@ class GrowthHabit(CategorizedPlantPropertyBase):
         verbose_name_plural = _("growth habits")
 
 
+class SpeciesGrowthHabitManager(models.Manager):
+    def get_by_natural_key(self, species_slug, growth_habit_slug):
+        return self.get(
+            species__species__slug=species_slug, growth_habit__slug=growth_habit_slug
+        )
+
+
 class SpeciesGrowthHabit(CategorizedSpeciesPropertyThroughBase):
     species = models.ForeignKey("SpeciesProperties", on_delete=models.CASCADE)
     growth_habit = models.ForeignKey(GrowthHabit, on_delete=models.CASCADE)
+
+    objects = SpeciesGrowthHabitManager()
+
+    def natural_key(self):
+        return (self.species.species.slug, self.growth_habit.slug)
 
     class Meta(CategorizedSpeciesPropertyThroughBase.Meta):
         unique_together = ("species", "growth_habit")
@@ -80,9 +92,21 @@ class ClimateZone(CategorizedPlantPropertyBase):
         return f"{self.main_group}{self.seasonal_precipitation or ''}{self.heat_level or ''}: {self.name}"
 
 
+class SpeciesClimateZoneManager(models.Manager):
+    def get_by_natural_key(self, species_slug, climate_zone_slug):
+        return self.get(
+            species__species__slug=species_slug, climate_zone__slug=climate_zone_slug
+        )
+
+
 class SpeciesClimateZone(CategorizedSpeciesPropertyThroughBase):
     species = models.ForeignKey("SpeciesProperties", on_delete=models.CASCADE)
     climate_zone = models.ForeignKey(ClimateZone, on_delete=models.CASCADE)
+
+    objects = SpeciesClimateZoneManager()
+
+    def natural_key(self):
+        return (self.species.species.slug, self.climate_zone.slug)
 
     class Meta(CategorizedSpeciesPropertyThroughBase.Meta):
         unique_together = ("species", "climate_zone")
@@ -111,14 +135,27 @@ class HumanUse(CategorizedPlantPropertyBase):
         ordering = ("use_type", "name")
 
 
+class SpeciesHumanUseManager(models.Manager):
+    def get_by_natural_key(self, species_slug, human_use_slug):
+        return self.get(
+            species__species__slug=species_slug, human_use__slug=human_use_slug
+        )
+
+
 class SpeciesHumanUse(CategorizedSpeciesPropertyThroughBase):
     species = models.ForeignKey("SpeciesProperties", on_delete=models.CASCADE)
     human_use = models.ForeignKey(HumanUse, on_delete=models.CASCADE)
+
+    objects = SpeciesHumanUseManager()
+
+    def natural_key(self):
+        return (self.species.species.slug, self.human_use.slug)
 
     class Meta(CategorizedSpeciesPropertyThroughBase.Meta):
         unique_together = ("species", "human_use")
 
 
+### REMOVE ME
 class HumanUseThroughBase(CategorizedSpeciesPropertyThroughBase):
     class Meta(HumanUse.Meta, CategorizedSpeciesPropertyThroughBase.Meta):
         ordering = None
@@ -136,6 +173,7 @@ class EcologicalRole(CategorizedPlantPropertyBase):
         verbose_name_plural = _("ecological roles")
 
 
+### REMOVE ME
 class EcologicalRoleThroughBase(CategorizedSpeciesPropertyThroughBase):
     class Meta(EcologicalRole.Meta, CategorizedSpeciesPropertyThroughBase.Meta):
         ordering = None
@@ -147,9 +185,21 @@ class EcologicalRoleThroughBase(CategorizedSpeciesPropertyThroughBase):
     )
 
 
+class SpeciesEcologicalRoleManager(models.Manager):
+    def get_by_natural_key(self, species_slug, eco_role_slug):
+        return self.get(
+            species__species__slug=species_slug, ecological_role__slug=eco_role_slug
+        )
+
+
 class SpeciesEcologicalRole(CategorizedSpeciesPropertyThroughBase):
     species = models.ForeignKey("SpeciesProperties", on_delete=models.CASCADE)
     ecological_role = models.ForeignKey(EcologicalRole, on_delete=models.CASCADE)
+
+    objects = SpeciesEcologicalRoleManager()
+
+    def natural_key(self):
+        return (self.species.species.slug, self.ecological_role.slug)
 
     class Meta(CategorizedSpeciesPropertyThroughBase.Meta):
         unique_together = ("species", "ecological_role")
@@ -169,9 +219,19 @@ class SoilPreference(CategorizedPlantPropertyBase):
         verbose_name_plural = _("soil textures")
 
 
+class SpeicesSoilPreferenceManager(models.Manager):
+    def get_by_natural_key(self, species_slug, soil_texture_slug):
+        return self.get(
+            species__species__slug=species_slug, soil_texture__slug=soil_texture_slug
+        )
+
+
 class SpeciesSoilPreference(CategorizedSpeciesPropertyThroughBase):
     species = models.ForeignKey("SpeciesProperties", on_delete=models.CASCADE)
     soil_texture = models.ForeignKey(SoilPreference, on_delete=models.CASCADE)
+
+    def natural_key(self):
+        return (self.species.species.slug, self.soil_texture.slug)
 
     class Meta(CategorizedSpeciesPropertyThroughBase.Meta):
         unique_together = ("species", "soil_texture")

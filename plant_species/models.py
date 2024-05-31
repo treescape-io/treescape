@@ -33,6 +33,11 @@ from plant_species.enrichment.wikipedia import get_wikipedia_page
 logger = logging.getLogger(__name__)
 
 
+class CommonNameManager(models.Manager):
+    def get_by_natural_key(self, name, language):
+        return self.get(name=name, language=language)
+
+
 class CommonNameBase(models.Model):
     """Abstract base class for common names."""
 
@@ -42,6 +47,9 @@ class CommonNameBase(models.Model):
     is_default = models.BooleanField(
         _("default"), default=False, help_text=_("Use as default name for language.")
     )
+
+    def natural_key(self):
+        return (self.name, self.language)
 
     def __str__(self):
         """Returns the common name and its language."""
@@ -62,6 +70,14 @@ class CommonNameBase(models.Model):
 
             # The use of return is explained in the comments
             return super().save(*args, **kwargs)
+
+
+class SpeciesManager(models.Manager):
+    def get_by_natural_key(self, slug):
+        return self.get(slug=slug)
+
+    def get_or_create_by_natural_key(self, slug, **kwargs):
+        return self.get_or_create(slug=slug, defaults=kwargs)
 
 
 class SpeciesBase(models.Model):
@@ -91,11 +107,16 @@ class SpeciesBase(models.Model):
         editable=False,
     )
 
+    objects = SpeciesManager()
+
     if typing.TYPE_CHECKING:
         from django.db.models.manager import RelatedManager
 
         common_names: RelatedManager[CommonNameBase]
         _rank: Rank
+
+    def natural_key(self):
+        return (self.slug,)
 
     def __str__(self):
         """Returns the Latin name of the family."""

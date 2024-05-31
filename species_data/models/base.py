@@ -11,6 +11,13 @@ from species_data.fields import (
 )
 
 
+class CategorizedPlantPropertyManager(models.Manager):
+    """Manager for CategorizedPlantPropertyBase."""
+
+    def get_by_natural_key(self, slug):
+        return self.get(slug=slug)
+
+
 class CategorizedPlantPropertyBase(models.Model):
     """Abstract base model for categorization of species."""
 
@@ -18,9 +25,14 @@ class CategorizedPlantPropertyBase(models.Model):
     slug = models.SlugField(_("slug"), max_length=255, unique=True, blank=True)
     description = models.TextField()
 
+    objects = CategorizedPlantPropertyManager()
+
     class Meta:
         abstract = True
         ordering = ["name"]
+
+    def natural_key(self):
+        return (self.slug,)
 
     def __str__(self):
         return self.name
