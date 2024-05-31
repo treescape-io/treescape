@@ -55,7 +55,7 @@ LOGGING = {
         "level": "INFO",
     },
     "loggers": {
-        "species_data": {
+        "species_data.enrichment.enrich": {
             "handlers": ["console"],
             "level": "DEBUG",
             "propagate": False,
