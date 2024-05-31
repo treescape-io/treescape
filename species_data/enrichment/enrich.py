@@ -4,6 +4,7 @@ import datetime
 from langchain_core.language_models import BaseLanguageModel
 
 from plant_species.models import Species
+from species_data.enrichment.utils import get_fields
 from species_data.models import (
     Source,
     SourceType,
@@ -149,8 +150,9 @@ def enrich_species_data(species: Species, llm: BaseLanguageModel):
 
     species_properties = SpeciesProperties.objects.get_or_create(species=species)[0]
 
-    range_properties = ["height", "width"]
-    for prop_name in range_properties:
+    fields = get_fields(SpeciesProperties)
+
+    for prop_name in fields.decimalranges:
         # TODO: Only update when confidence is higher!
         if prop_name in plant_data:
             set_decimalrange_property(species_properties, plant_data, prop_name, source)
@@ -163,14 +165,6 @@ def enrich_species_data(species: Species, llm: BaseLanguageModel):
     # storing CategorizedSpeciesPropertyThroughBase and get_or_create'ing a Source with SourceType named Wikipedi
     # with the URL of the Wikipedia page.
 
-    # TODO: Extract automagically.
-    categories = [
-        "ecological_roles",
-        "growth_habits",
-        "human_uses",
-        "climate_zones",
-    ]
-
-    for prop_name in categories:
+    for prop_name in fields.categories:
         if prop_name in plant_data:
             set_category_property(species_properties, plant_data, prop_name, source)
