@@ -24,14 +24,27 @@ def set_decimalrange_property(
     source: Source,
 ):
     """Sets a decimal range property on a SpeciesProperties instance."""
+    if prop_name not in plant_data or not plant_data[prop_name]:
+        return
+
     plant_prop = plant_data[prop_name]
 
     # logger.debug(
     #     f"Setting {prop_name} on {species_properties.species}. Data: {plant_prop}"
     # )
 
+    if "confidence" not in plant_prop:
+        # No confidence, no game.
+        return
+
+    if not (
+        "minimum" in plant_prop or "typical" in plant_prop or "maximum" in plant_prop
+    ):
+        # Never only set confidence
+        return
+
     for value_name in ["minimum", "typical", "maximum", "confidence"]:
-        value = plant_prop.get(value_name)
+        value = plant_prop.get(value_name, None)
         if value:
             # Doing decimal.Decimal directly (on floats) gives really eff'ed up rounding errors!
             # So we need to go str first. The decimal conversion is just bonus.
@@ -57,10 +70,15 @@ def set_category_property(
     source: Source,
 ):
     """Sets a category property on a SpeciesProperties instance."""
-    category_data = plant_data[prop_name]
 
-    if "values" not in category_data:
+    if (
+        prop_name not in plant_data
+        or not plant_data[prop_name]
+        or not plant_data[prop_name]["values"]
+    ):
         return
+
+    category_data = plant_data[prop_name]
 
     logger.debug(f"Setting {prop_name} with {category_data}")
 
@@ -116,27 +134,6 @@ def enrich_species_data(species: Species, llm: BaseLanguageModel):
             "latin_name": species.latin_name,
         }
     )
-
-    # Plant data:
-    # {'ecological_roles': {'confidence': 0.9,
-    #                       'values': ['carbon-sequestration',
-    #                                  'habitat-provision',
-    #                                  'nitrogen-fixation',
-    #                                  'pest-and']},
-    #  'growth_habits': {'confidence': 0.8, 'values': ['tree']},
-    #  'height': {'confidence': 0.9, 'maximum': 30, 'minimum': 15, 'typical': 30},
-    #  'human_uses': {'confidence': 0.9,
-    #                 'values': ['animal-fodder',
-    #                            'firewood',
-    #                            'fiber',
-    #                            'timber',
-    #                            'medicinal-bark',
-    #                            'medicinal-flowers',
-    #                            'medicinal-leaves',
-    #                            'medicinal-roots',
-    #                            'ornamental-bark',
-    #                            'ornamental-flowers',
-    #                            'ornamental-foliage']}
 
     logger.debug(f"Received data: {pformat(plant_data)}")
 

@@ -1,10 +1,13 @@
+from langchain.globals import set_verbose, set_debug
 from langchain_core.language_models import BaseLanguageModel
-from langchain_core.output_parsers import JsonOutputParser
+from langchain.output_parsers import PydanticOutputParser, OutputFixingParser
 from langchain_core.prompts import PromptTemplate
-from langchain.output_parsers import OutputFixingParser
 
 
 from .models import get_species_data_model
+
+set_verbose(True)
+# set_debug(True)
 
 
 def get_enrichment_chain(llm: BaseLanguageModel):
@@ -29,21 +32,46 @@ def get_enrichment_chain(llm: BaseLanguageModel):
     - For categorical properties, only select your answer from provided values.
 
     {format_instructions}
+
+    Example output:
+    {example}
     """
+
+    example = """{'ecological_roles': {'confidence': 0.9,
+                          'values': ['carbon-sequestration',
+                                     'habitat-provision',
+                                     'nitrogen-fixation',
+                                     'pest-and']},
+     'growth_habits': {'confidence': 0.8, 'values': ['tree']},
+     'height': {'confidence': 0.9, 'maximum': 30, 'minimum': 15, 'typical': 30},
+     'human_uses': {'confidence': 0.9,
+                    'values': ['animal-fodder',
+                               'firewood',
+                               'fiber',
+                               'timber',
+                               'medicinal-bark',
+                               'medicinal-flowers',
+                               'medicinal-leaves',
+                               'medicinal-roots',
+                               'ornamental-bark',
+                               'ornamental-flowers',
+                               'ornamental-foliage']}
+    }"""
 
     SpeciesData = get_species_data_model()
 
-    json_parser = JsonOutputParser(pydantic_object=SpeciesData)
-    fixing_parser = OutputFixingParser.from_llm(parser=json_parser, llm=llm)
+    parser = PydanticOutputParser(pydantic_object=SpeciesData)
+    parser = OutputFixingParser.from_llm(parser=parser, llm=llm, max_retries=3)
 
     prompt = PromptTemplate(
         template=prompt_template,
         input_variables=["latin_name", "source_content"],
         partial_variables={
-            "format_instructions": fixing_parser.get_format_instructions()
+            "format_instructions": parser.get_format_instructions(),
+            "example": example,
         },
     )
 
-    chain = prompt | llm | fixing_parser
+    chain = prompt | llm | parser
 
     return chain
