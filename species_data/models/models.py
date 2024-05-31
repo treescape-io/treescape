@@ -1,11 +1,9 @@
-from typing import NamedTuple
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from plant_species.models import Species
 
 from .base import PlantPropertiesBase
-from .source import SourceType
 
 from .categories import (
     GrowthHabit,
