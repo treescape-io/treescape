@@ -13,6 +13,7 @@ from species_data.models import (
 )
 from species_data.models.models import SpeciesProperties
 from .chains import get_enrichment_chain
+from .exceptions import NoValuesSetException
 
 logger = logging.getLogger(__name__)
 
@@ -24,24 +25,12 @@ def set_decimalrange_property(
     source: Source,
 ):
     """Sets a decimal range property on a SpeciesProperties instance."""
-    if prop_name not in plant_data or not plant_data[prop_name]:
-        return
 
     plant_prop = plant_data[prop_name]
 
-    # logger.debug(
-    #     f"Setting {prop_name} on {species_properties.species}. Data: {plant_prop}"
-    # )
-
-    if "confidence" not in plant_prop:
-        # No confidence, no game.
-        return
-
-    if not (
-        "minimum" in plant_prop or "typical" in plant_prop or "maximum" in plant_prop
-    ):
-        # Never only set confidence
-        return
+    logger.debug(
+        f"Setting {prop_name} on {species_properties.species}. Data: {plant_prop}"
+    )
 
     for value_name in ["minimum", "typical", "maximum", "confidence"]:
         value = plant_prop.get(value_name, None)
@@ -116,10 +105,10 @@ def set_category_property(
             # TODO: full_clean here (so explicit get/update)
 
 
-def enrich_species_data(species: Species, llm: BaseLanguageModel):
+def enrich_species_data(species: Species):
     """Retrieves and stores additional data about a plant species using a language model."""
 
-    chain = get_enrichment_chain(llm)
+    chain = get_enrichment_chain()
 
     if not species.wikipedia_page:
         logger.warning(f"No Wikipedia page for {species}, skipping.")
@@ -128,6 +117,7 @@ def enrich_species_data(species: Species, llm: BaseLanguageModel):
     # Brute force token limit.
     source_content = species.wikipedia_page.content[:25000]
 
+    assert source_content
     plant_data = chain.invoke(
         {
             "source_content": source_content,
@@ -150,6 +140,9 @@ def enrich_species_data(species: Species, llm: BaseLanguageModel):
     species_properties = SpeciesProperties.objects.get_or_create(species=species)[0]
 
     fields = get_fields(SpeciesProperties)
+    assert fields
+    assert fields.decimalranges
+    assert fields.categories
 
     for prop_name in fields.decimalranges:
         # TODO: Only update when confidence is higher!
@@ -157,7 +150,9 @@ def enrich_species_data(species: Species, llm: BaseLanguageModel):
             set_decimalrange_property(species_properties, plant_data, prop_name, source)
 
     species_properties.full_clean()
+
     species_properties.save()
+    logger.debug(f"Saved {species_properties}")
 
     # For each of EcologicalRole, GrowthHabit, HumanUse and Climate zone:
     # when given, lookup category based on slug in values and update species with it,
@@ -167,3 +162,18 @@ def enrich_species_data(species: Species, llm: BaseLanguageModel):
     for prop_name in fields.categories:
         if prop_name in plant_data:
             set_category_property(species_properties, plant_data, prop_name, source)
+
+    # Prevent completely empty data. We can only test this after it has been created due to the
+    # relational map. It precludes things like empty Wikipedia pages.
+    if not any(
+        [
+            getattr(species_properties, f"{field}_{value}")
+            for field in fields.decimalranges
+            for value in ["minimum", "typical", "maximum"]
+        ]
+    ) and not any(
+        [getattr(species_properties, field).exists() for field in fields.categories]
+    ):
+        # Reverse save.
+        species_properties.delete()
+        raise NoValuesSetException(f"Deleted {species_properties}: no values set.")
