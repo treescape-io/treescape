@@ -81,7 +81,7 @@ class Command(BaseCommand):
 
                     add_count += 1
                 else:
-                    pbar.write(f"Skipping existing species: {species_name}.")
+                    pbar.write(f"Skipping existing species: {species_name}")
 
         self.stdout.write(
             self.style.SUCCESS(
