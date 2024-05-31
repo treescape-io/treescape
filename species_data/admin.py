@@ -7,6 +7,7 @@ from .models import (
     HumanUse,
     EcologicalRole,
     SoilPreference,
+    PropagationMethod,
     # FamilyGrowthHabit,
     # GenusGrowthHabit,
     SpeciesGrowthHabit,
@@ -22,6 +23,7 @@ from .models import (
     # FamilySoilPreference,
     # GenusSoilPreference,
     SpeciesSoilPreference,
+    SpeciesPropagationMethod,
     # FamilyProperties,
     # GenusProperties,
     SpeciesProperties,
@@ -71,6 +73,12 @@ class EcologicalRoleAdmin(admin.ModelAdmin):
 
 @admin.register(SoilPreference)
 class SoilPreferenceAdmin(admin.ModelAdmin):
+    list_display = ("name", "description")
+    search_fields = ("name",)
+
+
+@admin.register(PropagationMethod)
+class PropagationMethodAdmin(admin.ModelAdmin):
     list_display = ("name", "description")
     search_fields = ("name",)
 
@@ -140,6 +148,10 @@ class SpeciesSoilPreferenceInline(CategoryInlineBase):
     model = SpeciesSoilPreference
 
 
+class SpeciesPropagationMethodInline(CategoryInlineBase):
+    model = SpeciesPropagationMethod
+
+
 _autocomplete_source_fields = [
     "height_source",
     "width_source",
@@ -195,6 +207,7 @@ class SpeciesPropertiesAdmin(admin.ModelAdmin):
         SpeciesHumanUseInline,
         SpeciesEcologicalRoleInline,
         SpeciesSoilPreferenceInline,
+        SpeciesPropagationMethodInline,
     ]
     search_fields = (
         "species__latin_name",
@@ -211,7 +224,8 @@ class SpeciesPropertiesAdmin(admin.ModelAdmin):
         "climate_zones",
         "human_uses",
         "ecological_roles",
-        # "soil_preference",
+        "soil_preferences",
+        "propagation_methods",
         "species__genus__family",
     )
     list_select_related = ("species",)

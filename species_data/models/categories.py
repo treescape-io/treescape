@@ -155,34 +155,12 @@ class SpeciesHumanUse(CategorizedSpeciesPropertyThroughBase):
         unique_together = ("species", "human_use")
 
 
-### REMOVE ME
-class HumanUseThroughBase(CategorizedSpeciesPropertyThroughBase):
-    class Meta(HumanUse.Meta, CategorizedSpeciesPropertyThroughBase.Meta):
-        ordering = None
-
-    description = models.TextField(
-        _("description"), help_text=_("Description of specific human use.")
-    )
-
-
 class EcologicalRole(CategorizedPlantPropertyBase):
     """Various ecological roles."""
 
     class Meta(CategorizedPlantPropertyBase.Meta):
         verbose_name = _("ecological role")
         verbose_name_plural = _("ecological roles")
-
-
-### REMOVE ME
-class EcologicalRoleThroughBase(CategorizedSpeciesPropertyThroughBase):
-    class Meta(EcologicalRole.Meta, CategorizedSpeciesPropertyThroughBase.Meta):
-        ordering = None
-
-    description = models.TextField(
-        _("description"),
-        blank=True,
-        help_text=_("Optional description of specific ecological role."),
-    )
 
 
 class SpeciesEcologicalRoleManager(models.Manager):
@@ -219,7 +197,7 @@ class SoilPreference(CategorizedPlantPropertyBase):
         verbose_name_plural = _("soil textures")
 
 
-class SpeicesSoilPreferenceManager(models.Manager):
+class SpeciesSoilPreferenceManager(models.Manager):
     def get_by_natural_key(self, species_slug, soil_texture_slug):
         return self.get(
             species__species__slug=species_slug, soil_texture__slug=soil_texture_slug
@@ -230,8 +208,42 @@ class SpeciesSoilPreference(CategorizedSpeciesPropertyThroughBase):
     species = models.ForeignKey("SpeciesProperties", on_delete=models.CASCADE)
     soil_texture = models.ForeignKey(SoilPreference, on_delete=models.CASCADE)
 
+    objects = SpeciesSoilPreferenceManager()
+
     def natural_key(self):
         return (self.species.species.slug, self.soil_texture.slug)
 
     class Meta(CategorizedSpeciesPropertyThroughBase.Meta):
         unique_together = ("species", "soil_texture")
+
+
+class PropagationMethodManager(models.Manager):
+    def get_by_natural_key(self, propagation_method_slug):
+        return self.get(propagation_method_slug=propagation_method_slug)
+
+
+class PropagationMethod(CategorizedPlantPropertyBase):
+    """Methods of propagating plant species."""
+
+    description = models.TextField(
+        verbose_name=_("description"),
+        blank=True,
+        help_text=_("Optional description of soil preference."),
+    )
+
+    objects = PropagationMethodManager()
+
+    class Meta(CategorizedPlantPropertyBase.Meta):
+        verbose_name = _("propagation method")
+        verbose_name_plural = _("propagation methods")
+
+
+class SpeciesPropagationMethod(CategorizedSpeciesPropertyThroughBase):
+    species = models.ForeignKey("SpeciesProperties", on_delete=models.CASCADE)
+    propagation_method = models.ForeignKey(PropagationMethod, on_delete=models.CASCADE)
+
+    def natural_key(self):
+        return (self.species.species.slug, self.propagation_method.slug)
+
+    class Meta(CategorizedSpeciesPropertyThroughBase.Meta):
+        unique_together = ("species", "propagation_method")

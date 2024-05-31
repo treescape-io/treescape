@@ -7,6 +7,7 @@ from .base import PlantPropertiesBase
 
 from .categories import (
     GrowthHabit,
+    PropagationMethod,
     # FamilyGrowthHabit,
     # GenusGrowthHabit,
     SpeciesGrowthHabit,
@@ -23,6 +24,7 @@ from .categories import (
     # GenusEcologicalRole,
     SpeciesEcologicalRole,
     SoilPreference,
+    SpeciesPropagationMethod,
     # FamilySoilPreference,
     # GenusSoilPreference,
     SpeciesSoilPreference,
@@ -87,9 +89,14 @@ class SpeciesProperties(PlantPropertiesBase):
     ecological_roles = models.ManyToManyField(
         EcologicalRole, through=SpeciesEcologicalRole
     )
-    soil_preference = models.ManyToManyField(
+    soil_preferences = models.ManyToManyField(
         SoilPreference, through=SpeciesSoilPreference
     )
+    propagation_methods = models.ManyToManyField(
+        PropagationMethod, through=SpeciesPropagationMethod
+    )
+
+    objects = SpeciesPropertiesManager()
 
     def natural_key(self):
         return (self.species.slug,)

@@ -9,6 +9,8 @@ from .models import (
     GrowthHabit,
     HumanUse,
     EcologicalRole,
+    SoilPreference,
+    PropagationMethod,
     Source,
 )
 
@@ -93,6 +95,22 @@ class EcologicalRoleSerializer(serializers.HyperlinkedModelSerializer):
         extra_kwargs = {"url": {"lookup_field": "slug"}}
 
 
+class SoilPreferenceSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = SoilPreference
+        fields = "__all__"
+        lookup_field = "slug"
+        extra_kwargs = {"url": {"lookup_field": "slug"}}
+
+
+class PropagationMethodSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = PropagationMethod
+        fields = "__all__"
+        lookup_field = "slug"
+        extra_kwargs = {"url": {"lookup_field": "slug"}}
+
+
 class SpeciesPropertiesSerializer(serializers.ModelSerializer):
     class Meta:
         model = SpeciesProperties
@@ -110,6 +128,8 @@ class SpeciesPropertiesSerializer(serializers.ModelSerializer):
             "growth_habits",
             "human_uses",
             "ecological_roles",
+            "soil_preferences",
+            "propagation_methods",
         ]
 
     height_source = serializers.HyperlinkedRelatedField(
@@ -131,6 +151,18 @@ class SpeciesPropertiesSerializer(serializers.ModelSerializer):
     ecological_roles = serializers.HyperlinkedRelatedField(
         many=True,
         view_name="ecologicalrole-detail",
+        read_only=True,
+        lookup_field="slug",
+    )
+    soil_preferences = serializers.HyperlinkedRelatedField(
+        many=True,
+        view_name="soilpreference-detail",
+        read_only=True,
+        lookup_field="slug",
+    )
+    propagation_methods = serializers.HyperlinkedRelatedField(
+        many=True,
+        view_name="propagationmethod-detail",
         read_only=True,
         lookup_field="slug",
     )

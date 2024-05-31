@@ -19,6 +19,8 @@ from .categories import (
     SpeciesEcologicalRole,
     SoilPreference,
     SpeciesSoilPreference,
+    PropagationMethod,
+    SpeciesPropagationMethod,
 )
 
 from .models import (
@@ -45,6 +47,8 @@ __all__ = [
     "SpeciesHumanUse",
     "EcologicalRole",
     "SoilPreference",
+    "PropagationMethod",
+    "SpeciesPropagationMethod",
     # "FamilyEcologicalRole",
     # "GenusEcologicalRole",
     "SpeciesEcologicalRole",
