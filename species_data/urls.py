@@ -9,6 +9,8 @@ router.register(r"climatezones", views.ClimateZoneViewSet)
 router.register(r"growthhabits", views.GrowthHabitViewSet)
 router.register(r"humanuses", views.HumanUseViewSet)
 router.register(r"ecologicalroles", views.EcologicalRoleViewSet)
+router.register(r"soilpreference", views.SoilPreferenceViewSet)
+router.register(r"propagationmethod", views.PropagationMethodViewSet)
 router.register(r"sources", views.SourceViewSet)
 
 app_name = "species_data"

@@ -23,12 +23,12 @@ def get_enrichment_chain(llm: BaseLanguageModel):
     ```
 
     Important guidelines:
-    - Requested properties are optional, leave them out if no relevant information is provided in the source.
+    - Requested properties are optional, return `null` for a property if no relevant information is available in the source.
     - When minimum, maximum or typical values are not specified, return `null`. Never guess a value!
     - Specify length units in meters.
     - Return at most 1 decimal for numbers.
     - Width concerns the canopy width of a plant, not the trunk.
-    - If and only if you return a property, include your level of confidence in the values for that property from the [0.0, 1.0] range.
+    - Only when setting a property, include your level of confidence in the values for a property, based on the source data.
     - For categorical properties, only select your answer from provided values.
 
     {format_instructions}
@@ -55,9 +55,12 @@ def get_enrichment_chain(llm: BaseLanguageModel):
                                'medicinal-roots',
                                'ornamental-bark',
                                'ornamental-flowers',
-                               'ornamental-foliage']}
+                               'ornamental-foliage'],}
+     'soil_preferences': null,
+     'width': null,
+     'soil_acidity': null,
+     'propagation_methods': null
     }"""
-
     SpeciesData = get_species_data_model()
 
     parser = PydanticOutputParser(pydantic_object=SpeciesData)

@@ -41,9 +41,9 @@ def get_species_data_model() -> Type[BaseModel]:
         confidence: decimal.Decimal = Field(gt=0, lte=1, decimal_places=1, max_digits=5)
 
     class DecimalRangeField(ConfidenceModel):
-        minimum: Optional[decimal.Decimal] = Field(max_digits=5, decimal_places=1)
-        typical: Optional[decimal.Decimal] = Field(max_digits=5, decimal_places=1)
-        maximum: Optional[decimal.Decimal] = Field(max_digits=5, decimal_places=1)
+        minimum: Optional[decimal.Decimal] = Field(max_digits=4, decimal_places=2)
+        typical: Optional[decimal.Decimal] = Field(max_digits=4, decimal_places=2)
+        maximum: Optional[decimal.Decimal] = Field(max_digits=4, decimal_places=2)
 
     class DurationRangeField(ConfidenceModel):
         minimum: Optional[datetime.timedelta]

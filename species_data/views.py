@@ -8,6 +8,8 @@ from .models import (
     GrowthHabit,
     HumanUse,
     EcologicalRole,
+    SoilPreference,
+    PropagationMethod,
     Source,
 )
 
@@ -19,6 +21,8 @@ from .serializers import (
     GrowthHabitSerializer,
     HumanUseSerializer,
     EcologicalRoleSerializer,
+    SoilPreferenceSerializer,
+    PropagationMethodSerializer,
     SourceSerializer,
 )
 
@@ -80,6 +84,18 @@ class EcologicalRoleViewSet(viewsets.ModelViewSet):
     lookup_field = "slug"
     queryset = EcologicalRole.objects.all()
     serializer_class = EcologicalRoleSerializer
+
+
+class SoilPreferenceViewSet(viewsets.ModelViewSet):
+    lookup_field = "slug"
+    queryset = SoilPreference.objects.all()
+    serializer_class = SoilPreferenceSerializer
+
+
+class PropagationMethodViewSet(viewsets.ModelViewSet):
+    lookup_field = "slug"
+    queryset = PropagationMethod.objects.all()
+    serializer_class = PropagationMethodSerializer
 
 
 class SourceViewSet(viewsets.ModelViewSet):
