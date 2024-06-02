@@ -1,13 +1,13 @@
-from langchain.globals import set_verbose, set_debug
-from langchain_core.language_models import BaseLanguageModel
+# from langchain.globals import set_verbose, set_debug
 from langchain.output_parsers import (
     PydanticOutputParser,
     OutputFixingParser,
-    RetryOutputParser,
+    # RetryOutputParser,
 )
 from langchain_core.prompts import PromptTemplate
-from langchain_core.runnables import RunnableLambda, RunnableParallel
-from langchain_openai import ChatOpenAI
+# from langchain_core.runnables import RunnableLambda, RunnableParallel
+
+from species_data.enrichment.config import EnrichmentConfig
 
 
 from .models import get_species_data_model
@@ -16,22 +16,8 @@ from .models import get_species_data_model
 # set_debug(True)
 
 
-def get_enrichment_chain():
+def get_enrichment_chain(config: EnrichmentConfig):
     """Generates a chain for enriching plant species data using a language model."""
-
-    llm = ChatOpenAI(
-        model="gpt-3.5-turbo",
-        temperature=0.1,
-        model_kwargs={"response_format": {"type": "json_object"}},
-        max_tokens=512,  # Increases available tokens for input.
-    )
-
-    fallback_llm = ChatOpenAI(
-        model="gpt-4o",
-        temperature=0.1,
-        model_kwargs={"response_format": {"type": "json_object"}},
-        max_tokens=512,  # Increases available tokens for input.
-    )
 
     prompt_template = """As a plant expert, return available information about the plant species '{latin_name}'.
 
@@ -103,8 +89,10 @@ def get_enrichment_chain():
     SpeciesData = get_species_data_model()
 
     parser = PydanticOutputParser(pydantic_object=SpeciesData)
-    parser = OutputFixingParser.from_llm(parser=parser, llm=llm, max_retries=3)
-    parser = OutputFixingParser.from_llm(parser=parser, llm=fallback_llm, max_retries=1)
+    parser = OutputFixingParser.from_llm(parser=parser, llm=config.llm, max_retries=3)
+    parser = OutputFixingParser.from_llm(
+        parser=parser, llm=config.fallback_llm, max_retries=1
+    )
 
     prompt = PromptTemplate(
         template=prompt_template,
@@ -115,6 +103,6 @@ def get_enrichment_chain():
         },
     )
 
-    chain = prompt | llm | parser
+    chain = prompt | config.llm | parser
 
     return chain

@@ -1,11 +1,17 @@
+from enum import Enum
+import pdb
 from pprint import pformat
 
 import decimal
 import logging
 import datetime
-from langchain_core.language_models import BaseLanguageModel
+from typing import Set
+
+from pydantic.v1 import BaseModel
 
 from plant_species.models import Species
+from species_data.enrichment.config import EnrichmentConfig
+from species_data.enrichment.models import ConfidenceModel
 from species_data.enrichment.utils import get_fields
 from species_data.models import (
     Source,
@@ -20,20 +26,18 @@ logger = logging.getLogger(__name__)
 
 def set_decimalrange_property(
     species_properties: SpeciesProperties,
-    plant_data: dict,
     prop_name: str,
+    prop_value: dict,
     source: Source,
 ):
     """Sets a decimal range property on a SpeciesProperties instance."""
 
-    plant_prop = plant_data[prop_name]
-
     logger.debug(
-        f"Setting {prop_name} on {species_properties.species}. Data: {plant_prop}"
+        f"Setting {prop_name} on {species_properties.species}. Value: {prop_value}"
     )
 
     for value_name in ["minimum", "typical", "maximum", "confidence"]:
-        value = plant_prop.get(value_name, None)
+        value = getattr(prop_value, value_name, None)
         if value:
             # Doing decimal.Decimal directly (on floats) gives really eff'ed up rounding errors!
             # So we need to go str first. The decimal conversion is just bonus.
@@ -47,31 +51,27 @@ def set_decimalrange_property(
                 decimal_value,
             )
         else:
-            logger.debug(f"{prop_name}_{value_name} was EMPTY")
+            logger.info(f"No value for {prop_name}_{value_name}, skipping")
 
     setattr(species_properties, f"{prop_name}_source", source)
 
 
 def set_category_property(
     species_properties: SpeciesProperties,
-    plant_data: dict,
     prop_name: str,
+    prop_value: ConfidenceModel,
     source: Source,
 ):
     """Sets a category property on a SpeciesProperties instance."""
 
-    if (
-        prop_name not in plant_data
-        or not plant_data[prop_name]
-        or not plant_data[prop_name]["values"]
-    ):
+    if not getattr(prop_value, "values", None):
+        logger.info("No values in {prop_name}, skipping.")
         return
 
-    category_data = plant_data[prop_name]
+    logger.debug(f"Setting {prop_name} with {prop_value}")
 
-    logger.debug(f"Setting {prop_name} with {category_data}")
-
-    for value in category_data["values"]:
+    values: Set[Enum] = prop_value.values  # type: ignore
+    for value in values:
         # Derive category_class, the other side of the M2M)
         # and through_class (what links them) them
         # using prop_name on species_properties.
@@ -90,7 +90,7 @@ def set_category_property(
 
             try:
                 get_values[prop.target_field_name] = category_class.objects.get(
-                    slug=value
+                    slug=value.value
                 )
             except category_class.DoesNotExist:
                 print(f"Warning! {prop_name} with slug {value} not found!")
@@ -98,17 +98,17 @@ def set_category_property(
 
             update_values = {
                 "source": source,
-                "confidence": category_data["confidence"],
+                "confidence": prop_value.confidence,
             }
 
             through_class.objects.update_or_create(defaults=update_values, **get_values)
             # TODO: full_clean here (so explicit get/update)
 
 
-def enrich_species_data(species: Species):
+def enrich_species_data(species: Species, config: EnrichmentConfig):
     """Retrieves and stores additional data about a plant species using a language model."""
 
-    chain = get_enrichment_chain()
+    chain = get_enrichment_chain(config)
 
     if not species.wikipedia_page:
         logger.warning(f"No Wikipedia page for {species}, skipping.")
@@ -118,7 +118,7 @@ def enrich_species_data(species: Species):
     source_content = species.wikipedia_page.content[:25000]
 
     assert source_content
-    plant_data = chain.invoke(
+    plant_data: BaseModel = chain.invoke(
         {
             "source_content": source_content,
             "latin_name": species.latin_name,
@@ -141,13 +141,16 @@ def enrich_species_data(species: Species):
 
     fields = get_fields(SpeciesProperties)
     assert fields
-    assert fields.decimalranges
-    assert fields.categories
+    assert len(fields.decimalranges) > 0
+    assert len(fields.categories) > 0
 
-    for prop_name in fields.decimalranges:
-        # TODO: Only update when confidence is higher!
-        if prop_name in plant_data:
-            set_decimalrange_property(species_properties, plant_data, prop_name, source)
+    for prop_name, prop_value in [
+        (prop_name, getattr(plant_data, prop_name))
+        for prop_name in fields.decimalranges
+    ]:
+        if prop_value:
+            # TODO: Only update when confidence is higher!
+            set_decimalrange_property(species_properties, prop_name, prop_value, source)
 
     species_properties.full_clean()
 
@@ -159,9 +162,11 @@ def enrich_species_data(species: Species):
     # storing CategorizedSpeciesPropertyThroughBase and get_or_create'ing a Source with SourceType named Wikipedi
     # with the URL of the Wikipedia page.
 
-    for prop_name in fields.categories:
-        if prop_name in plant_data:
-            set_category_property(species_properties, plant_data, prop_name, source)
+    for prop_name, prop_value in [
+        (prop_name, getattr(plant_data, prop_name)) for prop_name in fields.categories
+    ]:
+        if prop_value:
+            set_category_property(species_properties, prop_name, prop_value, source)
 
     # Prevent completely empty data. We can only test this after it has been created due to the
     # relational map. It precludes things like empty Wikipedia pages.

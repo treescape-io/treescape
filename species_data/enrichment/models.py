@@ -34,21 +34,24 @@ class AllOptional(ModelMetaclass):
         return super().__new__(cls, name, bases, namespaces, **kwargs)
 
 
+class ConfidenceModel(BaseModel):
+    confidence: decimal.Decimal = Field(gt=0, lte=1, decimal_places=1, max_digits=5)
+
+
+class DecimalRangeField(ConfidenceModel):
+    minimum: Optional[decimal.Decimal] = Field(max_digits=4, decimal_places=2)
+    typical: Optional[decimal.Decimal] = Field(max_digits=4, decimal_places=2)
+    maximum: Optional[decimal.Decimal] = Field(max_digits=4, decimal_places=2)
+
+
+class DurationRangeField(ConfidenceModel):
+    minimum: Optional[datetime.timedelta]
+    typical: Optional[datetime.timedelta]
+    maximum: Optional[datetime.timedelta]
+
+
 def get_species_data_model() -> Type[BaseModel]:
     """Generates a Pydantic model based on the Django models for plant species data categories."""
-
-    class ConfidenceModel(BaseModel):
-        confidence: decimal.Decimal = Field(gt=0, lte=1, decimal_places=1, max_digits=5)
-
-    class DecimalRangeField(ConfidenceModel):
-        minimum: Optional[decimal.Decimal] = Field(max_digits=4, decimal_places=2)
-        typical: Optional[decimal.Decimal] = Field(max_digits=4, decimal_places=2)
-        maximum: Optional[decimal.Decimal] = Field(max_digits=4, decimal_places=2)
-
-    class DurationRangeField(ConfidenceModel):
-        minimum: Optional[datetime.timedelta]
-        typical: Optional[datetime.timedelta]
-        maximum: Optional[datetime.timedelta]
 
     def generate_django_enum(django_model: Type[CategorizedPlantPropertyBase]) -> Any:
         """Generates a string Enum based on the name field of the Django model instances."""
