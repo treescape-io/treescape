@@ -3,6 +3,7 @@ import logging
 import decimal
 import enum
 
+from pprint import pformat
 from typing import Tuple, Type, Optional, Set, Any
 
 from django.db.models.fields.related import ManyToManyField
@@ -19,11 +20,11 @@ from species_data.fields import DecimalEstimatedRange  # , DurationEstimatedRang
 logger = logging.getLogger(__name__)
 
 
-def get_species_data_model():
+def get_species_data_model() -> Type[BaseModel]:
     """Generates a Pydantic model based on the Django models for plant species data categories."""
 
     class ConfidenceModel(BaseModel):
-        confidence: decimal.Decimal = Field(gt=0, lt=1, decimal_places=1, max_digits=2)
+        confidence: decimal.Decimal = Field(gt=0, lte=1, decimal_places=1, max_digits=5)
 
     class DecimalRangeField(ConfidenceModel):
         minimum: Optional[decimal.Decimal] = Field(max_digits=5, decimal_places=1)
@@ -44,6 +45,8 @@ def get_species_data_model():
 
         # Create and return an enum with a name based on the Django model's name
         obj_enum = enum.Enum(f"{django_model.__name__}Enum", obj_dict)
+        logger.debug(f"generate_django_enum: {pformat(obj_dict)}")
+
         return obj_enum
 
     def generate_django_multiselect_field(
