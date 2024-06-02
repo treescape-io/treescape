@@ -39,9 +39,9 @@ class ConfidenceModel(BaseModel):
 
 
 class DecimalRangeField(ConfidenceModel):
-    minimum: Optional[decimal.Decimal] = Field(max_digits=4, decimal_places=2)
-    typical: Optional[decimal.Decimal] = Field(max_digits=4, decimal_places=2)
-    maximum: Optional[decimal.Decimal] = Field(max_digits=4, decimal_places=2)
+    minimum: Optional[decimal.Decimal] = Field(max_digits=5, decimal_places=2)
+    typical: Optional[decimal.Decimal] = Field(max_digits=5, decimal_places=2)
+    maximum: Optional[decimal.Decimal] = Field(max_digits=5, decimal_places=2)
 
 
 class DurationRangeField(ConfidenceModel):
