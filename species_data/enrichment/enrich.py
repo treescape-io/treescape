@@ -7,7 +7,7 @@ import logging
 import datetime
 from typing import Set
 
-from pydantic.v1 import BaseModel
+from pydantic.v1 import BaseModel, ValidationError
 
 from plant_species.models import Species
 from species_data.enrichment.config import EnrichmentConfig
@@ -42,9 +42,9 @@ def set_decimalrange_property(
             # Doing decimal.Decimal directly (on floats) gives really eff'ed up rounding errors!
             # So we need to go str first. The decimal conversion is just bonus.
             decimal_value = decimal.Decimal(str(value))
-            logger.debug(
-                f"Setting decimal value: {decimal_value} for input {value} on {prop_name}_{value_name}"
-            )
+            # logger.debug(
+            #     f"Setting decimal value: {decimal_value} for input {value} on {prop_name}_{value_name}"
+            # )
             setattr(
                 species_properties,
                 f"{prop_name}_{value_name}",
@@ -118,7 +118,10 @@ def enrich_species_data(species: Species, config: EnrichmentConfig):
     source_content = species.wikipedia_page.content[:25000]
 
     assert source_content
-    plant_data: BaseModel = chain.invoke(
+
+    plant_data: BaseModel
+
+    plant_data = chain.invoke(
         {
             "source_content": source_content,
             "latin_name": species.latin_name,
