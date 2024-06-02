@@ -19,7 +19,7 @@ set_verbose(True)
 # set_debug(True)
 
 # Here to save whitespace in input.
-_prompt_template = """As a plant data entry expert, return available information about the plant species '{latin_name}' as validly structured JSON.
+_prompt_template = """As a plant data entry expert, return available information about the plant species '{latin_name}' who strictly follows the provided JSON schema.
 
 Base your answers exclusively on the following source:
 
@@ -37,7 +37,9 @@ Important guidelines:
 - The value of `width` concerns the canopy width of a plant, not the trunk.
 - When returning a value for a property, include you `confidence`, based on the source data.
 - If no information is available for a property, leave the property out and do not return `confidence` for that property.
-- For categorical properties, only select your answer from provided values.
+- For categorical properties (like `ecological_roles`, `climate_zones`, `human_uses` and others) , only return values allowed in the schema's enum. Other values are rejected.
+- For categorical properties, if none of the values are relevant, find the closest one from the schema or leave the value out.
+- Never return invalid `values`, the parsing will fail and we'll have to start again.
 
 Example output:
 ```
@@ -114,15 +116,10 @@ def get_enrichment_chain(config: EnrichmentConfig):
     SpeciesData = get_species_data_model()
 
     parser = PydanticOutputParser(pydantic_object=SpeciesData)
-    # This sometimes makes up ludicrous stuff just to pass validation.
-    # Should use RetryParser instead.
-    # fixing_parser = OutputFixingParser.from_llm(
-    #     parser=parser, llm=config.llm, max_retries=1
-    # )
-    # fallback_parser = OutputFixingParser.from_llm(
-    #     parser=parser, llm=config.fallback_llm, max_retries=1
-    # )
-    retry_parser = RetryWithErrorOutputParser.from_llm(parser=parser, llm=config.llm)
+
+    retry_parser = RetryWithErrorOutputParser.from_llm(
+        parser=parser, llm=config.fallback_llm
+    )
 
     prompt = PromptTemplate(
         template=_prompt_template,
@@ -145,4 +142,4 @@ def get_enrichment_chain(config: EnrichmentConfig):
         )
     )
 
-    return main_chain.with_retry(stop_after_attempt=2)
+    return main_chain.with_retry(stop_after_attempt=3)
