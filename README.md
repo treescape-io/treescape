@@ -106,17 +106,17 @@ The following variables can be defined:
 
 ## Managing species data
 ### Load pre-generated data
-A pre-generated dataset is maintained for your convenience, which, due to their >2 GB size, are distributed separately. They can be loaded as follows:
+A pre-generated dataset is maintained for your convenience, which, due to their >5 GB size, are distributed separately. They can be loaded as follows:
 
 1. Ensure the database is fully migrated:
    ```sh
    ./manage.py migrate
    ```
-2. Download species data from https://drive.google.com/uc?export=download&id=132foZhPNVBdgbRL_Vva4G2QDRYKpBcDQ
+2. Download species data from https://drive.google.com/file/d/1FvZKHtlWXP682dMa1pvhINqdhml5kI_t/view
 
 3. Unarchive data (images and fixtures):
    ```sh
-   tar xvf plant_species_data.tbz2
+   tar xvf plant_species_data.tar
    ```
 4. Load data:
    ```sh
@@ -124,15 +124,14 @@ A pre-generated dataset is maintained for your convenience, which, due to their 
    ```
 5. Optionally, delete fixtures to free disk space:
    ```sh
-   rm plant_species_data.tbz2 fixtures/plant_species_data.json
+   rm plant_species_data.tar fixtures/plant_species_data.json
    ```
 
 ### Creating species fixture
 To archive current species data, yielding `plant_species_data.tar`:
 
 ```sh
-./manage.py dumpdata plant_species species_data | bzip2 > fixtures/plant_species_data.json.bz2
-tar cvf plant_species_data.tar fixtures media
+./scripts/export_species_data.sh
 ```
 
 ## Generating species data
