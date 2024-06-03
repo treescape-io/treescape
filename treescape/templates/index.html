@@ -42,6 +42,44 @@
 			align-items: center;
 			margin-right: 1rem;
 		}
+
+		/* Custom styles for the Mailchimp form */
+		#mc_embed_signup {
+			background: none;
+			clear: left;
+			font: 14px Helvetica, Arial, sans-serif;
+		}
+
+		#mc_embed_signup .mc-field-group {
+			margin-bottom: 1rem;
+			text-align: left;
+		}
+
+		#mc_embed_signup input[type=email] {
+			width: 80%;
+			margin: 0 auto;
+			display: block;
+		}
+
+		#mc_embed_signup .button {
+			background-color: #48bb78;
+			/* Green color */
+			color: white;
+			padding: 0.5rem 1rem;
+			border-radius: 0.25rem;
+			border: none;
+			cursor: pointer;
+			text-transform: uppercase;
+			font-weight: bold;
+			width: 50%;
+			margin: 0 auto;
+			display: block;
+		}
+
+		#mc_embed_signup .button:hover {
+			background-color: #38a169;
+			/* Darker green on hover */
+		}
 	</style>
 </head>
 
@@ -82,6 +120,60 @@
 				</p>
 				<h4 class="text-blue-500 hover:text-blue-700"><a href="https://github.com/treescape-io"
 						title="Treescape One Pager">Check our One Pager</a></h4>
+			</div>
+			<div class="mt-8">
+				<h3 class="text-lg">Stay posted!</h3>
+
+				<div id="mc_embed_shell">
+					<div id="mc_embed_signup">
+						<form
+							action="https://app.us14.list-manage.com/subscribe/post?u=ec4897ac47f21652a157d3495&amp;id=6ff1a4fac4&amp;f_id=0091a3e1f0"
+							method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form"
+							class="validate" target="_blank">
+							<div id="mc_embed_signup_scroll">
+								<div class="mc-field-group">
+									<input type="email" name="EMAIL"
+										class="required email w-full px-4 py-2 border rounded" id="mce-EMAIL"
+										required="" value="" placeholder="your@email.com">
+								</div>
+								<div hidden=""><input type="hidden" name="tags" value="7059617,7059618"></div>
+								<div id="mce-responses" class="clear foot">
+									<div class="response" id="mce-error-response" style="display: none;"></div>
+									<div class="response" id="mce-success-response" style="display: none;"></div>
+								</div>
+								<div aria-hidden="true" style="position: absolute; left: -5000px;">
+									<input type="text" name="b_ec4897ac47f21652a157d3495_6ff1a4fac4" tabindex="-1"
+										value="">
+								</div>
+								<div class="clear foot">
+									<input type="submit" name="subscribe" id="mc-embedded-subscribe"
+										class="button w-full" value="Subscribe">
+								</div>
+							</div>
+						</form>
+					</div>
+					<script type="text/javascript"
+						src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script>
+					<script type="text/javascript">
+						(function($) {
+							window.fnames = new Array();
+							window.ftypes = new Array();
+							fnames[0] = 'EMAIL';
+							ftypes[0] = 'email';
+							fnames[1] = 'FNAME';
+							ftypes[1] = 'text';
+							fnames[2] = 'LNAME';
+							ftypes[2] = 'text';
+							fnames[3] = 'ADDRESS';
+							ftypes[3] = 'address';
+							fnames[4] = 'PHONE';
+							ftypes[4] = 'phone';
+							fnames[5] = 'BIRTHDAY';
+							ftypes[5] = 'birthday';
+						}(jQuery));
+						var $mcj = jQuery.noConflict(true);
+					</script>
+				</div>
 			</div>
 
 			<div class="mt-8">
