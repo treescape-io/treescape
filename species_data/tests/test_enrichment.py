@@ -1,7 +1,7 @@
 import decimal
-from pprint import pformat
 from django.test import TestCase
-from langchain_community.llms.fake import FakeListLLM
+from langchain_core.language_models import FakeListChatModel
+from langchain_core.messages import ChatMessage
 from species_data.enrichment.config import EnrichmentConfig
 from species_data.enrichment.enrich import enrich_species_data
 from plant_species.models import Species, Genus, Family
@@ -65,12 +65,14 @@ class EnrichSpeciesDataTest(TestCase):
             },
         }
 
-        response = ResponseModel.parse_obj(response_data)
+        response_obj = ResponseModel.parse_obj(response_data)
+
+        # response = ChatMessage(role="AI", content=)
 
         # print(pformat(response_json))
         config = EnrichmentConfig(
-            llm=FakeListLLM(responses=[response.json()]),
-            fallback_llm=FakeListLLM(responses=[response.json()]),
+            llm=FakeListChatModel(responses=[response_obj.json()]),
+            fallback_llm=FakeListChatModel(responses=[response_obj.json()]),
         )
 
         species = _get_species()
@@ -117,27 +119,30 @@ class EnrichSpeciesDataTest(TestCase):
             SoilPreference.objects.filter(slug__in=["clayey", "sandy"]),
         )
         # Test source and confidence on Through
-        self.assertTrue(properties.speciesgrowthhabit_set.first().source)
-        self.assertTrue(properties.speciesclimatezone_set.first().source)
-        self.assertTrue(properties.specieshumanuse_set.first().source)
-        self.assertTrue(properties.speciesecologicalrole_set.first().source)
-        self.assertTrue(properties.speciessoilpreference_set.first().source)
+        self.assertTrue(properties.speciesgrowthhabit_set.first().source)  # pyright: ignore reportAttributeAccessIssue
+        self.assertTrue(properties.speciesclimatezone_set.first().source)  # pyright: ignore reportAttributeAccessIssue
+        self.assertTrue(properties.specieshumanuse_set.first().source)  # pyright: ignore reportAttributeAccessIssue
+        self.assertTrue(properties.speciesecologicalrole_set.first().source)  # pyright: ignore reportAttributeAccessIssue
+        self.assertTrue(properties.speciessoilpreference_set.first().source)  # pyright: ignore reportAttributeAccessIssue
 
         self.assertEqual(
-            properties.speciesgrowthhabit_set.first().confidence, decimal.Decimal("1")
+            properties.speciesgrowthhabit_set.first().confidence,  # pyright: ignore reportAttributeAccessIssue
+            decimal.Decimal("1"),
         )
         self.assertEqual(
-            properties.speciesclimatezone_set.first().confidence, decimal.Decimal("1")
+            properties.speciesclimatezone_set.first().confidence,  # pyright: ignore reportAttributeAccessIssue
+            decimal.Decimal("1"),
         )
         self.assertEqual(
-            properties.specieshumanuse_set.first().confidence, decimal.Decimal("1")
+            properties.specieshumanuse_set.first().confidence,  # pyright: ignore reportAttributeAccessIssue
+            decimal.Decimal("1"),
         )
         self.assertEqual(
-            properties.speciesecologicalrole_set.first().confidence,
+            properties.speciesecologicalrole_set.first().confidence,  # pyright: ignore reportAttributeAccessIssue
             decimal.Decimal("0.8"),
         )
         self.assertEqual(
-            properties.speciessoilpreference_set.first().confidence,
+            properties.speciessoilpreference_set.first().confidence,  # pyright: ignore reportAttributeAccessIssue
             decimal.Decimal("0.9"),
         )
 

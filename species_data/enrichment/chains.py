@@ -1,7 +1,7 @@
 import json
 import logging
 from typing import Type
-from langchain.globals import set_verbose, set_debug
+from langchain.globals import set_verbose
 from langchain.output_parsers import (
     PydanticOutputParser,
     RetryWithErrorOutputParser,
@@ -16,7 +16,6 @@ from species_data.enrichment.config import EnrichmentConfig
 logger = logging.getLogger(__name__)
 
 set_verbose(True)
-# set_debug(True)
 
 # Here to save whitespace in input.
 _prompt_template = """As a plant data entry expert, return available information about the plant species '{latin_name}' who strictly follows the provided JSON schema.
