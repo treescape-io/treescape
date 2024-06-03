@@ -1,3 +1,4 @@
+from langchain_core.exceptions import OutputParserException
 from tqdm import tqdm
 
 from django.core.management.base import BaseCommand
@@ -26,5 +27,7 @@ class Command(BaseCommand):
                     enrich_species_data(species, config)
                 except NoValuesSetException as e:
                     pbar.write(f"Skipping no data: {species}: {e}")
+                except OutputParserException as e:
+                    pbar.write(f"Skipping validation errors: {species}: {e}")
 
         self.stdout.write(self.style.SUCCESS("Successfully generated species data."))
