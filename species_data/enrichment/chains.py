@@ -1,5 +1,6 @@
 import json
 import logging
+from typing import Type
 from langchain.globals import set_verbose, set_debug
 from langchain.output_parsers import (
     PydanticOutputParser,
@@ -7,11 +8,10 @@ from langchain.output_parsers import (
 )
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableLambda, RunnableParallel
+from pydantic.v1 import BaseModel
 
 from species_data.enrichment.config import EnrichmentConfig
 
-
-from .models import get_species_data_model
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +54,7 @@ Another example
 """
 
 
-def get_enrichment_chain(config: EnrichmentConfig):
+def get_enrichment_chain(config: EnrichmentConfig, data_model: Type[BaseModel]):
     """Generates a chain for enriching plant species data using a language model."""
 
     example = json.dumps(
@@ -113,13 +113,9 @@ def get_enrichment_chain(config: EnrichmentConfig):
             "soil_preferences": {"confidence": 0.9, "values": ["clayey", "sandy"]},
         }
     )
-    SpeciesData = get_species_data_model()
+    parser = PydanticOutputParser(pydantic_object=data_model)
 
-    parser = PydanticOutputParser(pydantic_object=SpeciesData)
-
-    retry_parser = RetryWithErrorOutputParser.from_llm(
-        parser=parser, llm=config.fallback_llm
-    )
+    retry_parser = RetryWithErrorOutputParser.from_llm(parser=parser, llm=config.llm)
 
     prompt = PromptTemplate(
         template=_prompt_template,

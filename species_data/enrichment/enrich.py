@@ -1,5 +1,4 @@
 from enum import Enum
-import pdb
 from pprint import pformat
 
 import decimal
@@ -7,11 +6,11 @@ import logging
 import datetime
 from typing import Set
 
-from pydantic.v1 import BaseModel, ValidationError
+from pydantic.v1 import BaseModel
 
 from plant_species.models import Species
 from species_data.enrichment.config import EnrichmentConfig
-from species_data.enrichment.models import ConfidenceModel
+from species_data.enrichment.models import ConfidenceModel, get_species_data_model
 from species_data.enrichment.utils import get_fields
 from species_data.models import (
     Source,
@@ -108,7 +107,8 @@ def set_category_property(
 def enrich_species_data(species: Species, config: EnrichmentConfig):
     """Retrieves and stores additional data about a plant species using a language model."""
 
-    chain = get_enrichment_chain(config)
+    data_model = get_species_data_model()
+    chain = get_enrichment_chain(config, data_model)
 
     if not species.wikipedia_page:
         logger.warning(f"No Wikipedia page for {species}, skipping.")
@@ -119,9 +119,7 @@ def enrich_species_data(species: Species, config: EnrichmentConfig):
 
     assert source_content
 
-    plant_data: BaseModel
-
-    plant_data = chain.invoke(
+    plant_data: BaseModel = chain.invoke(
         {
             "source_content": source_content,
             "latin_name": species.latin_name,
