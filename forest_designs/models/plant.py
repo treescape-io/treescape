@@ -2,8 +2,8 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.db import models
 
-from forest_designs.models.base import UUIDIndexedModel
 from plant_species.models import Genus, Species, SpeciesVariety
+from treescape.models import UUIDIndexedModel
 
 
 class Plant(UUIDIndexedModel):

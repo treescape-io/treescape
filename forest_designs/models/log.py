@@ -3,7 +3,9 @@ import datetime
 from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.db import models
 
-from .base import KindBase, UUIDIndexedModel
+from treescape.models import UUIDIndexedModel
+
+from .base import KindBase
 from .plant import Plant
 
 

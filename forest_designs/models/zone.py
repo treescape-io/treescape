@@ -1,8 +1,10 @@
 from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.db import models
 
+from treescape.models import UUIDIndexedModel
 
-from .base import KindBase, UUIDIndexedModel
+
+from .base import KindBase
 
 
 class ZoneKind(KindBase):
