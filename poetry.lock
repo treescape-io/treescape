@@ -593,20 +593,6 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
-name = "django-advance-thumbnail"
-version = "1.0.0"
-description = "A Django app that automates thumbnail creation for image fields."
-optional = false
-python-versions = ">=3.6"
-files = [
-    {file = "django_advance_thumbnail-1.0.0.tar.gz", hash = "sha256:0264ca9c93d92ba9c09f627b20b46512da77284918585419078a6224625a0ada"},
-]
-
-[package.dependencies]
-Django = ">=3.0"
-Pillow = ">=8.0.0"
-
-[[package]]
 name = "django-composite-field"
 version = "2.0.0"
 description = "CompositeField implementation for Django"
@@ -2979,4 +2965,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "fa94fb1ca730a96b51db26d861b77fb09f01dd9e4719ef197d64e0ffd997cfaa"
+content-hash = "8ca9e929e9b16ab4776e8290aafdd15caa1eb1bb398026ae31e8e734e0a1cab4"
