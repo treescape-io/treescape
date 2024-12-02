@@ -2,7 +2,7 @@ import logging
 import typing
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.forms import ValidationError
+from django.forms import ImageField, ValidationError
 from django.template.defaultfilters import slugify
 from django.db import models, transaction
 from django.db.models.query import Q
@@ -12,8 +12,6 @@ from django.utils.safestring import mark_safe
 from django.utils.functional import cached_property
 from django.utils.translation import get_language
 from django.contrib import admin
-
-from django_advance_thumbnail import AdvanceThumbnailField
 
 from plant_species.enrichment.exceptions import (
     EnrichmentException,
@@ -91,20 +89,16 @@ class SpeciesBase(UUIDIndexedModel):
     description = models.TextField(_("description"), blank=True)
     gbif_id = models.IntegerField(_("GBIF usageKey"), editable=False, unique=True)
     image = models.ImageField(upload_to="plant_species/images/", null=True, blank=True)
-    image_thumbnail = AdvanceThumbnailField(  # pyright: ignore[reportCallIssue]
-        source_field="image",  # pyright: ignore[reportCallIssue]
+    image_thumbnail = models.ImageField(
         upload_to="plant_species/images/thumbnails/",
         null=True,
         blank=True,
-        size=(512, 512),  # pyright: ignore[reportCallIssue]
         editable=False,
     )
-    image_large = AdvanceThumbnailField(  # pyright: ignore[reportCallIssue]
-        source_field="image",  # pyright: ignore[reportCallIssue]
+    image_large = models.ImageField(
         upload_to="plant_species/images/large/",
         null=True,
         blank=True,
-        size=(2048, 2048),  # pyright: ignore[reportCallIssue]
         editable=False,
     )
 
