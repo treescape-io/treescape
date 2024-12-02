@@ -1,7 +1,6 @@
 import decimal
 from django.test import TestCase
 from langchain_core.language_models import FakeListChatModel
-from langchain_core.messages import ChatMessage
 from species_data.enrichment.config import EnrichmentConfig
 from species_data.enrichment.enrich import enrich_species_data
 from plant_species.models import Species, Genus, Family
