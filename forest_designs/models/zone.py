@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.db import models
 
 
-from .base import KindBase
+from .base import KindBase, UUIDIndexedModel
 
 
 class ZoneKind(KindBase):
@@ -13,7 +13,7 @@ class ZoneKind(KindBase):
         verbose_name_plural = _("zone types")
 
 
-class Zone(models.Model):
+class Zone(UUIDIndexedModel):
     """Zone within a forest design."""
 
     kind = models.ForeignKey(ZoneKind, on_delete=models.PROTECT)

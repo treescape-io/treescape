@@ -2,10 +2,11 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.db import models
 
+from forest_designs.models.base import UUIDIndexedModel
 from plant_species.models import Genus, Species, SpeciesVariety
 
 
-class Plant(models.Model):
+class Plant(UUIDIndexedModel):
     """Plant with specific location within design."""
 
     genus = models.ForeignKey(Genus, on_delete=models.PROTECT, blank=True)
