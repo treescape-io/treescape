@@ -28,6 +28,7 @@ from plant_species.enrichment.gbif import (
 )
 
 from plant_species.enrichment.wikipedia import get_wikipedia_page
+from treescape.models import UUIDIndexedModel
 
 
 logger = logging.getLogger(__name__)
@@ -38,7 +39,7 @@ class CommonNameManager(models.Manager):
         return self.get(name=name, language=language)
 
 
-class CommonNameBase(models.Model):
+class CommonNameBase(UUIDIndexedModel):
     """Abstract base class for common names."""
 
     language = models.CharField(_("language"), max_length=7, choices=settings.LANGUAGES)
@@ -80,7 +81,7 @@ class SpeciesManager(models.Manager):
         return self.get_or_create(slug=slug, defaults=kwargs)
 
 
-class SpeciesBase(models.Model):
+class SpeciesBase(UUIDIndexedModel):
     """Abstract base class for species models."""
 
     latin_name = models.CharField(
@@ -453,7 +454,7 @@ class SpeciesCommonName(CommonNameBase):
         )
 
 
-class SpeciesVariety(models.Model):
+class SpeciesVariety(UUIDIndexedModel):
     """Represents a variety of a species."""
 
     species = models.ForeignKey(
