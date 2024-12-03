@@ -16,6 +16,7 @@ class Plant(UUIDIndexedModel):
         blank=True,
         on_delete=models.PROTECT,
         help_text=_("When specified, genus is automatically set."),
+        db_column="species_uuid",
     )
     variety = models.ForeignKey(
         SpeciesVariety,
@@ -23,6 +24,7 @@ class Plant(UUIDIndexedModel):
         null=True,
         blank=True,
         help_text=_("When specified, species and genus are automatically set."),
+        db_column="variety_uuid",
     )
 
     location = models.PointField(

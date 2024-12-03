@@ -23,6 +23,7 @@ Other/commercial licensing available upon request.
 * Minimal REST API to species data.
 
 ## Roadmap
+* Use uuid4 as primary keys to facilitate offline editing.
 * Import existing forest design.
 * User-friendly web frontend for plant data and forest designs, consider https://wq.io/.
 * Multiple data sources, where high confidence trumps low confidence.
