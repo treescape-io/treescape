@@ -19,6 +19,8 @@ Acacia stenophylla
 Acaciella angustissima
 Acalypha wilkesiana
 Acanthochlamys bracteata
+Acer campestre
+Acer monspessulanum
 Acer negundo
 Acer platanoides
 Acer pseudoplatanus
@@ -178,6 +180,8 @@ Araucaria columnaris
 Araucaria cunninghamii
 Araucaria heterophylla
 Araucaria hunsteinii
+Arbutus andrachne
+Arbutus canariensis
 Arbutus menziesii
 Arbutus unedo
 Arbutus xalapensis
@@ -441,6 +445,7 @@ Cinnamomum verum
 Cirsium arvense
 Cissus quadrangularis
 Cissus rotundifolia
+Cistus ladanifer
 Citharexylum caudatum
 Citrus aurantiifolia
 Citrus aurantium
@@ -451,6 +456,7 @@ Citrus medica
 Citrus reticulata
 Citrus trifoliata
 Clarkia speciosa
+Clematis vitalba
 Clerodendrum inerme
 Clethra arborea
 Clinopodium brownei
@@ -476,6 +482,7 @@ Coleus neochilus
 Coleus scutellarioides
 Colubrina arborescens
 Colubrina asiatica
+Colutea arborescens
 Combretum molle
 Commiphora africana
 Commiphora myrrha
@@ -503,6 +510,8 @@ Cordyline fruticosa
 Coriandrum sativum
 Cornus alternifolia
 Cornus mas
+Cornus sanguinea
+Coronilla glauca
 Corylus americana
 Corylus avellana
 Corylus colurna
@@ -514,6 +523,7 @@ Corypha utan
 Couroupita guianensis
 Crassula dichotoma
 Crataegus azarolus
+Crataegus laciniata
 Crataegus laevigata
 Crataegus mexicana
 Crataegus monogyna
@@ -548,6 +558,7 @@ Curcuma zedoaria
 Cussonia spicata
 Cyathula prostrata
 Cycas revoluta
+Cydonia oblonga
 Cymbopogon citratus
 Cymbopogon martini
 Cymbopogon nardus
@@ -663,6 +674,7 @@ Ensete ventricosum
 Enterolobium cyclocarpum
 Epipremnum aureum
 Equisetum arvense
+Erica arborea
 Erigeron canadensis
 Eriophorum gracile
 Erythrina
@@ -740,8 +752,10 @@ Foeniculum vulgare
 Fragaria chiloensis
 Frankenia hirsuta
 Frankenia laevis
+Fraxinus angustifolia
 Fraxinus excelsior
 Fraxinus latifolia
+Fraxinus ornus
 Fraxinus velutina
 Freesia corymbosa
 Freesia refracta
@@ -849,6 +863,7 @@ Hypoestes phyllostachya
 Hypopitys monotropa
 Hyptis lantanifolia
 Hyssopus officinalis
+Ilex aquifolium
 Ilex paraguariensis
 Illicium verum
 Impatiens chinensis
@@ -883,6 +898,9 @@ Juglans nigra
 Juglans regia
 Juncus effusus
 Juncus usitatus
+Juniperus communis
+Juniperus oxycedrus
+Juniperus phoenicea
 Juniperus procera
 Justicia gendarussa
 Justicia linearis
@@ -1060,6 +1078,7 @@ Myosotis sylvatica
 Myrciaria dubia
 Myrianthus holstii
 Myrianthus serratus
+Myrica faya
 Myrica gale
 Myristica fragrans
 Myristica malabarica
@@ -1158,6 +1177,7 @@ Phaseolus lunatus
 Phaseolus vulgaris
 Phellodendron amurense
 Philenoptera cyanescens
+Phillyrea latifolia
 Philodendron speciosum
 Phlegmariurus phlegmaria
 Phoenix dactylifera
@@ -1178,6 +1198,7 @@ Pimenta dioica
 Pinus ayacahuite
 Pinus caribaea
 Pinus contorta
+Pinus halepensis
 Pinus kesiya
 Pinus massoniana
 Pinus merkusii
@@ -1185,13 +1206,17 @@ Pinus mugo
 Pinus nigra
 Pinus oocarpa
 Pinus patula
+Pinus pinaster
 Pinus pinea
 Pinus ponderosa
+Pinus radiata
 Pinus strobus
 Pinus sylvestris
 Pinus tecunumanii
 Piper nigrum
 Piptadeniastrum africanum
+Pistacia lentiscus
+Pistacia terebinthus
 Pistacia vera
 Pithecellobium dulce
 Pittosporum viridiflorum
@@ -1239,6 +1264,10 @@ Prunus africana
 Prunus armeniaca
 Prunus avium
 Prunus domestica
+Prunus dulcis
+Prunus lusitanica
+Prunus mahaleb
+Prunus padus
 Prunus persica
 Prunus serotina
 Prunus spinosa
@@ -1265,12 +1294,18 @@ Punica granatum
 Punica protopunica
 Pycnanthus angolensis
 Pyrrosia piloselloides
+Pyrus bourgaeana
 Pyrus communis
+Pyrus cordata
 Pyrus pyrifolia
 Quassia amara
 Quercus acutissima
 Quercus alba
+Quercus canariensis
+Quercus coccifera
+Quercus faginea
 Quercus ilex
+Quercus pyrenaica
 Quercus robur
 Quercus suber
 Raphia farinifera
@@ -1282,6 +1317,7 @@ Rauvolfia serpentina
 Rehmannia glutinosa
 Reseda luteola
 Reynoutria japonica
+Rhamnus alaternus
 Rhamnus cathartica
 Rhaphiolepis bibas
 Rhaphiolepis deflexa
@@ -1297,6 +1333,7 @@ Ricinus communis
 Robinia hispida
 Robinia pseudoacacia
 Rosa abyssinica
+Rosa canina
 Rosa centifolia
 Rosa chinensis
 Rosa moschata
@@ -1312,6 +1349,7 @@ Rudbeckia hirta
 Ruehssia cundurango
 Rumex acetosa
 Ruschia uncinata
+Ruscus aculeatus
 Ruta graveolens
 Saba senegalensis
 Sabal palmetto
@@ -1321,7 +1359,11 @@ Sagittaria latifolia
 Sagittaria sagittifolia
 Salicornia europaea
 Salix alba
+Salix atrocinerea
 Salix babylonica
+Salix caprea
+Salix salviifolia
+Salix viminalis
 Salvia divinorum
 Salvia micrantha
 Salvia miltiorrhiza
@@ -1330,6 +1372,7 @@ Salvia rosmarinus
 Salvia splendens
 Salvia verbenaca
 Samanea saman
+Sambucus ebulus
 Sambucus nigra
 Santalum album
 Santalum spicatum
@@ -1394,6 +1437,8 @@ Solanum torvum
 Solanum tuberosum
 Sophora tomentosa
 Sorbus aucuparia
+Sorbus domestica
+Sorbus torminalis
 Sorghum almum
 Sorghum arundinaceum
 Sorghum bicolor
@@ -1517,6 +1562,7 @@ Uapaca kirkiana
 Ulmus americana
 Ulmus glabra
 Ulmus laevis
+Ulmus minor
 Uncaria tomentosa
 Urena lobata
 Urera aurantiaca
@@ -1555,6 +1601,7 @@ Veronica officinalis
 Veronicastrum virginicum
 Viburnum carlcephalum
 Viburnum opulus
+Viburnum tinus
 Vigna mungo
 Viola hederacea
 Viola odorata

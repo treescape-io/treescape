@@ -2,7 +2,7 @@ import logging
 import typing
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.forms import ValidationError
+from django.forms import ImageField, ValidationError
 from django.template.defaultfilters import slugify
 from django.db import models, transaction
 from django.db.models.query import Q
@@ -12,8 +12,6 @@ from django.utils.safestring import mark_safe
 from django.utils.functional import cached_property
 from django.utils.translation import get_language
 from django.contrib import admin
-
-from django_advance_thumbnail import AdvanceThumbnailField
 
 from plant_species.enrichment.exceptions import (
     EnrichmentException,
@@ -28,6 +26,7 @@ from plant_species.enrichment.gbif import (
 )
 
 from plant_species.enrichment.wikipedia import get_wikipedia_page
+from treescape.models import UUIDIndexedModel
 
 
 logger = logging.getLogger(__name__)
@@ -38,7 +37,7 @@ class CommonNameManager(models.Manager):
         return self.get(name=name, language=language)
 
 
-class CommonNameBase(models.Model):
+class CommonNameBase(UUIDIndexedModel):
     """Abstract base class for common names."""
 
     language = models.CharField(_("language"), max_length=7, choices=settings.LANGUAGES)
@@ -80,7 +79,7 @@ class SpeciesManager(models.Manager):
         return self.get_or_create(slug=slug, defaults=kwargs)
 
 
-class SpeciesBase(models.Model):
+class SpeciesBase(UUIDIndexedModel):
     """Abstract base class for species models."""
 
     latin_name = models.CharField(
@@ -90,20 +89,16 @@ class SpeciesBase(models.Model):
     description = models.TextField(_("description"), blank=True)
     gbif_id = models.IntegerField(_("GBIF usageKey"), editable=False, unique=True)
     image = models.ImageField(upload_to="plant_species/images/", null=True, blank=True)
-    image_thumbnail = AdvanceThumbnailField(  # pyright: ignore[reportCallIssue]
-        source_field="image",  # pyright: ignore[reportCallIssue]
+    image_thumbnail = models.ImageField(
         upload_to="plant_species/images/thumbnails/",
         null=True,
         blank=True,
-        size=(512, 512),  # pyright: ignore[reportCallIssue]
         editable=False,
     )
-    image_large = AdvanceThumbnailField(  # pyright: ignore[reportCallIssue]
-        source_field="image",  # pyright: ignore[reportCallIssue]
+    image_large = models.ImageField(
         upload_to="plant_species/images/large/",
         null=True,
         blank=True,
-        size=(2048, 2048),  # pyright: ignore[reportCallIssue]
         editable=False,
     )
 
@@ -453,7 +448,7 @@ class SpeciesCommonName(CommonNameBase):
         )
 
 
-class SpeciesVariety(models.Model):
+class SpeciesVariety(UUIDIndexedModel):
     """Represents a variety of a species."""
 
     species = models.ForeignKey(

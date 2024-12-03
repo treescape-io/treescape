@@ -119,7 +119,7 @@ WSGI_APPLICATION = "treescape.wsgi.application"
 
 DATABASES = {
     # read os.environ['DATABASE_URL']
-    "default": env.db_url(default=f'spatialite:///{BASE_DIR / "db.sqlite3"}')  # type: ignore
+    "default": env.db_url(default=f'spatialite:///{BASE_DIR / "treescape.sqlite3"}')  # type: ignore
 }
 
 
