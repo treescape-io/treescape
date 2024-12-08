@@ -50,9 +50,14 @@ class PlantPropertiesBase(models.Model):
     height = DecimalEstimatedRange(verbose_name=_("plant height (m)"))
     width = DecimalEstimatedRange(verbose_name=_("canopy width (m)"))
 
-    soil_acidity = DecimalEstimatedRange(verbose_name=_("preferred soil acidity (pH)"))
-
-    sun_hours = DurationEstimatedRange(verbose_name=_("hours of direct sun per day"))
+    temperature = DecimalEstimatedRange(
+        verbose_name=_("temperature tolerance (degrees C)")
+    )
+    precipitation = DecimalEstimatedRange(
+        verbose_name=_("precipitation tolerance (mm/year)")
+    )
+    soil_acidity = DecimalEstimatedRange(verbose_name=_("soil acidity tolerance (pH)"))
+    sun_hours = DurationEstimatedRange(verbose_name=_("sunlight tolerance (h/day)"))
 
     production_start = DurationEstimatedRange(verbose_name=_("production start"))
     production_peak = DurationEstimatedRange(verbose_name=_("production peak"))
