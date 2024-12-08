@@ -2,6 +2,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.db import models
 
+from forest_designs.models.state import PlantState
 from plant_species.models import Genus, Species, SpeciesVariety
 from treescape.models import UUIDIndexedModel
 
@@ -32,7 +33,12 @@ class Plant(UUIDIndexedModel):
     location = models.PointField(
         _("location"), unique=True, tolerance=0.05, spatial_index=True
     )
-    notes = models.TextField(_("notes"), blank=True)
+
+    def get_state(self) -> PlantState | None:
+        try:
+            return self.statetransitions.objects.last()  # pyright: ignore reportAttributeAccessIssue
+        except PlantState.DoesNotExist:
+            return None
 
     def get_name(self) -> str | None:
         """Return plant name, based on the level of detail given."""

@@ -1,5 +1,7 @@
 from django.contrib.gis import admin
 
+from forest_designs.models.state import PlantState, PlantStateTransition
+
 from .models import (
     Plant,
     PlantImage,
@@ -11,6 +13,11 @@ from .models import (
 )
 
 
+class KindAdminBase(admin.ModelAdmin):
+    list_display = ("name",)
+    search_fields = ("name",)
+
+
 @admin.register(PlantImage)
 class PlantImageAdmin(admin.ModelAdmin):
     list_display = ("plant", "date", "kind")
@@ -19,9 +26,8 @@ class PlantImageAdmin(admin.ModelAdmin):
 
 
 @admin.register(PlantImageKind)
-class PlantImageKindAdmin(admin.ModelAdmin):
-    list_display = ("name",)
-    search_fields = ("name",)
+class PlantImageKindAdmin(KindAdminBase):
+    pass
 
 
 @admin.register(PlantLog)
@@ -32,13 +38,21 @@ class PlantLogAdmin(admin.ModelAdmin):
 
 
 @admin.register(PlantLogKind)
-class PlantLogKindAdmin(admin.ModelAdmin):
-    list_display = ("name",)
-    search_fields = ("name",)
+class PlantLogKindAdmin(KindAdminBase):
+    pass
+
+
+@admin.register(PlantState)
+class PlantStateAdmin(KindAdminBase):
+    pass
 
 
 class PlantInlineBase(admin.TabularInline):
     extra = 0
+
+
+class PlantStateTransitionAdmin(PlantInlineBase):
+    model = PlantStateTransition
 
 
 class PlantImageInline(PlantInlineBase):
@@ -56,7 +70,7 @@ class PlantAdmin(admin.GISModelAdmin):
     model = Plant
 
     autocomplete_fields = ("genus", "species", "variety")
-    inlines = [PlantImageInline, PlantLogInline]
+    inlines = [PlantImageInline, PlantStateTransitionAdmin, PlantLogInline]
 
 
 @admin.register(Zone)
@@ -68,8 +82,7 @@ class ZoneAdmin(admin.GISModelAdmin):
 
 
 @admin.register(ZoneKind)
-class ZoneKindAdmin(admin.ModelAdmin):
+class ZoneKindAdmin(KindAdminBase):
     """Admin inline for ZoneKind model."""
 
-    list_display = ("name",)
-    search_fields = ("name",)
+    pass
