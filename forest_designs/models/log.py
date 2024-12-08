@@ -25,6 +25,7 @@ class PlantLog(UUIDIndexedModel):
     )
     date = models.DateTimeField(
         _("date"),
+        db_index=True,
         help_text=_("Timestamp of the log entry."),
         default=datetime.datetime.now,
     )
