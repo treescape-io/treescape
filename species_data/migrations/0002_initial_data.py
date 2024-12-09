@@ -261,7 +261,7 @@ def create_initial_growth_habits(apps, schema_editor):
     ]
 
     for obj in growth_habits:
-        obj["slug"] = slugify(str(obj))
+        obj["slug"] = slugify(str(obj["name"]))
         created_obj = GrowthHabit(**obj)
         created_obj.full_clean()
         created_obj.save()
@@ -368,7 +368,7 @@ def create_human_uses(apps, schema_editor):
     ]
 
     for obj in human_uses:
-        obj["slug"] = slugify(str(obj))
+        obj["slug"] = slugify(str(obj["name"]))
         created_obj = HumanUse(**obj)
         created_obj.full_clean()
         created_obj.save()
@@ -440,7 +440,7 @@ def create_ecological_roles(apps, schema_editor):
     ]
 
     for obj in ecological_roles:
-        obj["slug"] = slugify(str(obj))
+        obj["slug"] = slugify(str(obj["name"]))
         created_obj = EcologicalRole(**obj)
         created_obj.full_clean()
         created_obj.save()

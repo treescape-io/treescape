@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
     dependencies = [
         (
             "species_data",
-            "0004_propagationmethod_remove_humanusethroughbase_source_and_more",
+            "0003_soil_preference_initial",
         ),
     ]
 
