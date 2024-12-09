@@ -34,11 +34,11 @@ Important guidelines:
 - The value of `maximum` should always be higher than `typical` and `minimum` should be lower still.
 - If only the `maximum` and or `minimum` are specified in the source, leave `typical` out.
 - The value of `width` concerns the canopy width of a plant, not the trunk.
-- When returning a value for a property, include you `confidence`, based on the source data.
+- When returning a value for a property, include your `confidence`, based on the source data.
 - If no information is available for a property, leave the property out and do not return `confidence` for that property.
 - For categorical properties (like `ecological_roles`, `climate_zones`, `human_uses` and others) , only return values allowed in the schema's enum. Other values are rejected.
 - For categorical properties, if none of the values are relevant, find the closest one from the schema or leave the value out.
-- Never return invalid `values`, the parsing will fail and we'll have to start again.
+- Never return invalid `values`, the parsing will fail.
 
 Example output:
 ```
