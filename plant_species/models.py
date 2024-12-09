@@ -286,7 +286,13 @@ class SpeciesBase(UUIDIndexedModel):
 
         for name_data in common_names:
             self.common_names.get_or_create(
-                language=name_data["language"], name=name_data["name"]
+                language=name_data["language"],
+                # Allow casing mismatch in common names, prevents duplicates
+                name__iexact=name_data["name"].capitalize(),
+                defaults={
+                    # Consistent casing, a lot of them start with small letters.
+                    "name": name_data["name"].capitalize()
+                },
             )
 
     def enrich_wikipedia(self):
