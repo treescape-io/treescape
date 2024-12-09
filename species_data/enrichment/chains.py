@@ -29,7 +29,7 @@ Source:
 
 Important guidelines:
 - Requested properties are optional, leave them out in your reply if no relevant information is available in the source.
-- Specify length units in meters.
+- Use metric units.
 - Return at most 2 decimals for numeric properties.
 - The value of `maximum` should always be higher than `typical` and `minimum` should be lower still.
 - If only the `maximum` and or `minimum` are specified in the source, leave `typical` out.
