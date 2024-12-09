@@ -1,8 +1,10 @@
+from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.gis.db import models
+
+from treescape.models import UUIDIndexedModel
 
 
-class KindBase(models.Model):
+class KindBase(UUIDIndexedModel):
     """Base class for kinds of stuff (zones, images, logs)."""
 
     name = models.CharField(_("name"), max_length=255, unique=True)

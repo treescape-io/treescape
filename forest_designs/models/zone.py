@@ -1,6 +1,8 @@
 from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.db import models
 
+from treescape.models import UUIDIndexedModel
+
 
 from .base import KindBase
 
@@ -13,10 +15,12 @@ class ZoneKind(KindBase):
         verbose_name_plural = _("zone types")
 
 
-class Zone(models.Model):
+class Zone(UUIDIndexedModel):
     """Zone within a forest design."""
 
-    kind = models.ForeignKey(ZoneKind, on_delete=models.PROTECT)
+    kind = models.ForeignKey(
+        ZoneKind, on_delete=models.PROTECT, db_column="zonekind_uuid"
+    )
     name = models.CharField(_("name"), max_length=255)
     area = models.MultiPolygonField(_("area"), spatial_index=True)
 

@@ -3,6 +3,8 @@ import datetime
 from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.db import models
 
+from treescape.models import UUIDIndexedModel
+
 from .base import KindBase
 
 
@@ -14,13 +16,17 @@ class PlantImageKind(KindBase):
         verbose_name_plural = _("plant image types")
 
 
-class PlantImage(models.Model):
+class PlantImage(UUIDIndexedModel):
     """Image of a plant."""
 
-    plant = models.ForeignKey("Plant", on_delete=models.CASCADE, related_name="images")
+    plant = models.ForeignKey(
+        "Plant", on_delete=models.CASCADE, related_name="images", db_column="plant_uuid"
+    )
     date = models.DateTimeField(_("date"), db_index=True, default=datetime.datetime.now)
 
-    kind = models.ForeignKey(PlantImageKind, on_delete=models.PROTECT)
+    kind = models.ForeignKey(
+        PlantImageKind, on_delete=models.PROTECT, db_column="plantimagekind_uuid"
+    )
     image = models.ImageField(_("image"), upload_to="plant_images")
 
     def __str__(self) -> str:

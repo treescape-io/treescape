@@ -3,18 +3,22 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.db import models
 
 from plant_species.models import Genus, Species, SpeciesVariety
+from treescape.models import UUIDIndexedModel
 
 
-class Plant(models.Model):
+class Plant(UUIDIndexedModel):
     """Plant with specific location within design."""
 
-    genus = models.ForeignKey(Genus, on_delete=models.PROTECT, blank=True)
+    genus = models.ForeignKey(
+        Genus, on_delete=models.PROTECT, blank=True, db_column="genus_uuid"
+    )
     species = models.ForeignKey(
         Species,
         null=True,
         blank=True,
         on_delete=models.PROTECT,
         help_text=_("When specified, genus is automatically set."),
+        db_column="species_uuid",
     )
     variety = models.ForeignKey(
         SpeciesVariety,
@@ -22,6 +26,7 @@ class Plant(models.Model):
         null=True,
         blank=True,
         help_text=_("When specified, species and genus are automatically set."),
+        db_column="variety_uuid",
     )
 
     location = models.PointField(

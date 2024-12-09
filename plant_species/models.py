@@ -26,6 +26,7 @@ from plant_species.enrichment.gbif import (
 )
 
 from plant_species.enrichment.wikipedia import get_wikipedia_page
+from treescape.models import UUIDIndexedModel
 
 
 logger = logging.getLogger(__name__)
@@ -36,7 +37,7 @@ class CommonNameManager(models.Manager):
         return self.get(name=name, language=language)
 
 
-class CommonNameBase(models.Model):
+class CommonNameBase(UUIDIndexedModel):
     """Abstract base class for common names."""
 
     language = models.CharField(_("language"), max_length=7, choices=settings.LANGUAGES)
@@ -78,7 +79,7 @@ class SpeciesManager(models.Manager):
         return self.get_or_create(slug=slug, defaults=kwargs)
 
 
-class SpeciesBase(models.Model):
+class SpeciesBase(UUIDIndexedModel):
     """Abstract base class for species models."""
 
     latin_name = models.CharField(
@@ -125,8 +126,7 @@ class SpeciesBase(models.Model):
     def get_common_name(self) -> str | None:
         """Return common name for currently used language."""
 
-        if not self.pk:
-            return None
+        assert self.pk
 
         current_lang = get_language()
 
@@ -205,6 +205,9 @@ class SpeciesBase(models.Model):
     def enrich_gbif_backbone(self):
         """Fetch species data from GBIF backbone based on the latin name and updates the instance."""
 
+        if self.gbif_id:
+            return
+
         assert self.latin_name, "Species name required to enrich data."
         species_data = get_latin_names(self.latin_name, self._rank)
 
@@ -273,7 +276,7 @@ class SpeciesBase(models.Model):
 
     def enrich_gbif_common_names(self):
         """Fetch (missing) common names from GBIF in configured languages."""
-        assert self.pk, "Needs to be saved before adding common names."
+        assert self.pk
         assert self.gbif_id, "GBIF id required to fetch common names."
 
         enabled_languages = [lang[0] for lang in settings.LANGUAGES]
@@ -292,9 +295,7 @@ class SpeciesBase(models.Model):
             self.description = self.wikipedia_page.summary.strip()
 
     def enrich(self):
-        if not self.gbif_id:
-            self.enrich_gbif_backbone()
-
+        self.enrich_gbif_backbone()
         self.enrich_gbif_image()
         self.enrich_wikipedia()
 
@@ -304,12 +305,11 @@ class SpeciesBase(models.Model):
         self.enrich_gbif_common_names()
 
     def clean(self):
-        if not self.pk:
-            # Do this here in order to propagate user-friendly ValidationErrors.
-            try:
-                self.enrich()
-            except EnrichmentException as e:
-                raise ValidationError(e) from e
+        # Do this here in order to propagate user-friendly ValidationErrors.
+        try:
+            self.enrich()
+        except EnrichmentException as e:
+            raise ValidationError(e) from e
 
         super().clean()
 
@@ -339,7 +339,11 @@ class Genus(SpeciesBase):
     """Represents a biological genus, which is a group containing one or more species."""
 
     family = models.ForeignKey(
-        Family, on_delete=models.PROTECT, related_name="genera", blank=True
+        Family,
+        on_delete=models.PROTECT,
+        related_name="genera",
+        blank=True,
+        db_column="family_uuid",
     )
 
     class Meta(SpeciesBase.Meta):
@@ -353,7 +357,11 @@ class Species(SpeciesBase):
     """Represents a biological species with a Latin name."""
 
     genus = models.ForeignKey(
-        Genus, on_delete=models.PROTECT, related_name="species", blank=True
+        Genus,
+        on_delete=models.PROTECT,
+        related_name="species",
+        blank=True,
+        db_column="genus_uuid",
     )
 
     class Meta(SpeciesBase.Meta):
@@ -406,7 +414,10 @@ class FamilyCommonName(CommonNameBase):
     """Represents a common name for a family in a specific language."""
 
     family = models.ForeignKey(
-        Family, on_delete=models.CASCADE, related_name="common_names"
+        Family,
+        on_delete=models.CASCADE,
+        related_name="common_names",
+        db_column="family_uuid",
     )
 
     class Meta(CommonNameBase.Meta):
@@ -421,7 +432,10 @@ class GenusCommonName(CommonNameBase):
     """Represents a common name for a genus in a specific language."""
 
     genus = models.ForeignKey(
-        Genus, on_delete=models.CASCADE, related_name="common_names"
+        Genus,
+        on_delete=models.CASCADE,
+        related_name="common_names",
+        db_column="genus_uuid",
     )
 
     class Meta(CommonNameBase.Meta):
@@ -436,7 +450,10 @@ class SpeciesCommonName(CommonNameBase):
     """Represents a common name for a species in a specific language."""
 
     species = models.ForeignKey(
-        Species, on_delete=models.CASCADE, related_name="common_names"
+        Species,
+        on_delete=models.CASCADE,
+        related_name="common_names",
+        db_column="species_uuid",
     )
 
     class Meta(CommonNameBase.Meta):
@@ -447,11 +464,14 @@ class SpeciesCommonName(CommonNameBase):
         )
 
 
-class SpeciesVariety(models.Model):
+class SpeciesVariety(UUIDIndexedModel):
     """Represents a variety of a species."""
 
     species = models.ForeignKey(
-        Species, on_delete=models.CASCADE, related_name="varieties"
+        Species,
+        on_delete=models.CASCADE,
+        related_name="varieties",
+        db_column="species_uuid",
     )
     name = models.CharField(_("variety name"), max_length=255, db_index=True)
 

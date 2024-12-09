@@ -81,7 +81,10 @@ class SpeciesPropertiesManager(models.Manager):
 
 class SpeciesProperties(PlantPropertiesBase):
     species = models.OneToOneField(
-        Species, on_delete=models.CASCADE, related_name="properties"
+        Species,
+        on_delete=models.CASCADE,
+        related_name="properties",
+        db_column="species_uuid",
     )
     growth_habits = models.ManyToManyField(GrowthHabit, through=SpeciesGrowthHabit)
     climate_zones = models.ManyToManyField(ClimateZone, through=SpeciesClimateZone)

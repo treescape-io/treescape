@@ -44,7 +44,7 @@ class PlantTestCase(SpeciesTestMixin, TestCase):
         )
         plant.save()
 
-        plant = Plant.objects.get(id=plant.pk)
+        plant = Plant.objects.get(pk=plant.pk)
         self.assertEqual(plant.species, self.species)
         self.assertEqual(plant.genus, self.genus)
 
@@ -68,7 +68,7 @@ class PlantLogTestCase(SpeciesTestMixin, TestCase):
         plant_log = PlantLog(plant=plant, kind=kind, notes="Test log entry")
         plant_log.save()
 
-        saved_plant_log = PlantLog.objects.get(id=plant_log.pk)
+        saved_plant_log = PlantLog.objects.get(pk=plant_log.pk)
         self.assertEqual(saved_plant_log.notes, "Test log entry")
         self.assertEqual(saved_plant_log.plant, plant)
 
@@ -89,7 +89,7 @@ class ImageTestCase(SpeciesTestMixin, TestCase):
         )
         plant_image.save()
 
-        saved_plant_image = PlantImage.objects.get(id=plant_image.pk)
+        saved_plant_image = PlantImage.objects.get(pk=plant_image.pk)
         self.assertEqual(saved_plant_image.plant, plant)
         self.assertEqual(saved_plant_image.kind, kind)
         self.assertEqual(
@@ -104,11 +104,15 @@ class ZoneTestCase(TestCase):
 
         zone_kind = ZoneKind.objects.create(name="Test Zone Type")
         zone = Zone(
-            name="Test Zone", kind=zone_kind, area="MULTIPOLYGON(((0 0, 1 0, 1 1, 0 1, 0 0)))"
+            name="Test Zone",
+            kind=zone_kind,
+            area="MULTIPOLYGON(((0 0, 1 0, 1 1, 0 1, 0 0)))",
         )
         zone.save()
 
-        saved_zone = Zone.objects.get(id=zone.pk)
+        saved_zone = Zone.objects.get(pk=zone.pk)
         self.assertEqual(saved_zone.name, "Test Zone")
         self.assertEqual(saved_zone.kind, zone_kind)
-        self.assertEqual(saved_zone.area.wkt, "MULTIPOLYGON (((0 0, 1 0, 1 1, 0 1, 0 0)))")
+        self.assertEqual(
+            saved_zone.area.wkt, "MULTIPOLYGON (((0 0, 1 0, 1 1, 0 1, 0 0)))"
+        )
