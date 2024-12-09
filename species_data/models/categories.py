@@ -228,7 +228,7 @@ class PropagationMethod(CategorizedPlantPropertyBase):
     description = models.TextField(
         verbose_name=_("description"),
         blank=True,
-        help_text=_("Optional description of soil preference."),
+        help_text=_("Optional description of propagation method."),
     )
 
     objects = PropagationMethodManager()
