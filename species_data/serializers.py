@@ -124,6 +124,16 @@ class SpeciesPropertiesSerializer(serializers.ModelSerializer):
             "width_maximum",
             "width_confidence",
             "width_source",
+            "temperature_minimum",
+            "temperature_typical",
+            "temperature_maximum",
+            "temperature_confidence",
+            "temperature_source",
+            "precipitation_minimum",
+            "precipitation_typical",
+            "precipitation_maximum",
+            "precipitation_confidence",
+            "precipitation_source",
             "soil_acidity_minimum",
             "soil_acidity_typical",
             "soil_acidity_maximum",
@@ -141,6 +151,12 @@ class SpeciesPropertiesSerializer(serializers.ModelSerializer):
         view_name="source-detail", read_only=True
     )
     width_source = serializers.HyperlinkedRelatedField(
+        view_name="source-detail", read_only=True
+    )
+    temperature_source = serializers.HyperlinkedRelatedField(
+        view_name="source-detail", read_only=True
+    )
+    precipitation_source = serializers.HyperlinkedRelatedField(
         view_name="source-detail", read_only=True
     )
     soil_acidity_source = serializers.HyperlinkedRelatedField(
