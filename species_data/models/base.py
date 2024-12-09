@@ -47,8 +47,8 @@ class CategorizedPlantPropertyBase(models.Model):
 class PlantPropertiesBase(models.Model):
     """Abstract base class for properties of a species."""
 
-    height = DecimalEstimatedRange(verbose_name=_("plant height (m)"))
-    width = DecimalEstimatedRange(verbose_name=_("canopy width (m)"))
+    height = DecimalEstimatedRange(verbose_name=_("mature plant height (m)"))
+    width = DecimalEstimatedRange(verbose_name=_("mature plant canopy width (m)"))
 
     temperature = DecimalEstimatedRange(
         verbose_name=_("temperature tolerance (degrees C)")
