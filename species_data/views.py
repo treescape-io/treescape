@@ -43,14 +43,19 @@ class SpeciesDataViewSet(viewsets.ModelViewSet):
     lookup_field = "slug"
     queryset = Species.objects.all()
     serializer_class = SpeciesDataSerializer
-    filterset_fields = [
+    filterset_fields = {
         # "properties__genus__family",
         # "properties__genus",
-        "properties__climate_zones",
-        "properties__growth_habits",
-        "properties__human_uses",
-        "properties__ecological_roles",
-    ]
+        "properties__temperature_minimum": ["lte"],
+        "properties__temperature_maximum": ["gte"],
+        "properties__precipitation_minimum": ["lte"],
+        "properties__precipitation_maximum": ["gte"],
+        "properties__climate_zones": ["exact"],
+        "properties__growth_habits": ["exact"],
+        "properties__human_uses": ["exact"],
+        "properties__ecological_roles": ["exact"],
+    }
+
     search_fields = [
         "latin_name",
         "common_names__name",
