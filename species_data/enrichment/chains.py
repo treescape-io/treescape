@@ -39,7 +39,8 @@ Example output:
 ```
 {example}
 ```
-Another example
+
+Another example:
 ```
 {example2}
 ```
@@ -63,9 +64,9 @@ def get_enrichment_chain(config: EnrichmentConfig, data_model: Type[BaseModel]):
                 ],
             },
             "growth_habits": {"confidence": 1, "values": ["tree"]},
-            "height": {"confidence": 0.9, "maximum": 30, "minimum": 15, "typical": 30},
+            "height": {"confidence": 0.2, "maximum": 30, "minimum": 15, "typical": 30},
             "human_uses": {
-                "confidence": 0.9,
+                "confidence": 0.3,
                 "values": [
                     "animal-fodder",
                     "firewood",
@@ -96,7 +97,7 @@ def get_enrichment_chain(config: EnrichmentConfig, data_model: Type[BaseModel]):
                 ],
             },
             "ecological_roles": {
-                "confidence": 0.8,
+                "confidence": 0.5,
                 "values": [
                     "carbon-sequestration",
                     "habitat-provision",
@@ -104,7 +105,7 @@ def get_enrichment_chain(config: EnrichmentConfig, data_model: Type[BaseModel]):
                     "shade-provision",
                 ],
             },
-            "soil_preferences": {"confidence": 0.9, "values": ["clayey", "sandy"]},
+            "soil_preferences": {"confidence": 0.2, "values": ["clayey", "sandy"]},
         }
     )
     parser = PydanticOutputParser(pydantic_object=data_model)
