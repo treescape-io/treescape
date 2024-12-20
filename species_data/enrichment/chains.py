@@ -6,7 +6,7 @@ from langchain.output_parsers import (
     PydanticOutputParser,
     RetryWithErrorOutputParser,
 )
-from langchain_core.prompts import PromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableLambda, RunnableParallel
 from pydantic.v1 import BaseModel
 
@@ -18,14 +18,7 @@ logger = logging.getLogger(__name__)
 set_verbose(True)
 
 # Here to save whitespace in input.
-_prompt_template = """As a plant data entry expert, return available information about the plant species '{latin_name}' who strictly follows the provided JSON schema.
-
-Base your answers exclusively on the following source:
-
-Source:
-```
-{source_content}
-```
+_system_prompt = """You are a plant data entry expert. You return only valid JSON, following the provided schema. Only return plant information based on provided information.
 
 Important guidelines:
 - Requested properties are optional, leave them out in your reply if no relevant information is available in the source.
@@ -39,17 +32,22 @@ Important guidelines:
 - For categorical properties (like `ecological_roles`, `climate_zones`, `human_uses` and others) , only return values allowed in the schema's enum. Other values are rejected.
 - For categorical properties, if none of the values are relevant, find the closest one from the schema or leave the value out.
 - Never return invalid `values`, the parsing will fail.
+- Always provide your confidence for returned values. For example, the confidence should be 1.0 when the information is literally copied from provided information, 0.6 when unit conversion is required and 0.2 when information is indirectly inferred from provided information.
 
 Example output:
 ```
 {example}
 ```
-Another example
+
+Another example:
 ```
 {example2}
 ```
+"""
 
-{format_instructions}
+_user_prompt = """{format_instructions}
+
+Please provide plant properties for the species '{latin_name}'.
 """
 
 
@@ -68,9 +66,9 @@ def get_enrichment_chain(config: EnrichmentConfig, data_model: Type[BaseModel]):
                 ],
             },
             "growth_habits": {"confidence": 1, "values": ["tree"]},
-            "height": {"confidence": 0.9, "maximum": 30, "minimum": 15, "typical": 30},
+            "height": {"confidence": 0.2, "maximum": 30, "minimum": 15, "typical": 30},
             "human_uses": {
-                "confidence": 0.9,
+                "confidence": 0.3,
                 "values": [
                     "animal-fodder",
                     "firewood",
@@ -101,7 +99,7 @@ def get_enrichment_chain(config: EnrichmentConfig, data_model: Type[BaseModel]):
                 ],
             },
             "ecological_roles": {
-                "confidence": 0.8,
+                "confidence": 0.5,
                 "values": [
                     "carbon-sequestration",
                     "habitat-provision",
@@ -109,21 +107,21 @@ def get_enrichment_chain(config: EnrichmentConfig, data_model: Type[BaseModel]):
                     "shade-provision",
                 ],
             },
-            "soil_preferences": {"confidence": 0.9, "values": ["clayey", "sandy"]},
+            "soil_preferences": {"confidence": 0.2, "values": ["clayey", "sandy"]},
         }
     )
     parser = PydanticOutputParser(pydantic_object=data_model)
 
     retry_parser = RetryWithErrorOutputParser.from_llm(parser=parser, llm=config.llm)
 
-    prompt = PromptTemplate(
-        template=_prompt_template,
-        input_variables=["latin_name", "source_content"],
-        partial_variables={
-            "format_instructions": parser.get_format_instructions(),
-            "example": example,
-            "example2": example2,
-        },
+    prompt = ChatPromptTemplate.from_messages(
+        [("system", _system_prompt), ("user", _user_prompt)],
+    )
+
+    prompt = prompt.partial(
+        format_instructions=parser.get_format_instructions(),
+        example=example,
+        example2=example2,
     )
 
     completion_chain = prompt | config.llm
