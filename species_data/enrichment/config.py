@@ -17,7 +17,7 @@ def get_default_config():
     return EnrichmentConfig(
         llm=ChatPerplexity(
             api_key=settings.PPLX_API_KEY,
-            model="llama-3.1-sonar-huge-128k-online",
+            model="llama-3.1-sonar-small-128k-online",
             temperature=0.1,
             client=None,
             timeout=None,
@@ -28,8 +28,8 @@ def get_default_config():
         #     model_kwargs={"response_format": {"type": "json_object"}},
         # ),
         fallback_llm=ChatOpenAI(
-            model="gpt-4o",
-            temperature=0.3,
+            model="gpt-4o-mini",
+            temperature=0.1,
             model_kwargs={"response_format": {"type": "json_object"}},
         ),
     )
