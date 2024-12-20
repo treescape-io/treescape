@@ -112,7 +112,9 @@ def get_enrichment_chain(config: EnrichmentConfig, data_model: Type[BaseModel]):
     )
     parser = PydanticOutputParser(pydantic_object=data_model)
 
-    retry_parser = RetryWithErrorOutputParser.from_llm(parser=parser, llm=config.llm)
+    retry_parser = RetryWithErrorOutputParser.from_llm(
+        parser=parser, llm=config.fallback_llm
+    )
 
     prompt = ChatPromptTemplate.from_messages(
         [("system", _system_prompt), ("user", _user_prompt)],
