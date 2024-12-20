@@ -9,7 +9,7 @@ from plant_species.enrichment.exceptions import SpeciesAlreadyExists, SpeciesNot
 from plant_species.models import Species
 
 # Path to species_list.txt, getting current directory where script resides.
-species_txt = Path(__file__).resolve().parent / "species_list.txt"
+species_txt = Path(__file__).resolve().parent.parent.parent.parent / "species_list.txt"
 
 
 def _validationerror_is(e: ValidationError, is_type: Type[Exception]) -> bool:
