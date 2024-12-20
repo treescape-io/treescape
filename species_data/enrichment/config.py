@@ -23,8 +23,8 @@ def get_default_config():
             timeout=None,
         ),
         fallback_llm=ChatOpenAI(
-            model="gpt-4o",
-            temperature=0.3,
+            model="gpt-4o-mini",
+            temperature=0.1,
             model_kwargs={"response_format": {"type": "json_object"}},
         ),
     )
