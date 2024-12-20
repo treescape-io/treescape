@@ -34,6 +34,7 @@ Important guidelines:
 - For categorical properties (like `ecological_roles`, `climate_zones`, `human_uses` and others) , only return values allowed in the schema's enum. Other values are rejected.
 - For categorical properties, if none of the values are relevant, find the closest one from the schema or leave the value out.
 - Never return invalid `values`, the parsing will fail.
+- Always provide your confidence for returned values. The confidence should be 1.0 when the information is literally copied from provided information and 0.1 when it is inferred with no information provided.
 
 Example output:
 ```
