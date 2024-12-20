@@ -349,6 +349,7 @@ class Genus(SpeciesBase):
         on_delete=models.PROTECT,
         related_name="genera",
         blank=True,
+        to_field="uuid",
         db_column="family_uuid",
     )
 
@@ -367,6 +368,7 @@ class Species(SpeciesBase):
         on_delete=models.PROTECT,
         related_name="species",
         blank=True,
+        to_field="uuid",
         db_column="genus_uuid",
     )
 
@@ -423,6 +425,7 @@ class FamilyCommonName(CommonNameBase):
         Family,
         on_delete=models.CASCADE,
         related_name="common_names",
+        to_field="uuid",
         db_column="family_uuid",
     )
 
@@ -441,6 +444,7 @@ class GenusCommonName(CommonNameBase):
         Genus,
         on_delete=models.CASCADE,
         related_name="common_names",
+        to_field="uuid",
         db_column="genus_uuid",
     )
 
@@ -459,6 +463,7 @@ class SpeciesCommonName(CommonNameBase):
         Species,
         on_delete=models.CASCADE,
         related_name="common_names",
+        to_field="uuid",
         db_column="species_uuid",
     )
 
@@ -478,6 +483,7 @@ class SpeciesVariety(UUIDIndexedModel):
         on_delete=models.CASCADE,
         related_name="varieties",
         db_column="species_uuid",
+        to_field="uuid",
     )
     name = models.CharField(_("variety name"), max_length=255, db_index=True)
 

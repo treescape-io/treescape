@@ -19,7 +19,10 @@ class Zone(UUIDIndexedModel):
     """Zone within a forest design."""
 
     kind = models.ForeignKey(
-        ZoneKind, on_delete=models.PROTECT, db_column="zonekind_uuid"
+        ZoneKind,
+        on_delete=models.PROTECT,
+        db_column="zonekind_uuid",
+        to_field="uuid",
     )
     name = models.CharField(_("name"), max_length=255)
     area = models.MultiPolygonField(_("area"), spatial_index=True)

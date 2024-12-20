@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
     dependencies = [
         (
             "forest_designs",
-            "0003_plantstate_remove_plant_notes_alter_plantlog_date_and_more",
+            "0002_initial_data",
         ),
     ]
 

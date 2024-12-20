@@ -25,6 +25,7 @@ class PlantStateTransition(UUIDIndexedModel):
         on_delete=models.CASCADE,
         related_name="statetransitions",
         db_column="plant_uuid",
+        to_field="uuid",
     )
     date = models.DateTimeField(
         _("date"),
@@ -38,6 +39,7 @@ class PlantStateTransition(UUIDIndexedModel):
         on_delete=models.PROTECT,
         db_column="state_uuid",
         related_name="transitions",
+        to_field="uuid",
     )
 
     def __str__(self) -> str:

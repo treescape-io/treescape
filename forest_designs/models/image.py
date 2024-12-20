@@ -25,7 +25,10 @@ class PlantImage(UUIDIndexedModel):
     date = models.DateTimeField(_("date"), db_index=True, default=datetime.datetime.now)
 
     kind = models.ForeignKey(
-        PlantImageKind, on_delete=models.PROTECT, db_column="plantimagekind_uuid"
+        PlantImageKind,
+        on_delete=models.PROTECT,
+        db_column="plantimagekind_uuid",
+        to_field="uuid",
     )
     image = models.ImageField(_("image"), upload_to="plant_images")
 

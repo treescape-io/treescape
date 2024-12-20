@@ -21,7 +21,11 @@ class PlantLog(UUIDIndexedModel):
     """Represents a chronological record of events related to a plant."""
 
     plant = models.ForeignKey(
-        Plant, on_delete=models.CASCADE, related_name="logs", db_column="plant_uuid"
+        Plant,
+        on_delete=models.CASCADE,
+        related_name="logs",
+        db_column="plant_uuid",
+        to_field="uuid",
     )
     date = models.DateTimeField(
         _("date"),
@@ -30,7 +34,10 @@ class PlantLog(UUIDIndexedModel):
         default=datetime.datetime.now,
     )
     kind = models.ForeignKey(
-        PlantLogKind, on_delete=models.PROTECT, db_column="plantlogkind_uuid"
+        PlantLogKind,
+        on_delete=models.PROTECT,
+        db_column="plantlogkind_uuid",
+        to_field="uuid",
     )
     notes = models.TextField(_("notes"))
 
