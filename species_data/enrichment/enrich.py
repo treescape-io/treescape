@@ -128,15 +128,15 @@ def enrich_species_data(species: Species, config: EnrichmentConfig):
 
     logger.debug(f"Received data: {pformat(plant_data)}")
 
-    # source_type = SourceType.objects.get_or_create(name="Wikipedia")[0]
-    # source = Source.objects.get_or_create(
-    #     url=f"https://en.wikipedia.org/w/index.php?title={species.wikipedia_page.title}&oldid={species.wikipedia_page.revision_id}",
-    #     defaults={
-    #         "name": species.wikipedia_page.title,
-    #         "source_type": source_type,
-    #         "date": datetime.datetime.now(),
-    #     },
-    # )[0]
+    source_type = SourceType.objects.get_or_create(name="Perplexity")[0]
+    source = Source.objects.get_or_create(
+        url=f"https://en.wikipedia.org/w/index.php?title={species.wikipedia_page.title}&oldid={species.wikipedia_page.revision_id}",
+        defaults={
+            "name": species.wikipedia_page.title,
+            "source_type": source_type,
+            "date": datetime.datetime.now(),
+        },
+    )[0]
 
     species_properties = SpeciesProperties.objects.get_or_create(species=species)[0]
 
