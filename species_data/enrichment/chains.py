@@ -20,12 +20,7 @@ set_verbose(True)
 # Here to save whitespace in input.
 _prompt_template = """As a plant data entry expert, return available information about the plant species '{latin_name}' who strictly follows the provided JSON schema.
 
-Base your answers exclusively on the following source:
-
-Source:
-```
-{source_content}
-```
+Base your answers exclusively on the provided information and return valid JSON and valid JSON only.
 
 Important guidelines:
 - Requested properties are optional, leave them out in your reply if no relevant information is available in the source.

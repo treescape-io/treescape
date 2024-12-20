@@ -115,28 +115,28 @@ def enrich_species_data(species: Species, config: EnrichmentConfig):
         return
 
     # Brute force token limit.
-    source_content = species.wikipedia_page.content[:25000]
+    # source_content = species.wikipedia_page.content[:25000]
 
-    assert source_content
+    # assert source_content
 
     plant_data: BaseModel = chain.invoke(
         {
-            "source_content": source_content,
+            # "source_content": source_content,
             "latin_name": species.latin_name,
         }
     )
 
     logger.debug(f"Received data: {pformat(plant_data)}")
 
-    source_type = SourceType.objects.get_or_create(name="Wikipedia")[0]
-    source = Source.objects.get_or_create(
-        url=f"https://en.wikipedia.org/w/index.php?title={species.wikipedia_page.title}&oldid={species.wikipedia_page.revision_id}",
-        defaults={
-            "name": species.wikipedia_page.title,
-            "source_type": source_type,
-            "date": datetime.datetime.now(),
-        },
-    )[0]
+    # source_type = SourceType.objects.get_or_create(name="Wikipedia")[0]
+    # source = Source.objects.get_or_create(
+    #     url=f"https://en.wikipedia.org/w/index.php?title={species.wikipedia_page.title}&oldid={species.wikipedia_page.revision_id}",
+    #     defaults={
+    #         "name": species.wikipedia_page.title,
+    #         "source_type": source_type,
+    #         "date": datetime.datetime.now(),
+    #     },
+    # )[0]
 
     species_properties = SpeciesProperties.objects.get_or_create(species=species)[0]
 
