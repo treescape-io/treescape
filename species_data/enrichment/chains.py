@@ -18,9 +18,7 @@ logger = logging.getLogger(__name__)
 set_verbose(True)
 
 # Here to save whitespace in input.
-_prompt_template = """As a plant data entry expert, return available information about the plant species '{latin_name}' who strictly follows the provided JSON schema.
-
-Base your answers exclusively on the provided information and return valid JSON and valid JSON only.
+_prompt_template = """You are a plant data entry expert. You return only valid JSON, following the provided schema. Only return plant information based on provided information.
 
 Important guidelines:
 - Requested properties are optional, leave them out in your reply if no relevant information is available in the source.
@@ -34,7 +32,7 @@ Important guidelines:
 - For categorical properties (like `ecological_roles`, `climate_zones`, `human_uses` and others) , only return values allowed in the schema's enum. Other values are rejected.
 - For categorical properties, if none of the values are relevant, find the closest one from the schema or leave the value out.
 - Never return invalid `values`, the parsing will fail.
-- Always provide your confidence for returned values. The confidence should be 1.0 when the information is literally copied from provided information and 0.1 when it is inferred with no information provided.
+- Always provide your confidence for returned values. For example, the confidence should be 1.0 when the information is literally copied from provided information, 0.6 when unit conversion is required and 0.2 when information is inferred from provided information.
 
 Example output:
 ```
@@ -47,6 +45,8 @@ Another example:
 ```
 
 {format_instructions}
+
+Please provide information about '{latin_name}'.
 """
 
 
