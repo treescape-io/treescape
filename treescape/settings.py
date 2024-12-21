@@ -164,16 +164,45 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / "static"
-
 # Project-wide static files.
 STATICFILES_DIRS = [
     BASE_DIR / "treescape" / "static",
 ]
 
-MEDIA_ROOT = BASE_DIR / "media"
-MEDIA_URL = "media/"
+if DEBUG:
+    STATIC_URL = "static/"
+    STATIC_ROOT = BASE_DIR / "static"
+
+    MEDIA_ROOT = BASE_DIR / "media"
+    MEDIA_URL = "media/"
+
+else:
+    # Use S3 storage to allow consistent file access both from Django and QGIS.
+    S3_OPTIONS = {
+        "bucket_name": env("AWS_STORAGE_BUCKET_NAME"),
+        "access_key": env("AWS_S3_ACCESS_KEY_ID"),
+        "secret_key": env("AWS_S3_SECRET_ACCESS_KEY"),
+        "endpoint_url": env("AWS_S3_ENDPOINT_URL"),
+        "custom_domain": env("AWS_S3_CUSTOM_DOMAIN"),
+        "querystring_auth": env("AWS_QUERYSTRING_AUTH"),
+    }
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3.S3Storage",
+            "OPTIONS": S3_OPTIONS
+            | {
+                "location": "media",
+            },
+        },
+        "staticfiles": {
+            "BACKEND": "storages.backends.s3.S3Storage",
+            "OPTIONS": S3_OPTIONS
+            | {
+                "location": "static",
+            },
+        },
+    }
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

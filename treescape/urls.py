@@ -25,12 +25,12 @@ from species_data import urls
 
 from .views import index
 
-urlpatterns = (
-    [
-        path("", index),
-        path("admin/", admin.site.urls),
-        path("api/", include(urls.urlpatterns)),
-    ]
-    + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-)
+urlpatterns = [
+    path("", index),
+    path("admin/", admin.site.urls),
+    path("api/", include(urls.urlpatterns)),
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
