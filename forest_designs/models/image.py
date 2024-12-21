@@ -3,7 +3,7 @@ import datetime
 from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.db import models
 
-from treescape.models import UUIDIndexedModel
+from treescape.models import UUIDIndexedModel, uuid_image_path_generator
 
 from .base import KindBase
 
@@ -30,7 +30,9 @@ class PlantImage(UUIDIndexedModel):
         db_column="plantimagekind_uuid",
         to_field="uuid",
     )
-    image = models.ImageField(_("image"), upload_to="plant_images")
+    image = models.ImageField(
+        _("image"), upload_to=uuid_image_path_generator("forest_designs/images/")
+    )
 
     def __str__(self) -> str:
         return f"{self.plant} image"
