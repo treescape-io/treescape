@@ -1,8 +1,9 @@
 import logging
+from pathlib import PurePath
 import typing
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.forms import ImageField, ValidationError
+from django.forms import ValidationError
 from django.template.defaultfilters import slugify
 from django.db import models, transaction
 from django.db.models.query import Q
@@ -26,7 +27,7 @@ from plant_species.enrichment.gbif import (
 )
 
 from plant_species.enrichment.wikipedia import get_wikipedia_page
-from treescape.models import UUIDIndexedModel
+from treescape.models import UUIDIndexedModel, uuid_image_path_generator
 
 
 logger = logging.getLogger(__name__)
@@ -88,15 +89,19 @@ class SpeciesBase(UUIDIndexedModel):
     slug = models.SlugField(_("slug"), max_length=255, unique=True, blank=True)
     description = models.TextField(_("description"), blank=True)
     gbif_id = models.IntegerField(_("GBIF usageKey"), editable=False, unique=True)
-    image = models.ImageField(upload_to="plant_species/images/", null=True, blank=True)
+    image = models.ImageField(
+        upload_to=uuid_image_path_generator("plant_species/images/full/"),
+        null=True,
+        blank=True,
+    )
     image_thumbnail = models.ImageField(
-        upload_to="plant_species/images/thumbnails/",
+        upload_to=uuid_image_path_generator("plant_species/images/thumbnail/"),
         null=True,
         blank=True,
         editable=False,
     )
     image_large = models.ImageField(
-        upload_to="plant_species/images/large/",
+        upload_to=uuid_image_path_generator("plant_species/images/large/"),
         null=True,
         blank=True,
         editable=False,
