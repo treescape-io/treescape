@@ -20,7 +20,11 @@ class PlantImage(UUIDIndexedModel):
     """Image of a plant."""
 
     plant = models.ForeignKey(
-        "Plant", on_delete=models.CASCADE, related_name="images", db_column="plant_uuid"
+        "Plant",
+        on_delete=models.CASCADE,
+        related_name="images",
+        db_column="plant_uuid",
+        to_field="uuid",
     )
     date = models.DateTimeField(_("date"), db_index=True, default=datetime.datetime.now)
 
