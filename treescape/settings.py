@@ -45,9 +45,13 @@ ALLOWED_HOSTS = ["treescape.app", "127.0.0.1", "localhost"]
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {"format": "%(levelname)s %(asctime)s %(name)s %(message)s"},
+    },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
+            "formatter": "verbose",
         },
     },
     "root": {
@@ -60,6 +64,7 @@ LOGGING = {
             "level": "DEBUG",
             "propagate": False,
         },
+        "pyvips": {"handlers": ["console"], "level": "WARNING", "propagate": False},
     },
 }
 

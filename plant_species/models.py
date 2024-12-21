@@ -1,6 +1,8 @@
 import logging
-from pathlib import PurePath
 import typing
+
+from django.core.files.base import ContentFile
+import pyvips
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ValidationError
@@ -271,13 +273,42 @@ class SpeciesBase(UUIDIndexedModel):
             # Skip existing images.
             return
 
+        LARGE_SIZE = 2048
+        THUMBNAIL_SIZE = 512
+
         assert isinstance(self.gbif_id, int), "gbif_id not an integer"
-        image_file = get_image(self.gbif_id)
-        if image_file:
+        image_data = get_image(self.gbif_id)
+        if image_data:
             assert self.latin_name
             image_name = f"{slugify(self.latin_name)}.jpg"
-            logger.debug("Saving image %s for %s", image_name, self.latin_name)
-            self.image.save(image_name, image_file)
+
+            logger.debug("Saving full image %s for %s", image_name, self.latin_name)
+            self.image.save(image_name, ContentFile(image_data))
+
+            # Read single source image from ContentFile
+            vips_image = pyvips.Image.new_from_buffer(image_data, "")
+
+            logger.debug("Saving large image %s for %s", image_name, self.latin_name)
+            large_image = vips_image.thumbnail_image(
+                LARGE_SIZE,
+                height=LARGE_SIZE,
+                crop="attention",
+                size="down",
+            )
+            large_buffer = large_image.jpegsave_buffer(Q=85)
+            self.image_large.save(image_name, ContentFile(large_buffer))
+
+            logger.debug(
+                "Saving thumbnail image %s for %s", image_name, self.latin_name
+            )
+            thumbnail_image = vips_image.thumbnail_image(
+                THUMBNAIL_SIZE,
+                height=THUMBNAIL_SIZE,
+                crop="attention",
+                size="down",
+            )
+            thumbnail_buffer = thumbnail_image.jpegsave_buffer(Q=85)
+            self.image_thumbnail.save(image_name, ContentFile(thumbnail_buffer))
 
     def enrich_gbif_common_names(self):
         """Fetch (missing) common names from GBIF in configured languages."""

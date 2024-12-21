@@ -1,6 +1,5 @@
 import enum
 import typing
-from django.core.files.base import ContentFile
 import pycountry
 
 from pygbif import occurrences, species
@@ -300,7 +299,7 @@ def _get_image_urls(taxonKey: int) -> typing.List[str]:
     return [url for url in map(_get_image_url, results) if url is not None]
 
 
-def get_image(gbif_id: int) -> ContentFile | None:
+def get_image(gbif_id: int) -> bytes | None:
     """Fetch image from GBIF and return as ContentFile."""
     image_urls = _get_image_urls(gbif_id)
 
@@ -314,8 +313,7 @@ def get_image(gbif_id: int) -> ContentFile | None:
                     continue
 
                 # Pick the first JPEG image returned.
-                content_file = ContentFile(response.content)
-                return content_file
+                return response.content
     return None
 
 

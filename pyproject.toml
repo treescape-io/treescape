@@ -25,6 +25,7 @@ django-environ = "^0.11.2"
 drf-redesign = "^0.3.9"
 aider = "^0.2.4"
 django-storages = {extras = ["s3"], version = "^1.14.4"}
+pyvips = {extras = ["binary"], version = "^2.2.3"}
 
 [tool.poetry.group.dev.dependencies]
 pyright = "^1.1.363"
