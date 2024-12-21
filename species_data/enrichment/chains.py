@@ -6,7 +6,7 @@ from langchain.output_parsers import (
     PydanticOutputParser,
     RetryWithErrorOutputParser,
 )
-from langchain_core.prompts import PromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableLambda, RunnableParallel
 from pydantic.v1 import BaseModel
 
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 set_verbose(True)
 
 # Here to save whitespace in input.
-_prompt_template = """You are a plant data entry expert. You return only valid JSON, following the provided schema. Only return plant information based on provided information.
+_system_prompt = """You are a plant data entry expert. You return only valid JSON, following the provided schema. Only return plant information based on provided information.
 
 Important guidelines:
 - Requested properties are optional, leave them out in your reply if no relevant information is available in the source.
@@ -43,8 +43,9 @@ Another example:
 ```
 {example2}
 ```
+"""
 
-{format_instructions}
+_user_prompt = """{format_instructions}
 
 Please provide information about '{latin_name}'.
 """
@@ -115,14 +116,14 @@ def get_enrichment_chain(config: EnrichmentConfig, data_model: Type[BaseModel]):
         parser=parser, llm=config.fallback_llm
     )
 
-    prompt = PromptTemplate(
-        template=_prompt_template,
-        input_variables=["latin_name", "source_content"],
-        partial_variables={
-            "format_instructions": parser.get_format_instructions(),
-            "example": example,
-            "example2": example2,
-        },
+    prompt = ChatPromptTemplate.from_messages(
+        [("system", _system_prompt), ("user", _user_prompt)],
+    )
+
+    prompt = prompt.partial(
+        format_instructions=parser.get_format_instructions(),
+        example=example,
+        example2=example2,
     )
 
     completion_chain = prompt | config.llm

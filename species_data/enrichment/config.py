@@ -22,11 +22,6 @@ def get_default_config():
             client=None,
             timeout=None,
         ),
-        # llm=ChatOpenAI(
-        #     model="gpt-4o-mini",
-        #     temperature=0.1,
-        #     model_kwargs={"response_format": {"type": "json_object"}},
-        # ),
         fallback_llm=ChatOpenAI(
             model="gpt-4o-mini",
             temperature=0.1,
