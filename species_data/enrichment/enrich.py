@@ -110,9 +110,9 @@ def enrich_species_data(species: Species, config: EnrichmentConfig):
     data_model = get_species_data_model()
     chain = get_enrichment_chain(config, data_model)
 
-    if not species.wikipedia_page:
-        logger.warning(f"No Wikipedia page for {species}, skipping.")
-        return
+    # if not species.wikipedia_page:
+    #     logger.warning(f"No Wikipedia page for {species}, skipping.")
+    #     return
 
     # Brute force token limit.
     # source_content = species.wikipedia_page.content[:25000]
@@ -130,9 +130,9 @@ def enrich_species_data(species: Species, config: EnrichmentConfig):
 
     source_type = SourceType.objects.get_or_create(name="Perplexity")[0]
     source = Source.objects.get_or_create(
-        url=f"https://en.wikipedia.org/w/index.php?title={species.wikipedia_page.title}&oldid={species.wikipedia_page.revision_id}",
+        url=f"perplexity:{species}",
         defaults={
-            "name": species.wikipedia_page.title,
+            "name": species,
             "source_type": source_type,
             "date": datetime.datetime.now(),
         },
