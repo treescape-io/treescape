@@ -34,6 +34,8 @@ Important guidelines:
 - Never return invalid `values`, the parsing will fail.
 - Always provide your confidence for returned values. For example, the confidence should be 1.0 when the information is literally copied from provided information, 0.6 when unit conversion is required and 0.2 when information is indirectly inferred from provided information.
 
+{format_instructions}
+
 Example output:
 ```
 {example}
@@ -45,10 +47,7 @@ Another example:
 ```
 """
 
-_user_prompt = """{format_instructions}
-
-Please provide plant properties for the species '{latin_name}'.
-"""
+_user_prompt = """Please provide plant properties ({plant_properties}) for the species '{species_name}'."""
 
 
 def get_enrichment_chain(config: EnrichmentConfig, data_model: Type[BaseModel]):
@@ -116,14 +115,21 @@ def get_enrichment_chain(config: EnrichmentConfig, data_model: Type[BaseModel]):
         parser=parser, llm=config.fallback_llm
     )
 
+    # Perplexity (only) uses user prompt for RAG query.
     prompt = ChatPromptTemplate.from_messages(
         [("system", _system_prompt), ("user", _user_prompt)],
+    )
+
+    # List requested properties as string.
+    plant_properties = " ".join(
+        [f.replace("_", " ") for f in data_model.schema()["properties"].keys()]
     )
 
     prompt = prompt.partial(
         format_instructions=parser.get_format_instructions(),
         example=example,
         example2=example2,
+        plant_properties=plant_properties,
     )
 
     completion_chain = prompt | config.llm

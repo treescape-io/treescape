@@ -122,7 +122,7 @@ def enrich_species_data(species: Species, config: EnrichmentConfig):
     plant_data: BaseModel = chain.invoke(
         {
             # "source_content": source_content,
-            "latin_name": species.latin_name,
+            "species_name": str(species),
         }
     )
 
