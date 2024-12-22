@@ -30,7 +30,7 @@ class SourceField(models.ForeignKey):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault(
             "verbose_name",
-            _("source"),
+            _("sources"),
         )
         kwargs.setdefault("to", "species_data.Source")
         kwargs.setdefault("on_delete", models.CASCADE)
@@ -93,7 +93,7 @@ class DecimalEstimatedRange(CompositeField):
         decimal_places=2,
     )
     confidence = ConfidenceField(verbose_name=_("%(parent_verbose_name)s confidence"))  # pyright: ignore[reportCallIssue]
-    sources = SourcesField(verbose_name=_("%(parent_verbose_name)s source"))  # pyright: ignore[reportCallIssue]
+    sources = SourcesField(verbose_name=_("%(parent_verbose_name)s sources"))  # pyright: ignore[reportCallIssue]
 
 
 class DurationEstimatedRange(CompositeField):
@@ -123,4 +123,4 @@ class DurationEstimatedRange(CompositeField):
         blank=True,
     )
     confidence = ConfidenceField(verbose_name=_("%(parent_verbose_name)s confidence"))
-    sources = SourcesField(verbose_name=_("%(parent_verbose_name)s source"))  # pyright: ignore[reportCallIssue]
+    sources = SourcesField(verbose_name=_("%(parent_verbose_name)s sources"))  # pyright: ignore[reportCallIssue]

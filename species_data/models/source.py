@@ -36,4 +36,11 @@ class Source(models.Model):
         ordering = ["name"]
 
     def __str__(self):
-        return f"{self.source_type}: {self.name}"
+        if self.name:
+            return f"{self.source_type}: {self.name}"
+        elif self.url:
+            return f"{self.source_type}: {self.url}"
+        elif self.pk:
+            return f"{self.source_type}: {self.pk}"
+
+        return self.source_type
