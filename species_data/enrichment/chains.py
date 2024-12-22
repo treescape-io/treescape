@@ -8,7 +8,7 @@ from langchain.output_parsers import (
 )
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableLambda, RunnableParallel
-from pydantic.v1 import BaseModel
+from pydantic import BaseModel
 
 from species_data.enrichment.config import EnrichmentConfig
 
@@ -135,10 +135,14 @@ def get_enrichment_chain(config: EnrichmentConfig, data_model: Type[BaseModel]):
     completion_chain = prompt | config.llm
 
     def parse_result(response):
-        return retry_parser.parse_with_prompt(
+        citations = response["completion"].additional_kwargs["citations"]
+
+        parsed_response = retry_parser.parse_with_prompt(
             completion=response["completion"].content,
             prompt_value=response["prompt_value"],
         )
+
+        return (parsed_response, citations)
 
     main_chain = RunnableParallel(
         completion=completion_chain, prompt_value=prompt

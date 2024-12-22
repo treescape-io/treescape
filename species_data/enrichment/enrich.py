@@ -4,9 +4,9 @@ from pprint import pformat
 import decimal
 import logging
 import datetime
-from typing import Iterable, Set
+from typing import Iterable, Set, Tuple
 
-from pydantic.v1 import BaseModel
+from pydantic import BaseModel
 
 from plant_species.models import Species
 from species_data.enrichment.config import EnrichmentConfig
@@ -52,7 +52,8 @@ def set_decimalrange_property(
         else:
             logger.info(f"No value for {prop_name}_{value_name}, skipping")
 
-    setattr(species_properties, f"{prop_name}_sources", sources)
+    sources_attr = getattr(species_properties, f"{prop_name}_sources")
+    sources_attr.set(sources)
 
 
 def set_category_property(
@@ -95,13 +96,16 @@ def set_category_property(
                 print(f"Warning! {prop_name} with slug {value} not found!")
                 continue
 
-            update_values = {
-                "sources": sources,
-                "confidence": prop_value.confidence,
-            }
+            try:
+                obj = through_class.objects.get(**get_values)
+            except through_class.DoesNotExist:
+                obj = through_class(**get_values)
 
-            through_class.objects.update_or_create(defaults=update_values, **get_values)
-            # TODO: full_clean here (so explicit get/update)
+            obj.confidence = prop_value.confidence
+            obj.full_clean()
+            obj.save()
+
+            obj.sources.set(sources)
 
 
 def enrich_species_data(species: Species, config: EnrichmentConfig):
@@ -119,7 +123,10 @@ def enrich_species_data(species: Species, config: EnrichmentConfig):
 
     # assert source_content
 
-    plant_data: BaseModel = chain.invoke(
+    plant_data: BaseModel
+    citations: Iterable[str]
+
+    plant_data, citations = chain.invoke(
         {
             # "source_content": source_content,
             "species_name": str(species),
@@ -129,14 +136,18 @@ def enrich_species_data(species: Species, config: EnrichmentConfig):
     logger.debug(f"Received data: {pformat(plant_data)}")
 
     source_type = SourceType.objects.get_or_create(name="Perplexity")[0]
-    source = Source.objects.get_or_create(
-        url=f"perplexity:{species}",
-        defaults={
-            "name": species,
-            "source_type": source_type,
-            "date": datetime.datetime.now(),
-        },
-    )[0]
+
+    sources = []
+    for url in citations:
+        source = Source.objects.get_or_create(
+            url=url,
+            source_type=source_type,
+            defaults={
+                "date": datetime.datetime.now(),
+            },
+        )[0]
+
+        sources.append(source)
 
     species_properties = SpeciesProperties.objects.get_or_create(species=species)[0]
 
@@ -152,7 +163,7 @@ def enrich_species_data(species: Species, config: EnrichmentConfig):
         if prop_value:
             # TODO: Only update when confidence is higher!
             set_decimalrange_property(
-                species_properties, prop_name, prop_value, [source]
+                species_properties, prop_name, prop_value, sources
             )
 
     species_properties.full_clean()
@@ -169,7 +180,7 @@ def enrich_species_data(species: Species, config: EnrichmentConfig):
         (prop_name, getattr(plant_data, prop_name)) for prop_name in fields.categories
     ]:
         if prop_value:
-            set_category_property(species_properties, prop_name, prop_value, [source])
+            set_category_property(species_properties, prop_name, prop_value, sources)
 
     # Prevent completely empty data. We can only test this after it has been created due to the
     # relational map. It precludes things like empty Wikipedia pages.

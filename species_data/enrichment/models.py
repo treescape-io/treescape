@@ -7,12 +7,8 @@ from pprint import pformat
 from typing import Tuple, Type, Optional, Set, Any
 
 from django.db.models.fields.related import ManyToManyField
-from langchain_core.pydantic_v1 import (
-    BaseModel,
-    Field,
-    create_model,
-)
-from pydantic.v1.main import ModelMetaclass
+from pydantic import BaseModel, Field, create_model
+
 from species_data.models import SpeciesProperties
 from species_data.models.base import CategorizedPlantPropertyBase
 from species_data.fields import DecimalEstimatedRange  # , DurationEstimatedRange
@@ -21,33 +17,20 @@ from species_data.fields import DecimalEstimatedRange  # , DurationEstimatedRang
 logger = logging.getLogger(__name__)
 
 
-# https://stackoverflow.com/questions/67699451/make-every-field-as-optional-with-pydantic
-class AllOptional(ModelMetaclass):
-    def __new__(cls, name, bases, namespaces, **kwargs):
-        annotations = namespaces.get("__annotations__", {})
-        for base in bases:
-            annotations.update(base.__annotations__)
-        for field in annotations:
-            if not field.startswith("__"):
-                annotations[field] = Optional[annotations[field]]
-        namespaces["__annotations__"] = annotations
-        return super().__new__(cls, name, bases, namespaces, **kwargs)
-
-
 class ConfidenceModel(BaseModel):
-    confidence: decimal.Decimal = Field(gt=0, lte=1, decimal_places=1, max_digits=5)
+    confidence: decimal.Decimal = Field(gt=0, le=1, decimal_places=1, max_digits=5)
 
 
 class DecimalRangeField(ConfidenceModel):
-    minimum: Optional[decimal.Decimal] = Field(max_digits=7, decimal_places=2)
-    typical: Optional[decimal.Decimal] = Field(max_digits=7, decimal_places=2)
-    maximum: Optional[decimal.Decimal] = Field(max_digits=7, decimal_places=2)
+    minimum: Optional[decimal.Decimal] = Field(None, max_digits=7, decimal_places=2)
+    typical: Optional[decimal.Decimal] = Field(None, max_digits=7, decimal_places=2)
+    maximum: Optional[decimal.Decimal] = Field(None, max_digits=7, decimal_places=2)
 
 
 class DurationRangeField(ConfidenceModel):
-    minimum: Optional[datetime.timedelta]
-    typical: Optional[datetime.timedelta]
-    maximum: Optional[datetime.timedelta]
+    minimum: Optional[datetime.timedelta] = None
+    typical: Optional[datetime.timedelta] = None
+    maximum: Optional[datetime.timedelta] = None
 
 
 def get_species_data_model() -> Type[BaseModel]:
@@ -80,12 +63,12 @@ def get_species_data_model() -> Type[BaseModel]:
 
         return model
 
-    def get_model_field(property_field) -> Optional[Tuple[str, Tuple[Any, Any]]]:
+    def get_model_field(property_field) -> Optional[Tuple[str, Tuple[Type, Any]]]:
         """Determine the Django model field type based on the property field type."""
         field_type = None
         if isinstance(property_field, DecimalEstimatedRange):
             logger.debug(f"Adding DecimalRangeField property '{property_field}'.")
-            field_type = DecimalRangeField
+            field_type = Optional[DecimalRangeField]
 
         # Skip for MVP as we'll need to properly implement ISO durations (including months and years).
         # elif isinstance(property_field, DurationEstimatedRange):
@@ -96,10 +79,12 @@ def get_species_data_model() -> Type[BaseModel]:
             property_field.related_model, CategorizedPlantPropertyBase
         ):
             logger.debug(f"Adding multiselect property '{property_field}'.")
-            field_type = generate_django_multiselect_field(property_field.related_model)
+            field_type = Optional[
+                generate_django_multiselect_field(property_field.related_model)
+            ]
 
         if field_type:
-            return property_field.name, (field_type, ...)
+            return property_field.name, (field_type, None)
 
         return None
 
@@ -110,11 +95,6 @@ def get_species_data_model() -> Type[BaseModel]:
         if result is not None
     }
 
-    model = create_model("SpeciesModelBase", **model_fields)  # type: ignore
+    model = create_model("SpeciesModel", **model_fields)  # type: ignore
 
-    # Make all properties optional.
-    # For some reason, specyfing Optional[field_type] in get_model_field() doesn't do it.
-    class SpeciesModel(model, metaclass=AllOptional):
-        pass
-
-    return SpeciesModel
+    return model
