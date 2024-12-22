@@ -8,6 +8,7 @@ from species_data.fields import (
     ConfidenceField,
     DecimalEstimatedRange,
     DurationEstimatedRange,
+    SourcesField,
 )
 
 
@@ -70,7 +71,7 @@ class PlantPropertiesBase(models.Model):
 class CategorizedSpeciesPropertyThroughBase(models.Model):
     """Abstract base model for through of CategorizedPlantPropertyBase <-> SpeciesBase M2M, including confidence and source."""
 
-    source = models.ForeignKey(Source, on_delete=models.CASCADE)
+    sources = SourcesField()  # pyright: ignore[reportCallIssue]
     confidence = ConfidenceField()
 
     class Meta:

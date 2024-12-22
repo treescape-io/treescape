@@ -86,7 +86,7 @@ class PropagationMethodAdmin(admin.ModelAdmin):
 # Inline Admins for through models
 class CategoryInlineBase(admin.TabularInline):
     extra = 0
-    autocomplete_fields = ("source",)
+    autocomplete_fields = ("sources",)
 
 
 # class FamilyGrowthHabitInline(CategoryInlineBase):
@@ -153,12 +153,15 @@ class SpeciesPropagationMethodInline(CategoryInlineBase):
 
 
 _autocomplete_source_fields = [
-    "height_source",
-    "width_source",
-    "soil_acidity_source",
-    "production_start_source",
-    "production_peak_source",
-    "lifetime_source",
+    "height_sources",
+    "width_sources",
+    "soil_acidity_sources",
+    "production_start_sources",
+    "production_peak_sources",
+    "lifetime_sources",
+    "temperature_sources",
+    "precipitation_sources",
+    "sun_hours_sources",
 ]
 
 

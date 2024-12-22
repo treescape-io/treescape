@@ -24,7 +24,8 @@ class ConfidenceField(models.DecimalField):
 
 
 class SourceField(models.ForeignKey):
-    """Custom ForeignKey field linking to 'species_data.Source'."""
+    """Legacy; kept for migrations.
+    Custom ForeignKey field linking to 'species_data.Source'."""
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault(
@@ -34,6 +35,23 @@ class SourceField(models.ForeignKey):
         kwargs.setdefault("to", "species_data.Source")
         kwargs.setdefault("on_delete", models.CASCADE)
         kwargs.setdefault("null", True)
+        kwargs.setdefault("blank", True)
+
+        # Disable related name (reverse accessor) so it doesn't clash.
+        kwargs.setdefault("related_name", "+")
+
+        super().__init__(*args, **kwargs)
+
+
+class SourcesField(models.ManyToManyField):
+    """Custom ManyToMany field linking to 'species_data.Source'."""
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault(
+            "verbose_name",
+            _("sources"),
+        )
+        kwargs.setdefault("to", "species_data.Source")
         kwargs.setdefault("blank", True)
 
         # Disable related name (reverse accessor) so it doesn't clash.
@@ -75,7 +93,7 @@ class DecimalEstimatedRange(CompositeField):
         decimal_places=2,
     )
     confidence = ConfidenceField(verbose_name=_("%(parent_verbose_name)s confidence"))  # pyright: ignore[reportCallIssue]
-    source = SourceField(verbose_name=_("%(parent_verbose_name)s source"))  # pyright: ignore[reportCallIssue]
+    sources = SourcesField(verbose_name=_("%(parent_verbose_name)s source"))  # pyright: ignore[reportCallIssue]
 
 
 class DurationEstimatedRange(CompositeField):
@@ -105,4 +123,4 @@ class DurationEstimatedRange(CompositeField):
         blank=True,
     )
     confidence = ConfidenceField(verbose_name=_("%(parent_verbose_name)s confidence"))
-    source = SourceField(verbose_name=_("%(parent_verbose_name)s source"))  # pyright: ignore[reportCallIssue]
+    sources = SourcesField(verbose_name=_("%(parent_verbose_name)s source"))  # pyright: ignore[reportCallIssue]

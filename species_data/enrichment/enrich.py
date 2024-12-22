@@ -4,7 +4,7 @@ from pprint import pformat
 import decimal
 import logging
 import datetime
-from typing import Set
+from typing import Iterable, Set
 
 from pydantic.v1 import BaseModel
 
@@ -27,7 +27,7 @@ def set_decimalrange_property(
     species_properties: SpeciesProperties,
     prop_name: str,
     prop_value: dict,
-    source: Source,
+    sources: Iterable[Source],
 ):
     """Sets a decimal range property on a SpeciesProperties instance."""
 
@@ -52,14 +52,14 @@ def set_decimalrange_property(
         else:
             logger.info(f"No value for {prop_name}_{value_name}, skipping")
 
-    setattr(species_properties, f"{prop_name}_source", source)
+    setattr(species_properties, f"{prop_name}_sources", sources)
 
 
 def set_category_property(
     species_properties: SpeciesProperties,
     prop_name: str,
     prop_value: ConfidenceModel,
-    source: Source,
+    sources: Iterable[Source],
 ):
     """Sets a category property on a SpeciesProperties instance."""
 
@@ -96,7 +96,7 @@ def set_category_property(
                 continue
 
             update_values = {
-                "source": source,
+                "sources": sources,
                 "confidence": prop_value.confidence,
             }
 
@@ -151,7 +151,9 @@ def enrich_species_data(species: Species, config: EnrichmentConfig):
     ]:
         if prop_value:
             # TODO: Only update when confidence is higher!
-            set_decimalrange_property(species_properties, prop_name, prop_value, source)
+            set_decimalrange_property(
+                species_properties, prop_name, prop_value, [source]
+            )
 
     species_properties.full_clean()
 
@@ -167,7 +169,7 @@ def enrich_species_data(species: Species, config: EnrichmentConfig):
         (prop_name, getattr(plant_data, prop_name)) for prop_name in fields.categories
     ]:
         if prop_value:
-            set_category_property(species_properties, prop_name, prop_value, source)
+            set_category_property(species_properties, prop_name, prop_value, [source])
 
     # Prevent completely empty data. We can only test this after it has been created due to the
     # relational map. It precludes things like empty Wikipedia pages.

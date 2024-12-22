@@ -28,7 +28,7 @@ class Source(models.Model):
 
     name = models.CharField(_("name"), max_length=255)
     date = models.DateField(_("date"), default=datetime.datetime.now)
-    url = models.URLField(_("URL"), unique=True)
+    url = models.URLField(_("URL"))
 
     class Meta:
         verbose_name = _("source")
