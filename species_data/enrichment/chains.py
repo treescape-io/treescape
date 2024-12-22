@@ -134,13 +134,14 @@ def get_enrichment_chain(config: EnrichmentConfig, data_model: Type[BaseModel]):
 
     completion_chain = prompt | config.llm
 
-    main_chain = RunnableParallel(
-        completion=completion_chain, prompt_value=prompt
-    ) | RunnableLambda(
-        lambda response: retry_parser.parse_with_prompt(
+    def parse_result(response):
+        return retry_parser.parse_with_prompt(
             completion=response["completion"].content,
             prompt_value=response["prompt_value"],
         )
-    )
+
+    main_chain = RunnableParallel(
+        completion=completion_chain, prompt_value=prompt
+    ) | RunnableLambda(parse_result)
 
     return main_chain.with_retry(stop_after_attempt=3)
