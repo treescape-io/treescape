@@ -13,6 +13,7 @@ class Plant(UUIDIndexedModel):
     genus = models.ForeignKey(
         Genus,
         on_delete=models.PROTECT,
+        null=True,
         blank=True,
         db_column="genus_uuid",
         to_field="uuid",
