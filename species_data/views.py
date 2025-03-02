@@ -27,19 +27,19 @@ from .serializers import (
 )
 
 
-class FamilyDataViewSet(viewsets.ModelViewSet):
+class FamilyDataViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = "slug"
     queryset = Family.objects.all()
     serializer_class = FamilyDataSerializer
 
 
-class GenusDataViewSet(viewsets.ModelViewSet):
+class GenusDataViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = "slug"
     queryset = Genus.objects.all()
     serializer_class = GenusDataSerializer
 
 
-class SpeciesDataViewSet(viewsets.ModelViewSet):
+class SpeciesDataViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = "slug"
     queryset = Species.objects.all()
     serializer_class = SpeciesDataSerializer
@@ -67,42 +67,42 @@ class SpeciesDataViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
 
 
-class ClimateZoneViewSet(viewsets.ModelViewSet):
+class ClimateZoneViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = "slug"
     queryset = ClimateZone.objects.all()
     serializer_class = ClimateZoneSerializer
 
 
-class GrowthHabitViewSet(viewsets.ModelViewSet):
+class GrowthHabitViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = "slug"
     queryset = GrowthHabit.objects.all()
     serializer_class = GrowthHabitSerializer
 
 
-class HumanUseViewSet(viewsets.ModelViewSet):
+class HumanUseViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = "slug"
     queryset = HumanUse.objects.all()
     serializer_class = HumanUseSerializer
 
 
-class EcologicalRoleViewSet(viewsets.ModelViewSet):
+class EcologicalRoleViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = "slug"
     queryset = EcologicalRole.objects.all()
     serializer_class = EcologicalRoleSerializer
 
 
-class SoilPreferenceViewSet(viewsets.ModelViewSet):
+class SoilPreferenceViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = "slug"
     queryset = SoilPreference.objects.all()
     serializer_class = SoilPreferenceSerializer
 
 
-class PropagationMethodViewSet(viewsets.ModelViewSet):
+class PropagationMethodViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = "slug"
     queryset = PropagationMethod.objects.all()
     serializer_class = PropagationMethodSerializer
 
 
-class SourceViewSet(viewsets.ModelViewSet):
+class SourceViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Source.objects.all()
     serializer_class = SourceSerializer
