@@ -18,19 +18,30 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
-
 from django.conf.urls.static import static
+from rest_framework.schemas import get_schema_view
 
 from species_data import urls as species_urls
 from forest_designs import urls as forest_urls
 
 from .views import index
 
+# Schema view for generating OpenAPI schema
+schema_view = get_schema_view(
+    title="Treescape API",
+    description="API for accessing species data and forest designs",
+    version="1.0.0",
+    urlconf="treescape.urls",
+)
+
 urlpatterns = [
     path("", index),
     path("admin/", admin.site.urls),
     path("api/v1/species/", include(species_urls.urlpatterns)),
     path("api/v1/forest-designs/", include(forest_urls.urlpatterns)),
+    
+    # OpenAPI schema
+    path("api/v1/openapi.xml", schema_view, name="openapi-schema"),
 ]
 
 if settings.DEBUG:
