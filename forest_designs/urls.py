@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
 
-# Create a router for all resources
+# Create a router for all resources with format suffix patterns
 router = DefaultRouter()
 
 # Main resources
@@ -20,6 +20,7 @@ router.register(r'plants-log-kinds', views.PlantLogKindViewSet, basename='plantl
 # Zone-related resources with explicit path prefixes for nesting
 router.register(r'zones-kinds', views.ZoneKindViewSet, basename='zonekind')
 
+# Format suffixes for content negotiation
 urlpatterns = [
     path('', include(router.urls)),
 ]

@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     "django_filters",
     "drf_redesign",
     "rest_framework",
+    "rest_framework_gis",
     "plant_species",
     "forest_designs",
     "species_data",
@@ -124,7 +125,7 @@ WSGI_APPLICATION = "treescape.wsgi.application"
 
 DATABASES = {
     # read os.environ['DATABASE_URL']
-    "default": env.db_url(default=f'spatialite:///{BASE_DIR / "treescape.sqlite3"}')  # type: ignore
+    "default": env.db_url(default=f"spatialite:///{BASE_DIR / 'treescape.sqlite3'}")  # type: ignore
 }
 
 
@@ -225,6 +226,20 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ],
+    "DEFAULT_PARSER_CLASSES": [
+        "rest_framework.parsers.JSONParser",
+        "rest_framework.parsers.FormParser",
+        "rest_framework.parsers.MultiPartParser",
+    ],
+    "DEFAULT_SCHEMA_CLASS": "rest_framework_gis.schema.GeoFeatureAutoSchema",
+    # Format suffix patterns
+    "URL_FORMAT_OVERRIDE": "format",
+    "FORMAT_SUFFIX_KWARG": "format",
+    "DEFAULT_CONTENT_NEGOTIATION_CLASS": "rest_framework.negotiation.DefaultContentNegotiation",
 }
 
 PPLX_API_KEY = env("PPLX_API_KEY")

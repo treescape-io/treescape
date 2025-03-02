@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeometryField
 from .models import (
     Plant, 
     Zone, 
@@ -24,6 +25,8 @@ class ZoneKindSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ZoneSerializer(serializers.HyperlinkedModelSerializer):
+    """Standard serializer for Zone model"""
+    
     kind = ZoneKindSerializer(read_only=True)
     kind_id = serializers.PrimaryKeyRelatedField(
         queryset=ZoneKind.objects.all(),
@@ -38,6 +41,27 @@ class ZoneSerializer(serializers.HyperlinkedModelSerializer):
         extra_kwargs = {
             'url': {'lookup_field': 'id'}
         }
+
+
+class ZoneGeoSerializer(GeoFeatureModelSerializer):
+    """GeoJSON serializer for Zone model"""
+    
+    kind = ZoneKindSerializer(read_only=True)
+    kind_id = serializers.PrimaryKeyRelatedField(
+        queryset=ZoneKind.objects.all(),
+        source='kind',
+        write_only=True
+    )
+    url = serializers.HyperlinkedIdentityField(
+        view_name='zone-detail',
+        lookup_field='id'
+    )
+    
+    class Meta:
+        model = Zone
+        geo_field = 'area'
+        fields = ['url', 'id', 'name', 'area', 'kind', 'kind_id']
+        lookup_field = 'id'
 
 
 class PlantStateSerializer(serializers.HyperlinkedModelSerializer):
@@ -139,6 +163,8 @@ class SpeciesSlugRelatedField(serializers.HyperlinkedRelatedField):
 
 
 class PlantSerializer(serializers.HyperlinkedModelSerializer):
+    """Standard serializer for Plant model"""
+    
     # Handle state, which is calculated via get_state method
     state = PlantStateSerializer(source='get_state', read_only=True)
     state_id = serializers.PrimaryKeyRelatedField(
@@ -146,8 +172,6 @@ class PlantSerializer(serializers.HyperlinkedModelSerializer):
         write_only=True,
         required=False
     )
-    
-    # Zone relationship is not in the model, removing from serializer
     
     # Handle related collections
     images = PlantImageSerializer(many=True, read_only=True)
@@ -172,6 +196,76 @@ class PlantSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field = 'id'
         extra_kwargs = {
             'url': {'lookup_field': 'id'},
+            'species': {'required': False},
+            'genus': {'required': False},
+            'variety': {'required': False}
+        }
+    
+    def create(self, validated_data):
+        # Handle state transition creation if state_id is provided
+        state = validated_data.pop('state_id', None)
+        plant = Plant.objects.create(**validated_data)
+        
+        if state:
+            PlantStateTransition.objects.create(plant=plant, state=state)
+            
+        return plant
+        
+    def update(self, instance, validated_data):
+        # Handle state transition creation if state_id is provided
+        state = validated_data.pop('state_id', None)
+        
+        # Update instance with all other fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        
+        if state:
+            PlantStateTransition.objects.create(plant=instance, state=state)
+            
+        return instance
+
+
+class PlantGeoSerializer(GeoFeatureModelSerializer):
+    """GeoJSON serializer for Plant model"""
+    
+    # Handle state, which is calculated via get_state method
+    state = PlantStateSerializer(source='get_state', read_only=True)
+    state_id = serializers.PrimaryKeyRelatedField(
+        queryset=PlantState.objects.all(),
+        write_only=True,
+        required=False
+    )
+    
+    # Handle related collections
+    images = PlantImageSerializer(many=True, read_only=True)
+    logs = PlantLogSerializer(many=True, read_only=True)
+    
+    # Properly handle species reference
+    species_detail = serializers.HyperlinkedRelatedField(
+        source='species',
+        view_name='species-detail',
+        lookup_field='slug',
+        read_only=True
+    )
+    
+    # Include custom name field
+    name = serializers.CharField(source='get_name', read_only=True)
+    
+    # Hyperlinked URL field
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plant-detail',
+        lookup_field='id'
+    )
+    
+    class Meta:
+        model = Plant
+        geo_field = 'location'
+        fields = ['url', 'id', 'species', 'species_detail', 'location', 'name', 
+                 'genus', 'variety', 'state', 'state_id', 
+                 'images', 'logs']
+        lookup_field = 'id'
+        extra_kwargs = {
             'species': {'required': False},
             'genus': {'required': False},
             'variety': {'required': False}

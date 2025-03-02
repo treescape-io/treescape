@@ -824,6 +824,21 @@ files = [
 django = ">=3.0"
 
 [[package]]
+name = "djangorestframework-gis"
+version = "1.1"
+description = "Geographic add-ons for Django Rest Framework"
+optional = false
+python-versions = "*"
+files = [
+    {file = "djangorestframework_gis-1.1-py2.py3-none-any.whl", hash = "sha256:fd8631c2c10208df5f05ee297ce333aaa9a794acd654420207f72e8f9acd59ea"},
+    {file = "djangorestframework_gis-1.1.tar.gz", hash = "sha256:84b915503a59263ed9473ecde34b19260c3e9c5c8ebb3aea8d91a67fd39f7215"},
+]
+
+[package.dependencies]
+django-filter = ">=23.5,<25.0"
+djangorestframework = ">=3.12,<3.16"
+
+[[package]]
 name = "drf-redesign"
 version = "0.3.9"
 description = "Redesign of the browse-able api of Django REST Framework with Bootstrap 5"
@@ -3344,4 +3359,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "918b2ff1ad1539d16c4177f1bfaf9d857367cfed29ec333f06cc1d9a68aa9c63"
+content-hash = "ca181c3520951ece78c63a3077c1733ae0bf6a71668063cf579ba180b7060d06"

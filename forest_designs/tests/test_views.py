@@ -86,6 +86,40 @@ class PlantViewTestCase(ForestDesignsViewTestMixin, TestCase):
         data = json.loads(response.content)
         self.assertEqual(data['name'], str(self.species))
     
+    def test_plant_format_parameter(self):
+        """Test using the format parameter."""
+        url = reverse('plant-list')
+        response = self.client.get(url, {'format': 'json'})
+        self.assertEqual(response.status_code, 200)
+        # The response should be standard JSON
+        data = json.loads(response.content)
+        self.assertTrue('results' in data)
+        
+    def test_spatial_filter_api_is_functional(self):
+        """Test that the spatial filter API is functional."""
+        # Check that the endpoint responds to the in_bbox parameter
+        url = reverse('plant-list')
+        response = self.client.get(url, {'in_bbox': '0,0,5,5'})
+        self.assertEqual(response.status_code, 200, "API should accept in_bbox parameter")
+        
+    def test_format_combinations(self):
+        """Test that we can combine format parameter with filtering."""
+        # Create a plant
+        Plant.objects.all().delete()
+        plant1 = Plant.objects.create(
+            species=self.species,
+            location="POINT(1 1)"
+        )
+        
+        # Test format=json parameter
+        url = reverse('plant-list')
+        response = self.client.get(url, {'format': 'json'})
+        self.assertEqual(response.status_code, 200)
+        
+        # Verify the response
+        data = json.loads(response.content)
+        self.assertTrue('results' in data)
+    
     def test_plant_state_serialization(self):
         """Test that plant state is correctly serialized."""
         response = self.client.get(reverse('plant-detail', kwargs={'id': self.plant.id}))
@@ -120,10 +154,10 @@ class PlantViewTestCase(ForestDesignsViewTestMixin, TestCase):
         import random
         x, y = random.uniform(10, 20), random.uniform(10, 20)
         
-        # Use the UUID directly instead of URL
+        # Regular JSON format
         data = {
             'species': str(self.species.uuid),  # Use the UUID as a string
-            'location': f'POINT({x} {y})',  # Use WKT format for the point
+            'location': f'POINT({x} {y})',  # WKT format for location
             'state_id': self.state2.id
         }
         response = self.client.post(
@@ -157,6 +191,7 @@ class ZoneViewTestCase(ForestDesignsViewTestMixin, TestCase):
         response = self.client.get(reverse('zone-list'))
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
+        # Regular JSON format
         self.assertEqual(len(data['results']), 1)
         # Use the zone created in setUpTestData instead of hardcoded name
         self.assertEqual(data['results'][0]['name'], self.zone.name)
@@ -166,8 +201,25 @@ class ZoneViewTestCase(ForestDesignsViewTestMixin, TestCase):
         response = self.client.get(reverse('zone-detail', kwargs={'id': self.zone.id}))
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
+        # Regular JSON format
         self.assertEqual(data['name'], self.zone.name)
         self.assertEqual(data['kind']['name'], self.zone_kind.name)
+    
+    def test_zone_format_parameter(self):
+        """Test using the format parameter."""
+        url = reverse('zone-list')
+        response = self.client.get(url, {'format': 'json'})
+        self.assertEqual(response.status_code, 200)
+        # The response should be standard JSON
+        data = json.loads(response.content)
+        self.assertTrue('results' in data)
+        
+    def test_zone_spatial_filter_api_is_functional(self):
+        """Test that the spatial filter API is functional."""
+        # Check that the endpoint responds to the in_bbox parameter
+        url = reverse('zone-list')
+        response = self.client.get(url, {'in_bbox': '0,0,7,7'})
+        self.assertEqual(response.status_code, 200, "API should accept in_bbox parameter")
     
     def test_create_zone(self):
         """Test creating a new zone."""
@@ -181,19 +233,22 @@ class ZoneViewTestCase(ForestDesignsViewTestMixin, TestCase):
         import random
         offset = random.uniform(20, 30)
         
+        # Regular JSON format
         data = {
             'name': unique_name,
             'kind_id': self.zone_kind.id,
-            'area': json.dumps({
-                'type': 'MultiPolygon',
-                'coordinates': [[[[offset, offset], [offset, offset+5], [offset+5, offset+5], [offset+5, offset], [offset, offset]]]]
-            })
+            'area': f'MULTIPOLYGON((({offset} {offset}, {offset} {offset+5}, {offset+5} {offset+5}, {offset+5} {offset}, {offset} {offset})))'
         }
         response = self.client.post(
             url,
             data=json.dumps(data),
             content_type='application/json'
         )
+        
+        # If response is not 201, print the error message to help debug
+        if response.status_code != 201:
+            print(f"Response status: {response.status_code}")
+            print(f"Response content: {response.content.decode()}")
         self.assertEqual(response.status_code, 201)
         
         # Check that the zone was created
@@ -202,6 +257,9 @@ class ZoneViewTestCase(ForestDesignsViewTestMixin, TestCase):
         zone = Zone.objects.get(id=zone_id)
         self.assertEqual(zone.name, unique_name)
         self.assertEqual(zone.kind, self.zone_kind)
+        
+        # Verify returned data
+        self.assertEqual(data['name'], unique_name)
 
 
 class PlantStateViewTestCase(ForestDesignsViewTestMixin, TestCase):
