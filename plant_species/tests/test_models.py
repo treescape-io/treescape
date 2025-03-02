@@ -38,7 +38,12 @@ class SpeciesBaseTestCase(SpeciesTestMixin, TestCase):
         self.assertEqual(self.species.slug, slugify(self.species.latin_name))
 
     @patch("plant_species.models.get_latin_names")
-    def test_enrich_gbif_backbone(self, mock_get_latin_names):
+    @patch("plant_species.models.get_image")
+    @patch("pyvips.Image.new_from_buffer")
+    def test_enrich_gbif_backbone(self, mock_new_from_buffer, mock_get_image, mock_get_latin_names):
+        from django.core.files.base import ContentFile
+        
+        # Mock latin names return values
         mock_get_latin_names.return_value = {
             "speciesKey": 4,
             "genusKey": 5,
@@ -47,7 +52,16 @@ class SpeciesBaseTestCase(SpeciesTestMixin, TestCase):
             "genus": "Rosb",
             "family": "Rosaceab",
         }
-
+        
+        # Mock image data
+        mock_image_data = b"fake image data"
+        mock_content_file = ContentFile(mock_image_data)
+        mock_get_image.return_value = mock_content_file
+        
+        # Mock vips image
+        mock_vips_image = mock_new_from_buffer.return_value
+        mock_vips_image.thumbnail_image.return_value.jpegsave_buffer.return_value = b"thumbnail data"
+        
         new_species = Species(latin_name="Banana bananinus")
         new_species.enrich_gbif_backbone()
 

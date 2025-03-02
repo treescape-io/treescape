@@ -67,12 +67,38 @@ class EnrichSpeciesDataTest(TestCase):
 
         response_obj = ResponseModel.parse_obj(response_data)
 
-        # response = ChatMessage(role="AI", content=)
-
-        # print(pformat(response_json))
+        # Use monkey patching to create a mock that includes citations
+        original_call = FakeListChatModel._call
+        
+        # Override the _call method to include citations in the response
+        def _patched_call(self, messages, stop=None, run_manager=None, **kwargs):
+            response = original_call(self, messages, stop, run_manager, **kwargs)
+            # Return the modified message with citations
+            return response
+            
+        # Create a mock for _generate method that adds citations
+        def _patched_generate(self, messages, stop=None, **kwargs):
+            from langchain_core.messages import AIMessage
+            from langchain_core.outputs import ChatGeneration, ChatResult
+            
+            response = self._call(messages, stop, **kwargs)
+            message = AIMessage(
+                content=response,
+                additional_kwargs={"citations": ["https://example.org/1", "https://example.org/2"]}
+            )
+            generation = ChatGeneration(message=message)
+            return ChatResult(generations=[generation])
+        
+        # Apply our patches
+        FakeListChatModel._call = _patched_call
+        FakeListChatModel._generate = _patched_generate
+        
+        # Create our fake LLM
+        fake_llm = FakeListChatModel(responses=[response_obj.json()])
+        
         config = EnrichmentConfig(
-            llm=FakeListChatModel(responses=[response_obj.json()]),
-            fallback_llm=FakeListChatModel(responses=[response_obj.json()]),
+            llm=fake_llm,
+            fallback_llm=fake_llm,
         )
 
         species = _get_species()
@@ -118,12 +144,12 @@ class EnrichSpeciesDataTest(TestCase):
             properties.soil_preferences.all(),
             SoilPreference.objects.filter(slug__in=["clayey", "sandy"]),
         )
-        # Test source and confidence on Through
-        self.assertTrue(properties.speciesgrowthhabit_set.first().source)  # pyright: ignore reportAttributeAccessIssue
-        self.assertTrue(properties.speciesclimatezone_set.first().source)  # pyright: ignore reportAttributeAccessIssue
-        self.assertTrue(properties.specieshumanuse_set.first().source)  # pyright: ignore reportAttributeAccessIssue
-        self.assertTrue(properties.speciesecologicalrole_set.first().source)  # pyright: ignore reportAttributeAccessIssue
-        self.assertTrue(properties.speciessoilpreference_set.first().source)  # pyright: ignore reportAttributeAccessIssue
+        # Test sources and confidence on Through
+        self.assertTrue(properties.speciesgrowthhabit_set.first().sources.exists())  # pyright: ignore reportAttributeAccessIssue
+        self.assertTrue(properties.speciesclimatezone_set.first().sources.exists())  # pyright: ignore reportAttributeAccessIssue
+        self.assertTrue(properties.specieshumanuse_set.first().sources.exists())  # pyright: ignore reportAttributeAccessIssue
+        self.assertTrue(properties.speciesecologicalrole_set.first().sources.exists())  # pyright: ignore reportAttributeAccessIssue
+        self.assertTrue(properties.speciessoilpreference_set.first().sources.exists())  # pyright: ignore reportAttributeAccessIssue
 
         self.assertEqual(
             properties.speciesgrowthhabit_set.first().confidence,  # pyright: ignore reportAttributeAccessIssue
@@ -150,4 +176,4 @@ class EnrichSpeciesDataTest(TestCase):
         self.assertEqual(properties.height.typical, decimal.Decimal("32.5"))
         self.assertEqual(properties.height.maximum, decimal.Decimal("40"))
         self.assertEqual(properties.height.confidence, decimal.Decimal("0.1"))
-        self.assertTrue(properties.height.source)
+        self.assertTrue(properties.height_sources.exists())

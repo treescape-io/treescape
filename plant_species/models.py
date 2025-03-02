@@ -277,15 +277,19 @@ class SpeciesBase(UUIDIndexedModel):
         THUMBNAIL_SIZE = 512
 
         assert isinstance(self.gbif_id, int), "gbif_id not an integer"
-        image_data = get_image(self.gbif_id)
-        if image_data:
+        image_content_file = get_image(self.gbif_id)
+        if image_content_file:
             assert self.latin_name
             image_name = f"{slugify(self.latin_name)}.jpg"
 
             logger.debug("Saving full image %s for %s", image_name, self.latin_name)
-            self.image.save(image_name, ContentFile(image_data))
+            self.image.save(image_name, image_content_file)
 
-            # Read single source image from ContentFile
+            # Since get_image now returns a ContentFile, we need to get the content
+            image_data = image_content_file.read()
+            image_content_file.seek(0)  # Reset the file pointer for future reads
+            
+            # Read single source image from bytes
             vips_image = pyvips.Image.new_from_buffer(image_data, "")
 
             logger.debug("Saving large image %s for %s", image_name, self.latin_name)
