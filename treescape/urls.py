@@ -34,14 +34,19 @@ schema_view = get_schema_view(
     urlconf="treescape.urls",
 )
 
+# API v1 url patterns
+api_v1_patterns = [
+    path("species/", include(species_urls.urlpatterns)),
+    path("forest-designs/", include(forest_urls.urlpatterns)),
+    
+    # OpenAPI schema
+    path("openapi.xml", schema_view, name="openapi-schema"),
+]
+
 urlpatterns = [
     path("", index),
     path("admin/", admin.site.urls),
-    path("api/v1/species/", include(species_urls.urlpatterns)),
-    path("api/v1/forest-designs/", include(forest_urls.urlpatterns)),
-    
-    # OpenAPI schema
-    path("api/v1/openapi.xml", schema_view, name="openapi-schema"),
+    path("api/v1/", include(api_v1_patterns)),
 ]
 
 if settings.DEBUG:
