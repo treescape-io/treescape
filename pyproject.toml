@@ -27,6 +27,9 @@ aider = "^0.2.4"
 django-storages = {extras = ["s3"], version = "^1.14.4"}
 pyvips = {extras = ["binary"], version = "^2.2.3"}
 langchain-community = "^0.3.13"
+pyyaml = "^6.0.2"
+uritemplate = "^4.1.1"
+inflection = "^0.5.1"
 
 [tool.poetry.group.dev.dependencies]
 pyright = "^1.1.363"
