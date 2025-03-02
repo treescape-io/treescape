@@ -42,10 +42,10 @@ class Plant(UUIDIndexedModel):
     )
 
     def get_state(self) -> PlantState | None:
-        try:
-            return self.statetransitions.objects.last()  # pyright: ignore reportAttributeAccessIssue
-        except PlantState.DoesNotExist:
-            return None
+        transition = self.statetransitions.first()
+        if transition:
+            return transition.state
+        return None
 
     def get_name(self) -> str | None:
         """Return plant name, based on the level of detail given."""

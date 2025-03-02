@@ -21,14 +21,16 @@ from django.conf import settings
 
 from django.conf.urls.static import static
 
-from species_data import urls
+from species_data import urls as species_urls
+from forest_designs import urls as forest_urls
 
 from .views import index
 
 urlpatterns = [
     path("", index),
     path("admin/", admin.site.urls),
-    path("api/", include(urls.urlpatterns)),
+    path("api/v1/species/", include(species_urls.urlpatterns)),
+    path("api/v1/forest-designs/", include(forest_urls.urlpatterns)),
 ]
 
 if settings.DEBUG:
