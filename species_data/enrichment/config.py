@@ -17,7 +17,7 @@ def get_default_config():
     return EnrichmentConfig(
         llm=ChatPerplexity(
             api_key=settings.PPLX_API_KEY,
-            model="llama-3.1-sonar-large-128k-online",
+            model="sonar-pro",
             temperature=0.1,
             client=None,
             timeout=None,
