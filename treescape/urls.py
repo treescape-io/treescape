@@ -39,6 +39,10 @@ api_v1_patterns = [
     path("species/", include(species_urls.urlpatterns)),
     path("forest-designs/", include(forest_urls.urlpatterns)),
     
+    # Authentication endpoints
+    path("auth/", include("dj_rest_auth.urls")),
+    path("auth/registration/", include("dj_rest_auth.registration.urls")),
+    
     # OpenAPI schema
     path("openapi.xml", schema_view, name="openapi-schema"),
 ]
@@ -47,6 +51,7 @@ urlpatterns = [
     path("", index),
     path("admin/", admin.site.urls),
     path("api/v1/", include(api_v1_patterns)),
+    path("accounts/", include("allauth.urls")),  # Required for social auth callbacks
 ]
 
 if settings.DEBUG:

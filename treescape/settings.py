@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import environ
 
 from pathlib import Path
+from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
 
 
@@ -78,12 +79,24 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",  # Required for django-allauth
     "django.contrib.gis",
     "django_extensions",
     "django_filters",
     "drf_redesign",
     "rest_framework",
     "rest_framework_gis",
+    "rest_framework.authtoken",  # Required for dj-rest-auth
+    "rest_framework_simplejwt",  # JWT tokens
+    "dj_rest_auth",  # REST API auth endpoints
+    "dj_rest_auth.registration",  # Registration support
+    "allauth",  # Required for dj-rest-auth registration
+    "allauth.account",  # Basic account functionality
+    "allauth.socialaccount",  # Social authentication
+    "allauth.socialaccount.providers.google",  # Google OAuth provider
+    # Add more providers as needed:
+    # "allauth.socialaccount.providers.microsoft",
+    # "allauth.socialaccount.providers.apple",
     "plant_species",
     "forest_designs",
     "species_data",
@@ -97,6 +110,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",  # Required for django-allauth
 ]
 
 ROOT_URLCONF = "treescape.urls"
@@ -223,6 +237,11 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
     ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
@@ -240,6 +259,57 @@ REST_FRAMEWORK = {
     "URL_FORMAT_OVERRIDE": "format",
     "FORMAT_SUFFIX_KWARG": "format",
     "DEFAULT_CONTENT_NEGOTIATION_CLASS": "rest_framework.negotiation.DefaultContentNegotiation",
+}
+
+# Site ID is required by django-allauth
+SITE_ID = 1
+
+# Authentication settings for django-allauth
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_LOGIN_METHODS = {'email'}  # Updated from ACCOUNT_AUTHENTICATION_METHOD
+ACCOUNT_USERNAME_REQUIRED = False
+
+# JWT settings
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "ROTATE_REFRESH_TOKENS": True,
+}
+
+# DJ Rest Auth settings
+REST_AUTH = {
+    "USE_JWT": True,
+    "JWT_AUTH_COOKIE": "treescape-auth",
+    "JWT_AUTH_REFRESH_COOKIE": "treescape-refresh",
+    "JWT_AUTH_SECURE": not DEBUG,
+    "JWT_AUTH_HTTPONLY": True,
+    "JWT_AUTH_SAMESITE": "Lax",
+    "SESSION_LOGIN": False,
+}
+
+# Social account providers
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": env("GOOGLE_CLIENT_ID", default=""),
+            "secret": env("GOOGLE_CLIENT_SECRET", default=""),
+            "key": "",
+        },
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+    },
+    # Add more providers as needed:
+    # "microsoft": {
+    #     "APP": {
+    #         "client_id": env("MICROSOFT_CLIENT_ID", default=""),
+    #         "secret": env("MICROSOFT_CLIENT_SECRET", default=""),
+    #         "key": "",
+    #     },
+    # },
 }
 
 PPLX_API_KEY = env("PPLX_API_KEY")

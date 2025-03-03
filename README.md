@@ -104,6 +104,85 @@ The following variables can be defined:
 * `SECRET_KEY`: Used for security cookies etc. [Generate here](https://djecrety.ir/)
 * `DEBUG`: Set to `True` for local debugging.
 
+### Authentication Configuration
+The API supports OAuth authentication for mobile applications using django-allauth and dj-rest-auth. To set up authentication:
+
+1. First, configure the Site model for OAuth callbacks:
+   ```sh
+   # Access Django shell
+   ./manage.py shell
+   
+   # In the shell, set up the site
+   from django.contrib.sites.models import Site
+   site = Site.objects.get(pk=1)
+   site.domain = "yourdomain.com"  # Set to your domain or localhost:8000 for testing
+   site.name = "Treescape"
+   site.save()
+   ```
+
+2. Configure OAuth provider(s) in your `.env` file. For example, to use Google OAuth:
+   ```
+   GOOGLE_CLIENT_ID=your-google-client-id
+   GOOGLE_CLIENT_SECRET=your-google-secret
+   ```
+
+3. To use other providers, add the appropriate provider package to INSTALLED_APPS in settings.py:
+   ```python
+   INSTALLED_APPS = [
+       # ... existing apps
+       "allauth.socialaccount.providers.google",  # Already included by default
+       "allauth.socialaccount.providers.microsoft",  # Example additional provider
+       "allauth.socialaccount.providers.apple",  # Example additional provider
+   ]
+   ```
+
+4. Then add provider configuration to SOCIALACCOUNT_PROVIDERS in settings.py:
+   ```python
+   SOCIALACCOUNT_PROVIDERS = {
+       "google": {
+           "APP": {
+               "client_id": env("GOOGLE_CLIENT_ID", default=""),
+               "secret": env("GOOGLE_CLIENT_SECRET", default=""),
+           },
+       },
+       "microsoft": {
+           "APP": {
+               "client_id": env("MICROSOFT_CLIENT_ID", default=""),
+               "secret": env("MICROSOFT_CLIENT_SECRET", default=""),
+           },
+       },
+   }
+   ```
+
+Mobile apps can authenticate using the following endpoints:
+- `api/v1/auth/` - Token authentication endpoints
+- `api/v1/auth/registration/` - Registration endpoints  
+- `accounts/` - Social authentication callbacks
+
+### For Frontend/Mobile App Developers
+
+This API uses standard JWT authentication with the following specifics:
+
+1. **Available Authentication Endpoints**:
+   - Login: `POST /api/v1/auth/login/`
+   - Social auth (e.g., Google): `POST /api/v1/auth/google/`
+   - Token refresh: `POST /api/v1/auth/token/refresh/`
+   - Logout: `POST /api/v1/auth/logout/`
+
+2. **Authentication Headers**:
+   ```
+   Authorization: Bearer <your_jwt_token>
+   ```
+
+3. **Token Handling**:
+   - Access tokens expire after 60 minutes
+   - Refresh tokens are valid for 30 days
+   - The API uses refresh token rotation for security
+
+For a complete reference on working with the dj-rest-auth and JWT authentication, see:
+- [dj-rest-auth documentation](https://dj-rest-auth.readthedocs.io/en/latest/api_endpoints.html)
+- [djangorestframework-simplejwt documentation](https://django-rest-framework-simplejwt.readthedocs.io/en/latest/)
+
 
 ## Managing species data
 ### Load pre-generated data

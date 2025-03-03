@@ -31,6 +31,10 @@ pyyaml = "^6.0.2"
 uritemplate = "^4.1.1"
 inflection = "^0.5.1"
 djangorestframework-gis = "^1.1"
+dj-rest-auth = "^7.0.1"
+django-allauth = "^65.4.1"
+djangorestframework-simplejwt = "^5.5.0"
+cryptography = "^44.0.2"
 
 [tool.poetry.group.dev.dependencies]
 pyright = "^1.1.363"
