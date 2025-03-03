@@ -34,7 +34,7 @@ class GeoJSONNegotiationMixin:
     """Mixin that adds content negotiation for GeoJSON format"""
     
     def get_serializer_class(self):
-        if self.request.query_params.get('format') == 'geojson':
+        if self.request and (format := self.request.query_params.get('format')) == 'geojson':
             return self.geojson_serializer_class
         return super().get_serializer_class()
 
