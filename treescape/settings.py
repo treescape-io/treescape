@@ -97,6 +97,7 @@ INSTALLED_APPS = [
     # Add more providers as needed:
     # "allauth.socialaccount.providers.microsoft",
     # "allauth.socialaccount.providers.apple",
+    "corsheaders",  # CORS headers support
     "plant_species",
     "forest_designs",
     "species_data",
@@ -105,6 +106,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",  # CORS middleware (must be before CommonMiddleware)
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -313,3 +315,18 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 PPLX_API_KEY = env("PPLX_API_KEY")
+
+# CORS settings for React Native app
+CORS_ALLOW_ALL_ORIGINS = True  # For development, set to False in production
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:19006",  # React Native web dev server
+    "http://localhost:19000",  # Expo development server
+    "http://localhost:19001",  # Expo development server alternate port
+    "http://localhost:19002",  # Expo development server alternate port
+    "http://10.0.2.2:19000",   # Android emulator pointing to host's localhost
+    "https://treescape.app",   # Production URL
+]
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.expo\.dev$",  # Expo Go published apps
+]

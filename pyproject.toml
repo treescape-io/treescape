@@ -35,6 +35,7 @@ dj-rest-auth = "^7.0.1"
 django-allauth = "^65.4.1"
 djangorestframework-simplejwt = "^5.5.0"
 cryptography = "^44.0.2"
+django-cors-headers = "^4.7.0"
 
 [tool.poetry.group.dev.dependencies]
 pyright = "^1.1.363"
