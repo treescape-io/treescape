@@ -1,4 +1,3 @@
-import json
 from django.test import TestCase
 from django.contrib.gis.geos import Point, MultiPolygon, Polygon
 from forest_designs.models import Plant, Zone, ZoneKind, PlantState

@@ -2,7 +2,6 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils.translation import gettext_lazy as _
 
-from .source import Source
 
 from species_data.fields import (
     ConfidenceField,

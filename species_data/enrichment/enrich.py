@@ -4,7 +4,7 @@ from pprint import pformat
 import decimal
 import logging
 import datetime
-from typing import Iterable, Set, Tuple
+from typing import Iterable, Set
 
 from pydantic import BaseModel
 
