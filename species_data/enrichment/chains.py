@@ -2,10 +2,6 @@ import json
 import logging
 from typing import Type
 from langchain.globals import set_verbose
-from langchain.output_parsers import (
-    PydanticOutputParser,
-    RetryWithErrorOutputParser,
-)
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableLambda, RunnableParallel
 from pydantic import BaseModel
@@ -33,8 +29,6 @@ Important guidelines:
 - For categorical properties, if none of the values are relevant, find the closest one from the schema or leave the value out.
 - Never return invalid `values`, the parsing will fail.
 - Always provide your confidence for returned values. For example, the confidence should be 1.0 when the information is literally copied from provided information, 0.6 when unit conversion is required and 0.2 when information is indirectly inferred from provided information.
-
-{format_instructions}
 
 Example output:
 ```
@@ -109,11 +103,11 @@ def get_enrichment_chain(config: EnrichmentConfig, data_model: Type[BaseModel]):
             "soil_preferences": {"confidence": 0.2, "values": ["clayey", "sandy"]},
         }
     )
-    parser = PydanticOutputParser(pydantic_object=data_model)
+    # parser = PydanticOutputParser(pydantic_object=data_model)
 
-    retry_parser = RetryWithErrorOutputParser.from_llm(
-        parser=parser, llm=config.fallback_llm
-    )
+    # retry_parser = RetryWithErrorOutputParser.from_llm(
+    #     parser=parser, llm=config.fallback_llm
+    # )
 
     # Perplexity (only) uses user prompt for RAG query.
     prompt = ChatPromptTemplate.from_messages(
@@ -126,21 +120,40 @@ def get_enrichment_chain(config: EnrichmentConfig, data_model: Type[BaseModel]):
     )
 
     prompt = prompt.partial(
-        format_instructions=parser.get_format_instructions(),
+        # format_instructions=parser.get_format_instructions(),
         example=example,
         example2=example2,
         plant_properties=plant_properties,
     )
 
-    completion_chain = prompt | config.llm
+    # Add structured output to LLM
+    llm = config.llm.with_structured_output(data_model, include_raw=True)
+
+    completion_chain = prompt | llm
 
     def parse_result(response):
-        citations = response["completion"].additional_kwargs["citations"]
+        # Use a more robust way to extract citations and handle the data
+        # for both real Perplexity API and our fake test implementation
+        raw_response = response.get("raw", None)
+        citations = []
 
-        parsed_response = retry_parser.parse_with_prompt(
-            completion=response["completion"].content,
-            prompt_value=response["prompt_value"],
-        )
+        if raw_response and hasattr(raw_response, "additional_kwargs"):
+            citations = raw_response.additional_kwargs.get("citations", [])
+
+        parsed_response = response.get("parsed", None)
+
+        # If we don't have a parsed response but have raw content, try to parse it
+        if parsed_response is None and raw_response:
+            if hasattr(raw_response, "content"):
+                try:
+                    parsed_response = json.loads(raw_response.content)
+                except json.JSONDecodeError:
+                    # Use raw content as fallback
+                    logger.error(
+                        "Error parsing raw response content:\n%s", raw_response.content
+                    )
+
+                    parsed_response = raw_response.content
 
         return (parsed_response, citations)
 

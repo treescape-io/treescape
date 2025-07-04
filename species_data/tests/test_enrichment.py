@@ -1,6 +1,5 @@
 import decimal
 from django.test import TestCase
-from langchain_core.language_models import FakeListChatModel
 from species_data.enrichment.config import EnrichmentConfig
 from species_data.enrichment.enrich import enrich_species_data
 from plant_species.models import Species, Genus, Family
@@ -13,6 +12,7 @@ from species_data.models.categories import (
     SoilPreference,
 )
 from species_data.models.models import SpeciesProperties
+from species_data.tests.fake_chat_models import FakeStructuredOutputChatModel
 
 
 def _get_species():
@@ -66,35 +66,24 @@ class EnrichSpeciesDataTest(TestCase):
 
         response_obj = ResponseModel.parse_obj(response_data)
 
-        # Use monkey patching to create a mock that includes citations
-        original_call = FakeListChatModel._call
-        
-        # Override the _call method to include citations in the response
-        def _patched_call(self, messages, stop=None, run_manager=None, **kwargs):
-            response = original_call(self, messages, stop, run_manager, **kwargs)
-            # Return the modified message with citations
-            return response
-            
-        # Create a mock for _generate method that adds citations
-        def _patched_generate(self, messages, stop=None, **kwargs):
-            from langchain_core.messages import AIMessage
-            from langchain_core.outputs import ChatGeneration, ChatResult
-            
-            response = self._call(messages, stop, **kwargs)
-            message = AIMessage(
-                content=response,
-                additional_kwargs={"citations": ["https://example.org/1", "https://example.org/2"]}
-            )
-            generation = ChatGeneration(message=message)
-            return ChatResult(generations=[generation])
-        
-        # Apply our patches
-        FakeListChatModel._call = _patched_call
-        FakeListChatModel._generate = _patched_generate
-        
-        # Create our fake LLM
-        fake_llm = FakeListChatModel(responses=[response_obj.json()])
-        
+        # Create our fake structured-output-capable LLM
+        fake_llm = FakeStructuredOutputChatModel(responses=[response_obj.json()])
+
+        # Override the _generate method to include citations in the response
+        original_generate = fake_llm._generate
+
+        def patched_generate(*args, **kwargs):
+            result = original_generate(*args, **kwargs)
+            # Add citations to the message
+            for generation in result.generations:
+                generation.message.additional_kwargs["citations"] = [
+                    "https://example.org/1",
+                    "https://example.org/2",
+                ]
+            return result
+
+        fake_llm._generate = patched_generate
+
         config = EnrichmentConfig(
             llm=fake_llm,
             fallback_llm=fake_llm,
